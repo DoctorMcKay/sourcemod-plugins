@@ -7,8 +7,8 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-#define UPDATE_URL			"http://public-plugins.doctormckay.com/latest/backpack-tf.txt"
-#define PLUGIN_VERSION		"1.5.0"
+#define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/backpack-tf.txt"
+#define PLUGIN_VERSION		"1.5.1"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v2/"
 #define STEAM_URL			"http://www.doctormckay.com/steamapi/itemnames.php" // please don't use this page for anything besides this plugin, I don't want my server to crash... code used to generate it is here: http://pastebin.com/8Ps7Xt ... don't make me limit requests to this page by IP... I will do it if necessary
 #define ITEM_EARBUDS		"143"

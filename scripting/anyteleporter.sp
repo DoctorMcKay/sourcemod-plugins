@@ -5,8 +5,8 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-#define UPDATE_URL    "http://public-plugins.doctormckay.com/latest/anyteleporter.txt"
-#define PLUGIN_VERSION "1.2.0"
+#define UPDATE_URL    "http://hg.doctormckay.com/public-plugins/raw/default/anyteleporter.txt"
+#define PLUGIN_VERSION "1.3.0"
 
 public Plugin:myinfo = 
 {
@@ -54,4 +54,33 @@ public Action:TF2_OnPlayerTeleport(client, teleporter, &bool:result) {
 		result = true;
 		return Plugin_Changed;
 	}
+}
+
+/////////////////////////////////
+
+public OnAllPluginsLoaded() {
+	new Handle:convar;
+	if(LibraryExists("updater")) {
+		Updater_AddPlugin(UPDATE_URL);
+		new String:newVersion[10];
+		Format(newVersion, sizeof(newVersion), "%sA", PLUGIN_VERSION);
+		convar = CreateConVar("anyteleporter_version", newVersion, "AnyTeleporter Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);
+	} else {
+		convar = CreateConVar("anyteleporter_version", PLUGIN_VERSION, "AnyTeleporter Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);	
+	}
+	HookConVarChange(convar, Callback_VersionConVarChanged);
+}
+
+public Callback_VersionConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
+	ResetConVar(convar);
+}
+
+public OnLibraryAdded(const String:name[]) {
+	if(StrEqual(name, "updater")) {
+		Updater_AddPlugin(UPDATE_URL);
+	}
+}
+
+public Updater_OnPluginUpdated() {
+	ReloadPlugin();
 }

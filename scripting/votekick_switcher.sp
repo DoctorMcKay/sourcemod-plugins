@@ -5,8 +5,8 @@
 #undef REQUIRE_PLUGIN
 #tryinclude <updater>
 
-#define UPDATE_URL    "http://public-plugins.doctormckay.com/latest/votekick_switcher.txt"
-#define PLUGIN_VERSION "1.2.1"
+#define UPDATE_URL    "http://hg.doctormckay.com/public-plugins/raw/default/votekick_switcher.txt"
+#define PLUGIN_VERSION "1.2.2"
 
 new Handle:votekickCvar;
 new Handle:votekickMvMCvar;
@@ -89,11 +89,7 @@ public OnAllPluginsLoaded() {
 }
 
 public Callback_VersionConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
-	decl String:defaultValue[32];
-	GetConVarDefault(convar, defaultValue, sizeof(defaultValue));
-	if(!StrEqual(newValue, defaultValue)) {
-		SetConVarString(convar, defaultValue);
-	}
+	ResetConVar(convar);
 }
 
 public Action:Updater_OnPluginDownloading() {
@@ -101,6 +97,12 @@ public Action:Updater_OnPluginDownloading() {
 		return Plugin_Handled;
 	}
 	return Plugin_Continue;
+}
+
+public OnLibraryAdded(const String:name[]) {
+	if(StrEqual(name, "updater")) {
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public Updater_OnPluginUpdated() {

@@ -6,8 +6,8 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-#define UPDATE_URL			"http://public-plugins.doctormckay.com/latest/chatcolors.txt"
-#define PLUGIN_VERSION		"1.8.0"
+#define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolors.txt"
+#define PLUGIN_VERSION		"1.8.1"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors",
@@ -397,11 +397,7 @@ public OnAllPluginsLoaded() {
 }
 
 public Callback_VersionConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
-	decl String:defaultValue[32];
-	GetConVarDefault(convar, defaultValue, sizeof(defaultValue));
-	if(!StrEqual(newValue, defaultValue)) {
-		SetConVarString(convar, defaultValue);
-	}
+	ResetConVar(convar);
 }
 
 public Action:Updater_OnPluginDownloading() {
@@ -409,6 +405,12 @@ public Action:Updater_OnPluginDownloading() {
 		return Plugin_Handled;
 	}
 	return Plugin_Continue;
+}
+
+public OnLibraryAdded(const String:name[]) {
+	if(StrEqual(name, "updater")) {
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public Updater_OnPluginUpdated() {
