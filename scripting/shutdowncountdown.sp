@@ -6,8 +6,8 @@
 #undef REQUIRE_PLUGIN
 #tryinclude <updater>
 
-#define UPDATE_URL    "http://public-plugins.doctormckay.com/latest/shutdowncountdown.txt"
-#define PLUGIN_VERSION "1.6.1"
+#define UPDATE_URL    "http://hg.doctormckay.com/public-plugins/raw/default/shutdowncountdown.txt"
+#define PLUGIN_VERSION "1.6.2"
 
 new shutdownTime;
 new String:tag[20];
@@ -149,6 +149,12 @@ public Action:Updater_OnPluginDownloading() {
 		return Plugin_Handled;
 	}
 	return Plugin_Continue;
+}
+
+public OnLibraryAdded(const String:name[]) {
+	if(StrEqual(name, "updater")) {
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public Updater_OnPluginUpdated() {

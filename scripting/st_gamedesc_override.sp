@@ -6,8 +6,8 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-#define UPDATE_URL    "http://public-plugins.doctormckay.com/latest/game_desc_override.txt"
-#define PLUGIN_VERSION "1.1.2"
+#define UPDATE_URL    "http://hg.doctormckay.com/public-plugins/raw/default/game_desc_override.txt"
+#define PLUGIN_VERSION "1.1.3"
 
 new Handle:descriptionCvar = INVALID_HANDLE;
 new Handle:updaterCvar = INVALID_HANDLE;
@@ -41,14 +41,20 @@ public CvarChanged(Handle:cvar, const String:oldVal[], const String:newVal[]) {
 }
 
 public OnAllPluginsLoaded() {
+	new Handle:buffer;
 	if(LibraryExists("updater")) {
 		Updater_AddPlugin(UPDATE_URL);
 		new String:newVersion[10];
 		Format(newVersion, sizeof(newVersion), "%sA", PLUGIN_VERSION);
-		CreateConVar("st_gamedesc_override_version", newVersion, "SteamTools Game Description Override Version", FCVAR_DONTRECORD|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY);
+		buffer = CreateConVar("st_gamedesc_override_version", newVersion, "SteamTools Game Description Override Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);
 	} else {
-		CreateConVar("st_gamedesc_override_version", PLUGIN_VERSION, "SteamTools Game Description Override Version", FCVAR_DONTRECORD|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY);	
+		buffer = CreateConVar("st_gamedesc_override_version", PLUGIN_VERSION, "SteamTools Game Description Override Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);
 	}
+	HookConVarChange(buffer, Callback_VersionConVarChanged);
+}
+
+public Callback_VersionConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
+	ResetConVar(convar);
 }
 
 public Action:Updater_OnPluginDownloading() {
@@ -56,6 +62,12 @@ public Action:Updater_OnPluginDownloading() {
 		return Plugin_Handled;
 	}
 	return Plugin_Continue;
+}
+
+public OnLibraryAdded(const String:name[]) {
+	if(StrEqual(name, "updater")) {
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public Updater_OnPluginUpdated() {
