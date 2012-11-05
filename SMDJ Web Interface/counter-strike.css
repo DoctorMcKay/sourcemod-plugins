@@ -1,0 +1,62 @@
+@charset "utf-8";
+
+body {
+	font-family:Calibri, Candara, Segoe, Geneva, Tahoma, Arial, sans-serif;
+	font-size:14px;
+	text-align:center;
+	background-color:#003300;
+	color:#FFFFFF;
+}
+
+div#footer {
+	font-size:10px;
+	margin-top:40px;
+}
+
+a {
+	color:#FFFFFF;
+	text-decoration:underline;
+}
+
+a:hover {
+	text-decoration:none;
+}
+
+a:active {
+	text-decoration:underline;
+}
+
+table {
+	margin:auto;
+}
+
+td {
+	text-align:left;
+}
+
+th {
+	font-family:Calibri, Candara, Segoe, Geneva, Tahoma, Arial, sans-serif;
+	font-weight:bold;
+}
+
+.success {
+	width:90%;
+	font-weight:bold;
+	border:2px solid #00FF00;
+	border-radius:10px;
+	padding:5px;
+	margin:auto;
+}
+
+.error {
+	width:90%;
+	font-weight:bold;
+	border:2px solid #FF0000;
+	border-radius:10px;
+	padding:5px;
+	margin:auto;
+}
+
+.right {
+	text-align:right;
+}

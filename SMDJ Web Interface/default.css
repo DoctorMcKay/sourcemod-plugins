@@ -1,0 +1,48 @@
+@charset "utf-8";
+
+body {
+	font-family:Verdana, Arial;
+	font-size:14px;
+	text-align:center;
+}
+
+div#footer {
+	color:#666666;
+	font-size:10px;
+	margin-top:40px;
+}
+
+table {
+	margin:auto;
+}
+
+td {
+	text-align:left;
+}
+
+th {
+	font-family:Verdana, Arial, sans-serif;
+	font-weight:bold;
+}
+
+.success {
+	width:90%;
+	font-weight:bold;
+	border:2px solid #00FF00;
+	border-radius:10px;
+	padding:5px;
+	margin:auto;
+}
+
+.error {
+	width:90%;
+	font-weight:bold;
+	border:2px solid #FF0000;
+	border-radius:10px;
+	padding:5px;
+	margin:auto;
+}
+
+.right {
+	text-align:right;
+}

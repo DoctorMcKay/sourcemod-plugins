@@ -1,0 +1,19 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.2.1"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Changed update URL to SVN repository"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/votekick_switcher.smx"
+		"Source"	"Path_SM/scripting/votekick_switcher.sp"
+	}
+}

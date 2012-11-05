@@ -1,0 +1,27 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.5.0"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - (1.5.0) Changed RegConsoleCmd to AddCommandListener for say and say_team"
+		"Notes" " - (1.5.0) Last planned official release - auto-updating removed"
+		"Notes" " - (1.4.0) Added ability to disable automatic updating (impersonate_auto_update)"
+		"Notes" " - (1.3.0) You now can't impersonate someone who is currently impersonating someone else"
+		"Notes" " - (1.2.0) Why on earth did I use colors? ShowActivity2 is much better!"
+		"Notes" " - (1.2.0) Displays notification to admins when someone begins impersonating, finished impersonating, and every time they impersonate a message"
+		"Notes" " - (1.2.0) Plugin now logs"
+		"Notes"	" - (1.1.0) Plugin now uses colors.inc"
+		"Notes" " - (1.1.0) You can no longer impersonate yourself"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/impersonate.smx"
+		"Source"	"Path_SM/scripting/impersonate.sp"
+	}
+}

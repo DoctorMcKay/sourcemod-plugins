@@ -1,0 +1,23 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.9.0"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Added auto_steam_update_hud_text_x_pos cvar"
+		"Notes" " - Added auto_steam_update_hud_text_y_pos cvar"
+		"Notes" " - Added auto_steam_update_hud_text_red cvar"
+		"Notes" " - Added auto_steam_update_hud_text_green cvar"
+		"Notes" " - Added auto_steam_update_hud_text_blue cvar"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/auto_steam_update.smx"
+		"Source"	"Path_SM/scripting/auto_steam_update.sp"
+	}
+}
