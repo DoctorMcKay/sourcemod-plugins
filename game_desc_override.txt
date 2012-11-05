@@ -1,0 +1,19 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.1.2"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Changed update URL to SVN repository"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/st_gamedesc_override.smx"
+		"Source"	"Path_SM/scripting/st_gamedesc_override.sp"
+	}
+}

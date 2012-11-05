@@ -1,0 +1,19 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.5.0"
+		}
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Added new Halloween Unusual effects"
+		"Notes" " - Improved Updater integration"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/backpack-tf.smx"
+		"Source"	"Path_SM/scripting/backpack-tf.sp"
+	}
+}

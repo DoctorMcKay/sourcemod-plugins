@@ -1,0 +1,20 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.2.0"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Plugin now uses SourceMod 1.5's TF2_OnPlayerTeleport forward"
+		"Notes" " - TeleportCheck extension no longer required"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/anyteleporter.smx"
+		"Source"	"Path_SM/scripting/anyteleporter.sp"
+	}
+}

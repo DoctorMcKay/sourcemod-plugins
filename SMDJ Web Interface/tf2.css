@@ -1,0 +1,79 @@
+@charset "utf-8";
+
+@font-face {
+	font-family:TF2Build;
+	src: url("tf2build.eot");
+	src: local("TF2Build"), url("tf2build.ttf") format("truetype");
+}
+
+@font-face {
+	font-family:TF2Secondary;
+	src: url("tf2secondary.eot");
+	src: local("TF2Secondary"), url("tf2secondary.ttf") format("truetype");
+}
+
+body {
+	font-family:TF2Secondary, Verdana, Arial;
+	font-size:14px;
+	text-align:center;
+	background-color:#393431;
+	color:#EBE2CA;
+}
+
+h1, h2 {
+	font-family:TF2Build, Verdana, Arial;
+}
+
+div#footer {
+	color:#666666;
+	font-family:TF2Build, Verdana, Arial;
+	font-size:10px;
+	margin-top:40px;
+}
+
+a {
+	color:#EBE2CA;
+}
+
+a:hover {
+	color:#FF0000;
+}
+
+a:active {
+	color:#DD0000;
+}
+
+table {
+	margin:auto;
+}
+
+td {
+	text-align:left;
+}
+
+th {
+	font-family:TF2Build, Verdana, Arial, sans-serif;
+	font-weight:bold;
+}
+
+.success {
+	font-family:TF2Build, Verdana, Arial;
+	width:90%;
+	border:2px solid #00FF00;
+	border-radius:10px;
+	padding:5px;
+	margin:auto;
+}
+
+.error {
+	font-family:TF2Build, Verdana, Arial;
+	width:90%;
+	border:2px solid #FF0000;
+	border-radius:10px;
+	padding:5px;
+	margin:auto;
+}
+
+.right {
+	text-align:right;
+}

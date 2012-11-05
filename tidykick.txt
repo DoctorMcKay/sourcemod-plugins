@@ -1,0 +1,19 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.1.4"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Changed update URL to SVN repository"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/tidykick.smx"
+		"Source"	"Path_SM/scripting/tidykick.sp"
+	}
+}

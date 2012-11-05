@@ -1,0 +1,19 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.5.0"
+		}
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Updated update URL to SVN repository"
+		"Notes" " - Plugin now properly fails to load if Simple Chat Processor is not installed, and displays a link to download it"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/rainbowize.smx"
+		"Source"	"Path_SM/scripting/rainbowize.sp"
+	}
+}
