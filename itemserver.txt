@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.1.2"
+			"Latest"	"1.1.3"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Updater improvements"
+		"Notes" " - Fixed an error if the player leaves the server before the notification is printed"
 	}
 	
 	"Files"
