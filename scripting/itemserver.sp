@@ -10,7 +10,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/itemserver.txt"
-#define PLUGIN_VERSION		"1.1.2"
+#define PLUGIN_VERSION		"1.1.3"
 
 public Plugin:myinfo = {
 	name        = "[TF2] Local Item Server",
@@ -177,10 +177,14 @@ public OnItemsReceived(Handle:parent, Handle:hndl, const String:error[], any:pac
 			TF2Items_GiveWeapon(client, weapon); // only give them a weapon if TF2Items is capable of giving it
 		}
 	}
-	CreateTimer(2.0, Timer_GivenHint, client);
+	CreateTimer(2.0, Timer_GivenHint, GetClientUserId(client));
 }
 
-public Action:Timer_GivenHint(Handle:timer, any:client) {
+public Action:Timer_GivenHint(Handle:timer, any:userid) {
+	new client = GetClientOfUserId(userid);
+	if(userid == 0) {
+		return;
+	}
 	PrintHintText(client, "We have detected your loadout is unavailable.\nYou have been given your last known loadout.");
 }
 
