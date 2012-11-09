@@ -142,6 +142,7 @@ public OnSteamApiComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessful,
 	if(statusCode != HTTPStatusCode_OK || !requestSuccessful) {
 		LogError("Steam Web API failed. Status code: %i", _:statusCode);
 		CreateTimer(60.0, Timer_TrySteamAPI); // try again!
+		return;
 	}
 	decl String:path[256];
 	BuildPath(Path_SM, path, sizeof(path), "data/backpack-tf.txt");
@@ -182,6 +183,7 @@ public OnBackpackTFComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessfu
 	if(statusCode != HTTPStatusCode_OK || !requestSuccessful) {
 		LogError("backpack.tf API failed. Status code: %i", _:statusCode);
 		CreateTimer(60.0, Timer_Update); // try again!
+		return;
 	}
 	decl String:path[256];
 	BuildPath(Path_SM, path, sizeof(path), "data/backpack-tf.txt");

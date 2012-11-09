@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.5.1"
+			"Latest"	"1.5.2"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Updater improvements"
+		"Notes" " - Fixed a bug that occurs when the price list or item list is unable to be downloaded"
 	}
 	
 	"Files"
