@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.5.1"
+			"Latest"	"1.6.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Updater improvements"
+		"Notes" " - Added custom colors ability"
 	}
 	
 	"Files"
