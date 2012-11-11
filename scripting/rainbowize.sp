@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/rainbowize.txt"
-#define PLUGIN_VERSION		"1.5.1"
+#define PLUGIN_VERSION		"1.6.0"
 
 public Plugin:myinfo = {
 	name        = "[TF2] Rainbowize",
@@ -18,7 +18,7 @@ public Plugin:myinfo = {
 };
 
 new bool:isRainbowized[MAXPLAYERS + 1] = {false, ...};
-new String:colors[][] = {"FF0000", "FF7F00", "FFD700", "00AA00", "0000FF", "6600FF", "8B00FF"};
+new Handle:colors;
 new Handle:randomCvar = INVALID_HANDLE;
 new Handle:rainbowForward = INVALID_HANDLE;
 new Handle:updaterCvar = INVALID_HANDLE;
@@ -34,6 +34,38 @@ public OnPluginStart() {
 	updaterCvar = CreateConVar("sm_rainbowize_auto_update", "1", "Enables automatic updating (has no effect if Updater is not installed");
 	rainbowForward = CreateGlobalForward("OnRainbowizingChat", ET_Event, Param_Cell);
 	LoadTranslations("common.phrases");
+	colors = CreateArray(12);
+	decl String:path[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, path, sizeof(path), "configs/rainbowize_colors.ini");
+	if(!FileExists(path)) {
+		PushArrayString(colors, "FF0000");
+		PushArrayString(colors, "FF7F00");
+		PushArrayString(colors, "FFD700");
+		PushArrayString(colors, "00AA00");
+		PushArrayString(colors, "0000FF");
+		PushArrayString(colors, "6600FF");
+		PushArrayString(colors, "8B00FF");
+	} else {
+		new Handle:file = OpenFile(path, "r");
+		decl String:line[64];
+		while(ReadFileLine(file, line, sizeof(line))) {
+			if(strlen(line) != 6) {
+				LogError("Colors in rainbowize_colors.ini must be exactly 6 characters in length. Problem on line: %s", line);
+			} else {
+				PushArrayString(colors, line);
+			}
+		}
+		if(GetArraySize(colors) == 0) {
+			LogError("No colors found in rainbowize_colors.ini file. Reverting to default.");
+			PushArrayString(colors, "FF0000");
+			PushArrayString(colors, "FF7F00");
+			PushArrayString(colors, "FFD700");
+			PushArrayString(colors, "00AA00");
+			PushArrayString(colors, "0000FF");
+			PushArrayString(colors, "6600FF");
+			PushArrayString(colors, "8B00FF");
+		}
+	}
 }
 
 public OnClientConnected(client) {
@@ -124,14 +156,15 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 		return Plugin_Continue;
 	}
 	TrimString(message);
-	decl String:buffers[128][128];
+	decl String:buffers[64][64];
 	new parts = ExplodeString(message, " ", buffers, sizeof(buffers), sizeof(buffers[]));
 	new bool:first = true;
 	new bool:random = GetConVarBool(randomCvar);
-	new String:final[256];
-	new color = 0;
+	decl String:final[256];
+	new colorIndex = 0;
+	decl String:color[12];
 	if(random) {
-		color = GetRandomInt(0, sizeof(colors) - 1);
+		colorIndex = GetRandomInt(0, GetArraySize(colors) - 1);
 	}
 	for(new i = 0; i < parts; i++) {
 		if(first) {
@@ -139,13 +172,14 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 		} else {
 			StrCat(final, sizeof(final), " ");
 		}
-		Format(final, sizeof(final), "%s\x07%s%s", final, colors[color], buffers[i]);
+		GetArrayString(colors, colorIndex, color, sizeof(color));
+		Format(final, sizeof(final), "%s\x07%s%s", final, color, buffers[i]);
 		if(random) {
-			color = GetRandomInt(0, sizeof(colors) - 1);
+			colorIndex = GetRandomInt(0, GetArraySize(colors) - 1);
 		} else {
-			color++;
-			if(color >= sizeof(colors)) {
-				color = 0;
+			colorIndex++;
+			if(colorIndex >= GetArraySize(colors)) {
+				colorIndex = 0;
 			}
 		}
 	}
