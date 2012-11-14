@@ -8,9 +8,9 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/backpack-tf.txt"
-#define PLUGIN_VERSION		"1.5.1"
+#define PLUGIN_VERSION		"1.5.2"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v2/"
-#define STEAM_URL			"http://www.doctormckay.com/steamapi/itemnames.php" // please don't use this page for anything besides this plugin, I don't want my server to crash... code used to generate it is here: http://pastebin.com/8Ps7Xt ... don't make me limit requests to this page by IP... I will do it if necessary
+#define STEAM_URL			"http://www.doctormckay.com/steamapi/itemnames.php" // please don't use this page for anything besides this plugin, I don't want my server to crash... code used to generate it is here: http://pastebin.com/GV5HUtMZ ... don't make me limit requests to this page by IP... I will do it if necessary
 #define ITEM_EARBUDS		"143"
 #define ITEM_KEY			"5021"
 #define ITEM_CRATE			5022
@@ -369,7 +369,7 @@ IncrementChar(char) {
 }
 
 public Action:Command_PriceCheck(client, args) {
-	if(noPrices) {
+	if(noPrices || steamSchema == INVALID_HANDLE) {
 		ReplyToCommand(client, "\x04[SM] \x01The price list has not been loaded yet.");
 		return Plugin_Handled;
 	}
