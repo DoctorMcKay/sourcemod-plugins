@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/rainbowize.txt"
-#define PLUGIN_VERSION		"1.6.0"
+#define PLUGIN_VERSION		"1.6.1"
 
 public Plugin:myinfo = {
 	name        = "[TF2] Rainbowize",
@@ -19,9 +19,9 @@ public Plugin:myinfo = {
 
 new bool:isRainbowized[MAXPLAYERS + 1] = {false, ...};
 new Handle:colors;
-new Handle:randomCvar = INVALID_HANDLE;
-new Handle:rainbowForward = INVALID_HANDLE;
-new Handle:updaterCvar = INVALID_HANDLE;
+new Handle:randomCvar;
+new Handle:rainbowForward;
+new Handle:updaterCvar;
 
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) {
 	MarkNativeAsOptional("Updater_AddPlugin"); 
@@ -49,8 +49,10 @@ public OnPluginStart() {
 		new Handle:file = OpenFile(path, "r");
 		decl String:line[64];
 		while(ReadFileLine(file, line, sizeof(line))) {
-			if(strlen(line) != 6) {
-				LogError("Colors in rainbowize_colors.ini must be exactly 6 characters in length. Problem on line: %s", line);
+			line[6] = '\0'; // effectively substring 0, 6
+			StringToUpper(line);
+			if(strlen(line) != 6 || !IsValidHexadecimal(line)) {
+				LogError("Invalid color detected in rainbowize_colors.ini. Problem on line: %s", line);
 			} else {
 				PushArrayString(colors, line);
 			}
@@ -65,6 +67,39 @@ public OnPluginStart() {
 			PushArrayString(colors, "6600FF");
 			PushArrayString(colors, "8B00FF");
 		}
+	}
+}
+
+bool:IsValidHexadecimal(const String:input[]) {
+	for(new i = 0; ; i++) {
+		if(input[i] == '\0') {
+			break; // I'd rather return true here, but the compiler whines
+		}
+		if(!CharInString(input[i], "0123456789ABCDEF")) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool:CharInString(chr, const String:string[]) {
+	for(new i = 0; ; i++) {
+		if(string[i] == '\0') {
+			break; // I'd rather return false here, but the compiler whines
+		}
+		if(string[i] == chr) {
+			return true;
+		}
+	}
+	return false;
+}
+
+StringToUpper(String:input[]) {
+	for(new i = 0; ; i++) {
+		if(input[i] == '\0') {
+			return;
+		}
+		input[i] = CharToUpper(input[i]);
 	}
 }
 
