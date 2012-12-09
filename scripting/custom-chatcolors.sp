@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolors.txt"
-#define PLUGIN_VERSION		"2.0.0"
+#define PLUGIN_VERSION		"2.1.0"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors",
@@ -54,6 +54,8 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) 
 	CreateNative("CCC_SetTag", Native_SetTag);
 	CreateNative("CCC_ResetColor", Native_ResetColor);
 	CreateNative("CCC_ResetTag", Native_ResetTag);
+	
+	RegPluginLibrary("ccc");
 	
 	/* Deprecated */
 	CreateNative("CCC_GetNameColor", Native_GetNameColor);
@@ -549,7 +551,9 @@ GetTeamColor(client) {
 /////////////////////////////////
 
 public OnAllPluginsLoaded() {
-	RequireFeature(FeatureType_Native, "GetMessageFlags", "Simple Chat Processor is not installed. Please visit https://forums.alliedmods.net/showthread.php?t=198501 and install it.");
+	if(!LibraryExists("scp")) {
+		SetFailState("Simple Chat Processor is not installed. Please visit https://forums.alliedmods.net/showthread.php?t=198501 and install it.");
+	}
 	new Handle:convar;
 	if(LibraryExists("updater")) {
 		Updater_AddPlugin(UPDATE_URL);
