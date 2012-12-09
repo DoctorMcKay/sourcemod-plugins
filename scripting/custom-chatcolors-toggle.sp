@@ -8,7 +8,7 @@
 #include <updater>
 
 #define UPDATE_URL		"http://hg.doctormckay.com/public-plugins/raw/default/chatcolorstogglemodule.txt"
-#define PLUGIN_VERSION	"1.4.3"
+#define PLUGIN_VERSION	"1.4.4"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors Toggle Module",
@@ -163,6 +163,9 @@ public Action:CCC_OnChatColor(client) {
 /////////////////////////////////
 
 public OnAllPluginsLoaded() {
+	if(!LibraryExists("ccc")) {
+		SetFailState("Custom Chat Colors is not installed. Please visit https://forums.alliedmods.net/showthread.php?t=186695 and install it.");
+	}
 	new Handle:convar;
 	if(LibraryExists("updater")) {
 		Updater_AddPlugin(UPDATE_URL);

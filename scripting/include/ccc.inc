@@ -1,3 +1,9 @@
+/**
+ * This is the include file for Custom Chat Colors
+ * https://forums.alliedmods.net/showthread.php?t=186695
+ * To check that Custom Chat Colors is installed and running, verify that the "ccc" library exists
+ */
+
 #if defined _ccc_included
   #endinput
 #endif
