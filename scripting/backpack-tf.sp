@@ -8,7 +8,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/backpack-tf.txt"
-#define PLUGIN_VERSION		"1.5.2"
+#define PLUGIN_VERSION		"1.5.3"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v2/"
 #define STEAM_URL			"http://www.doctormckay.com/steamapi/itemnames.php" // please don't use this page for anything besides this plugin, I don't want my server to crash... code used to generate it is here: http://pastebin.com/GV5HUtMZ ... don't make me limit requests to this page by IP... I will do it if necessary
 #define ITEM_EARBUDS		"143"
@@ -241,7 +241,7 @@ public OnBackpackTFComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessfu
 	PrepPriceKv();
 	KvGotoFirstSubKey(backpackTFPricelist);
 	new bool:isNegative = false;
-	decl String:defindex[8], String:quality[32], String:name[64], String:difference[32], String:message[128];
+	decl String:defindex[8], String:section[32], String:quality[32], String:name[64], String:difference[32], String:message[128];
 	new Handle:array = CreateArray(128);
 	PushArrayString(array, "Type !pc for a price check.");
 	if(GetConVarBool(cvarDisplayChangedPrices)) {
@@ -251,7 +251,7 @@ public OnBackpackTFComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessfu
 			KvGotoFirstSubKey(backpackTFPricelist);
 			do {
 				// loop through qualities
-				KvGetSectionName(backpackTFPricelist, quality, sizeof(quality));
+				KvGetSectionName(backpackTFPricelist, section, sizeof(section));
 				KvGotoFirstSubKey(backpackTFPricelist);
 				do {
 					// loop through instances (series #s, effects)
@@ -261,11 +261,11 @@ public OnBackpackTFComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessfu
 					KvGetString(backpackTFPricelist, "last_change", difference, sizeof(difference));
 					CleanString(difference, sizeof(difference));
 					
-					if(StrEqual(quality, QUALITY_UNIQUE)) {
+					if(StrEqual(section, QUALITY_UNIQUE)) {
 						Format(quality, sizeof(quality), ""); // if quality is unique, don't display a quality
 					} else {
-						if(!GetTrieString(qualityNameTrie, quality, quality, sizeof(quality))) {
-							LogError("Unknown quality index: %s. Please report this!", quality);
+						if(!GetTrieString(qualityNameTrie, section, quality, sizeof(quality))) {
+							LogError("Unknown quality index: %s. Please report this!", section);
 							continue;
 						}
 					}
