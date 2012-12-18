@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.5.3"
+			"Latest"	"1.5.4"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed a bug that causes the plugin to print 'Unknown quality index' errors"
+		"Notes" " - Fixed a problem with HUD position limits"
 	}
 	
 	"Files"
