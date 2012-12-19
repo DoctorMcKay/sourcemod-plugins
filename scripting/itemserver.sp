@@ -10,7 +10,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/itemserver.txt"
-#define PLUGIN_VERSION		"1.1.3"
+#define PLUGIN_VERSION		"1.1.4"
 
 public Plugin:myinfo = {
 	name        = "[TF2] Local Item Server",
@@ -22,11 +22,11 @@ public Plugin:myinfo = {
 
 #define QUALITY_NORMAL 0
 
-new Handle:db = INVALID_HANDLE;
+new Handle:db;
 
-new Handle:classes = INVALID_HANDLE;
+new Handle:classes;
 
-new Handle:updaterCvar = INVALID_HANDLE;
+new Handle:updaterCvar;
 
 public OnPluginStart() {
 	updaterCvar = CreateConVar("local_item_server_auto_update", "1", "Enables automatic updating (has no effect if Updater is not installed)");
@@ -59,10 +59,9 @@ public OnTableCreated(Handle:parent, Handle:hndl, const String:error[], any:data
 	}
 	decl String:auth[32];
 	for(new i = 1; i <= MaxClients; i++) {
-		if(!IsClientConnected(i) || !IsClientAuthorized(i) || IsFakeClient(i)) {
+		if(!IsClientConnected(i) || IsFakeClient(i) || !GetClientAuthString(i, auth, sizeof(auth))) {
 			continue;
 		}
-		GetClientAuthString(i, auth, sizeof(auth));
 		OnClientAuthorized(i, auth);
 	}
 }
@@ -102,7 +101,9 @@ public Event_InventoryApplication(Handle:event, const String:name[], bool:dontBr
 		}
 	}
 	decl String:auth[32], String:qry[256];
-	GetClientAuthString(client, auth, sizeof(auth));
+	if(!GetClientAuthString(client, auth, sizeof(auth))) {
+		return; // not authorized
+	}
 	decl String:className[16];
 	switch(TF2_GetPlayerClass(client)) {
 		case TFClass_Scout: {
@@ -140,7 +141,7 @@ public Event_InventoryApplication(Handle:event, const String:name[], bool:dontBr
 		if(GetEntProp(client, Prop_Send, "m_bLoadoutUnavailable") == 1) {
 			new Handle:pack = CreateDataPack();
 			WritePackString(pack, className);
-			WritePackCell(pack, client);
+			WritePackCell(pack, GetClientUserId(client));
 			ResetPack(pack);
 			Format(qry, sizeof(qry), "SELECT * FROM `players` WHERE steamid = '%s'", auth);
 			SQL_TQuery(db, OnItemsReceived, qry, pack);
@@ -151,8 +152,11 @@ public Event_InventoryApplication(Handle:event, const String:name[], bool:dontBr
 public OnItemsReceived(Handle:parent, Handle:hndl, const String:error[], any:pack) {
 	decl String:className[16];
 	ReadPackString(pack, className, sizeof(className));
-	new client = ReadPackCell(pack);
+	new client = GetClientOfUserId(ReadPackCell(pack));
 	CloseHandle(pack);
+	if(client == 0) {
+		return;
+	}
 	if(strlen(error) > 0) {
 		LogError("Problem receiving items for %L: %s", client, error);
 		return;
@@ -182,7 +186,7 @@ public OnItemsReceived(Handle:parent, Handle:hndl, const String:error[], any:pac
 
 public Action:Timer_GivenHint(Handle:timer, any:userid) {
 	new client = GetClientOfUserId(userid);
-	if(userid == 0) {
+	if(client == 0) {
 		return;
 	}
 	PrintHintText(client, "We have detected your loadout is unavailable.\nYou have been given your last known loadout.");
