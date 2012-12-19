@@ -1,5 +1,5 @@
 #if defined _tidykick_included
-#endinput
+ #endinput
 #endif
 #define _tidykick_included
 
@@ -14,7 +14,7 @@
  */
 native TidyKickClient(client, const String:reason[], any:...);
 
-public SharedPlugin:_pl_ccc = {
+public SharedPlugin:__pl_tidykick = {
 	name = "tidykick",
 	file = "tidykick.smx",
 #if defined REQUIRE_PLUGIN
@@ -25,7 +25,7 @@ public SharedPlugin:_pl_ccc = {
 };
 
 #if !defined REQUIRE_PLUGIN
-public _pl_tidykick_SetNTVOptional() {
+public __pl_tidykick_SetNTVOptional() {
 	MarkNativeAsOptional("TidyKickClient");
 }
 #endif
