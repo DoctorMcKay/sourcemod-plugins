@@ -199,7 +199,7 @@ forward Action:CCC_OnTagApplied(client);
  */
 forward CCC_OnUserConfigLoaded(client);
 
-public SharedPlugin:_pl_ccc = {
+public SharedPlugin:__pl_ccc = {
 	name = "ccc",
 	file = "custom-chatcolors.smx",
 #if defined REQUIRE_PLUGIN
@@ -210,7 +210,7 @@ public SharedPlugin:_pl_ccc = {
 };
 
 #if !defined REQUIRE_PLUGIN
-public _pl_ccc_SetNTVOptional() {
+public __pl_ccc_SetNTVOptional() {
 	MarkNativeAsOptional("CCC_GetColor");
 	MarkNativeAsOptional("CCC_SetColor");
 	MarkNativeAsOptional("CCC_GetTag");
