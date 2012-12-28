@@ -41,7 +41,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) 
 public OnPluginStart() {
 	cvarUpdater = CreateConVar("smac_autodemo_auto_update", "1", "Enables automatic updating (has no effect if Updater is not installed)");
 	cvarCompressionLevel = CreateConVar("smac_autodemo_compression_level", "5", "Compression level for auto demos (only if the bzip2 extension is installed). Use 0 to disable demo compression.", _, true, 0.0, true, 9.0);
-	cvarUploadDemos = CreateConVar("smac_autodemo_ftp_upload", "1", "If enabled and tEasyFTP is installed, demos will be uploaded to the location specified in the \"autodemo\" configuration.", _, true, 0.0, true, 1.0);
+	cvarUploadDemos = CreateConVar("smac_autodemo_ftp_upload", "0", "If enabled and tEasyFTP is installed, demos will be uploaded to the location specified in the \"autodemo\" configuration.", _, true, 0.0, true, 1.0);
 	hudTimestamp = CreateHudSynchronizer();
 	hudCheaters = CreateHudSynchronizer();
 	
