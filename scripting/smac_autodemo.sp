@@ -11,7 +11,7 @@
 #include <bzip2>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/smac-autodemo.txt"
-#define PLUGIN_VERSION		"1.0.0"
+#define PLUGIN_VERSION		"1.0.1"
 
 public Plugin:myinfo = {
 	name        = "[ANY] SMAC AutoDemo",
@@ -75,9 +75,6 @@ public OnLockedConVarChanged(Handle:convar, const String:oldValue[], const Strin
 }
 
 public OnMapStart() {
-	if(FindSourceTV() == -1) {
-		SMAC_Log("WARNING: SourceTV bot not present. AutoDemos cannot be recorded until the SourceTV bot joins (usually next mapchange)");
-	}
 	CreateTimer(1.0, Timer_UpdateHud, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
@@ -129,6 +126,10 @@ public Action:Timer_UpdateHud(Handle:timer) {
 public Action:SMAC_OnCheatDetected(client, const String:module[]) {
 	if(StrEqual(module, "smac_aimbot.smx", false) && !aimbotDetected[client]) {
 		aimbotDetected[client] = true; // first aimbot detection, likely a false positive
+		return Plugin_Continue;
+	}
+	if(FindSourceTV() == -1) {
+		SMAC_Log("SourceTV is not present so an AutoDemo could not be recorded.");
 		return Plugin_Continue;
 	}
 	CreateTimer(2.0, Timer_Delay, GetClientUserId(client)); // delay for a couple seconds in case the client gets kicked or banned
