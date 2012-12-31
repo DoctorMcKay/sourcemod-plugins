@@ -7,7 +7,7 @@
 #endif
 #define _colors_included
 
-#define MORE_COLORS_VERSION "1.4.1"
+#define MORE_COLORS_VERSION "1.4.2"
 #define MAX_MESSAGE_LENGTH 250
 
 #define COLOR_RED 0xFF4040
@@ -363,7 +363,7 @@ stock Handle:InitColorTrie() {
 	SetTrieValue(hTrie, "antiquewhite", 0xFAEBD7);
 	SetTrieValue(hTrie, "aqua", 0x00FFFF);
 	SetTrieValue(hTrie, "aquamarine", 0x7FFFD4);
-	SetTrieValue(hTrie, "azure", 0xF0FFFF);
+	SetTrieValue(hTrie, "azure", 0x007FFF);
 	SetTrieValue(hTrie, "beige", 0xF5F5DC);
 	SetTrieValue(hTrie, "bisque", 0xFFE4C4);
 	SetTrieValue(hTrie, "black", 0x000000);
