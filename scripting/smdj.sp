@@ -6,37 +6,40 @@
 #include <socket>
 #include <clientprefs>
 
-#define PLUGIN_VERSION "2.4.0"
+#define PLUGIN_VERSION "2.5.0"
 
-new Handle:advertCvar = INVALID_HANDLE;
-new Handle:joinAdvertCvar = INVALID_HANDLE;
-new Handle:djUrlCvar = INVALID_HANDLE;
-new Handle:djUrlPortCvar = INVALID_HANDLE;
-new Handle:helpAdvertCvar = INVALID_HANDLE;
-new Handle:authKeyCvar = INVALID_HANDLE;
-new Handle:defaultRepeatCvar = INVALID_HANDLE;
-new Handle:defaultShuffleCvar = INVALID_HANDLE;
-new Handle:debugCvar = INVALID_HANDLE;
-new Handle:songMenu = INVALID_HANDLE;
-new Handle:songTitles = INVALID_HANDLE;
-new Handle:songIds = INVALID_HANDLE;
-new Handle:playlistIds = INVALID_HANDLE;
-new Handle:playlistNames = INVALID_HANDLE;
-new Handle:playlistSteamIds = INVALID_HANDLE;
-new Handle:playlistSongs = INVALID_HANDLE;
+new Handle:advertCvar;
+new Handle:joinAdvertCvar;
+new Handle:djUrlCvar;
+new Handle:djUrlPortCvar;
+new Handle:helpAdvertCvar;
+new Handle:authKeyCvar;
+new Handle:defaultRepeatCvar;
+new Handle:defaultShuffleCvar;
+new Handle:debugCvar;
 
-new Handle:repeatCookie = INVALID_HANDLE;
-new Handle:shuffleCookie = INVALID_HANDLE;
+new Handle:songMenu;
+new Handle:songTitles;
+new Handle:songIds;
+new Handle:playlistIds;
+new Handle:playlistNames;
+new Handle:playlistSteamIds;
+new Handle:playlistSongs;
 
-new bool:warningShown[MAXPLAYERS + 1] = {false, ...};
-new bool:advertShown[MAXPLAYERS + 1] = {false, ...};
-new bool:capturingPlaylistName[MAXPLAYERS + 1] = {false, ...};
-new bool:configsExecuted = false;
+new Handle:repeatCookie;
+new Handle:shuffleCookie;
 
-new Handle:hudText = INVALID_HANDLE;
+new bool:warningShown[MAXPLAYERS + 1];
+new bool:advertShown[MAXPLAYERS + 1];
+new bool:capturingPlaylistName[MAXPLAYERS + 1];
+new bool:configsExecuted;
 
-new Handle:playlistArray[MAXPLAYERS + 1] = {INVALID_HANDLE, ...};
+new Handle:hudText;
+
+new Handle:playlistArray[MAXPLAYERS + 1];
 new String:newPlaylistName[MAXPLAYERS + 1][33];
+
+new Handle:forwardOnStartListen;
 
 new songToPlay[MAXPLAYERS + 1];
 
@@ -49,21 +52,13 @@ public Plugin:myinfo = {
 };
 
 public OnPluginStart() {
-	RegConsoleCmd("dj", Command_MusicMenu, "Listen to music");
 	RegConsoleCmd("sm_dj", Command_MusicMenu, "Listen to music");
-	RegConsoleCmd("jukebox", Command_MusicMenu, "Listen to music");
 	RegConsoleCmd("sm_jukebox", Command_MusicMenu, "Listen to music");
-	RegConsoleCmd("music", Command_MusicMenu, "Listen to music");
 	RegConsoleCmd("sm_music", Command_MusicMenu, "Listen to music");
-	RegConsoleCmd("randomsong", Command_RandomSong, "Plays a random song");
 	RegConsoleCmd("sm_randomsong", Command_RandomSong, "Plays a random song");
-	RegConsoleCmd("songlist", Command_SongList, "Displays an advanced list of songs");
 	RegConsoleCmd("sm_songlist", Command_SongList, "Displays an advanced list of songs");
-	RegConsoleCmd("musicoff", Command_MusicOff, "Turn off music");
 	RegConsoleCmd("sm_musicoff", Command_MusicOff, "Turn off music");
-	RegConsoleCmd("musicinfo", Command_MusicInfo, "Displays info and controls about your current music");
 	RegConsoleCmd("sm_musicinfo", Command_MusicInfo, "Displays info and controls about your current music");
-	RegConsoleCmd("musichelp", Command_MusicHelp, "Display Adobe Flash help");
 	RegConsoleCmd("sm_musichelp", Command_MusicHelp, "Display Adobe Flash help");
 	RegAdminCmd("sm_reloadsongs", Command_ReloadSongs, ADMFLAG_RCON, "Reloads the songs list for SourceMod DJ");
 	RegAdminCmd("smdj_debug_dumparrays", Command_Debug_DumpArrays, ADMFLAG_ROOT, "DEBUG: Dumps the arrays to a file");
@@ -93,6 +88,7 @@ public OnPluginStart() {
 	TagsCheck("SMDJ");
 	HookConVarChange(FindConVar("sv_tags"), Callback_TagsChanged);
 	hudText = CreateHudSynchronizer();
+	forwardOnStartListen = CreateGlobalForward("SMDJ_OnStartListen", ET_Ignore, Param_Cell, Param_String);
 	LoadTranslations("common.phrases");
 }
 
@@ -322,7 +318,7 @@ public Handler_SongToOthers(Handle:menu, MenuAction:action, client, param) {
 	AddMenuItem(menu2, "@all", "Entire server");
 	decl String:target[32], String:name[MAX_NAME_LENGTH];
 	for(new i = 1; i <= MaxClients; i++) {
-		if(!IsClientInGame(i) || IsFakeClient(i) || i == client || !CanAdminTarget(GetUserAdmin(client), GetUserAdmin(i))) {
+		if(!IsClientInGame(i) || IsFakeClient(i) || !CanAdminTarget(GetUserAdmin(client), GetUserAdmin(i))) {
 			continue;
 		}
 		Format(target, sizeof(target), "#%i", GetClientUserId(i));
@@ -331,7 +327,6 @@ public Handler_SongToOthers(Handle:menu, MenuAction:action, client, param) {
 	}
 	SetMenuExitBackButton(menu2, true);
 	DisplayMenu(menu2, client, 0);
-	return;
 }
 
 public Handler_SelectTarget(Handle:menu, MenuAction:action, client, param) {
@@ -347,7 +342,7 @@ public Handler_SelectTarget(Handle:menu, MenuAction:action, client, param) {
 	if(action != MenuAction_Select) {
 		return;
 	}
-	decl String:selection[16];
+	decl String:selection[32];
 	GetMenuItem(menu, param, selection, sizeof(selection));
 	decl target_list[MaxClients], String:target_name[MAX_NAME_LENGTH], bool:tn_is_ml;
 	new total = ProcessTargetString(selection, client, target_list, MaxClients, COMMAND_FILTER_NO_BOTS, target_name, sizeof(target_name), tn_is_ml);
@@ -827,14 +822,18 @@ PlaySong(client, index, bool:playlist = false, bool:silent = false) {
 		return;
 	}
 	new id = GetArrayCell(songIds, index);
+	decl String:title[33];
+	GetArrayString(songTitles, index, title, sizeof(title));
 	if(GetConVarBool(advertCvar) && !silent) {
-		decl String:title[33];
-		GetArrayString(songTitles, index, title, sizeof(title));
 		CPrintToChatAllEx(client, "{green}[SMDJ] {teamcolor}%N {default}is listening to {olive}%s", client, title);
 	}
 	decl String:repeat[8];
 	GetClientCookie(client, repeatCookie, repeat, sizeof(repeat));
 	OpenURL(client, id, StringToInt(repeat));
+	Call_StartForward(forwardOnStartListen);
+	Call_PushCell(client);
+	Call_PushString(title);
+	Call_Finish();
 }
 
 OpenURL(client, songId, repeat = 1, bool:playlist = false) {
