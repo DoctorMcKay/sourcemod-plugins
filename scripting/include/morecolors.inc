@@ -7,13 +7,13 @@
 #endif
 #define _colors_included
 
-#define MORE_COLORS_VERSION "1.4.2"
-#define MAX_MESSAGE_LENGTH 250
+#define MORE_COLORS_VERSION		"1.5.0"
+#define MAX_MESSAGE_LENGTH		250
 
-#define COLOR_RED 0xFF4040
-#define COLOR_BLUE 0x99CCFF
-#define COLOR_GRAY 0xCCCCCC
-#define COLOR_GREEN 0x3EFF3E
+#define COLOR_RED				0xFF4040
+#define COLOR_BLUE				0x99CCFF
+#define COLOR_GRAY				0xCCCCCC
+#define COLOR_GREEN				0x3EFF3E
 
 new bool:CSkipList[MAXPLAYERS + 1] = {false, ...};
 new Handle:CTrie = INVALID_HANDLE;
@@ -326,6 +326,16 @@ stock CReplyToCommandEx(client, author, const String:message[], any:...) {
 }
 
 /**
+ * Determines whether a color name exists
+ * 
+ * @param color			The color name to check
+ * @return				True if the color exists, false otherwise
+ */
+stock bool:CColorExists(const String:color[]) {
+	return GetTrieValue(CTrie, color, 0);
+}
+
+/**
  * Returns the hexadecimal representation of a client's team color (will NOT initialize the trie)
  *
  * @param client		Client to get the team color for
@@ -360,9 +370,11 @@ stock CGetTeamColor(client) {
 stock Handle:InitColorTrie() {
 	new Handle:hTrie = CreateTrie();
 	SetTrieValue(hTrie, "aliceblue", 0xF0F8FF);
+	SetTrieValue(hTrie, "allies", 0x4D7942); // same as Allies team in DoD:S
 	SetTrieValue(hTrie, "antiquewhite", 0xFAEBD7);
 	SetTrieValue(hTrie, "aqua", 0x00FFFF);
 	SetTrieValue(hTrie, "aquamarine", 0x7FFFD4);
+	SetTrieValue(hTrie, "axis", 0xFF4040); // same as Axis team in DoD:S
 	SetTrieValue(hTrie, "azure", 0x007FFF);
 	SetTrieValue(hTrie, "beige", 0xF5F5DC);
 	SetTrieValue(hTrie, "bisque", 0xFFE4C4);
@@ -375,6 +387,7 @@ stock Handle:InitColorTrie() {
 	SetTrieValue(hTrie, "cadetblue", 0x5F9EA0);
 	SetTrieValue(hTrie, "chartreuse", 0x7FFF00);
 	SetTrieValue(hTrie, "chocolate", 0xD2691E);
+	SetTrieValue(hTrie, "community", 0x70B04A); // same as Community item quality in TF2
 	SetTrieValue(hTrie, "coral", 0xFF7F50);
 	SetTrieValue(hTrie, "cornflowerblue", 0x6495ED);
 	SetTrieValue(hTrie, "cornsilk", 0xFFF8DC);
@@ -411,6 +424,7 @@ stock Handle:InitColorTrie() {
 	SetTrieValue(hTrie, "fullblue", 0x0000FF);
 	SetTrieValue(hTrie, "fullred", 0xFF0000);
 	SetTrieValue(hTrie, "gainsboro", 0xDCDCDC);
+	SetTrieValue(hTrie, "genuine", 0x4D7455); // same as Genuine item quality in TF2
 	SetTrieValue(hTrie, "ghostwhite", 0xF8F8FF);
 	SetTrieValue(hTrie, "gold", 0xFFD700);
 	SetTrieValue(hTrie, "goldenrod", 0xDAA520);
@@ -418,6 +432,7 @@ stock Handle:InitColorTrie() {
 	SetTrieValue(hTrie, "grey", 0xCCCCCC);
 	SetTrieValue(hTrie, "green", 0x3EFF3E);
 	SetTrieValue(hTrie, "greenyellow", 0xADFF2F);
+	SetTrieValue(hTrie, "haunted", 0x38F3AB); // same as Haunted item quality in TF2
 	SetTrieValue(hTrie, "honeydew", 0xF0FFF0);
 	SetTrieValue(hTrie, "hotpink", 0xFF69B4);
 	SetTrieValue(hTrie, "indianred", 0xCD5C5C);
@@ -463,6 +478,7 @@ stock Handle:InitColorTrie() {
 	SetTrieValue(hTrie, "moccasin", 0xFFE4B5);
 	SetTrieValue(hTrie, "navajowhite", 0xFFDEAD);
 	SetTrieValue(hTrie, "navy", 0x000080);
+	SetTrieValue(hTrie, "normal", 0xB2B2B2); // same as Normal item quality in TF2
 	SetTrieValue(hTrie, "oldlace", 0xFDF5E6);
 	SetTrieValue(hTrie, "olive", 0x9EC34F);
 	SetTrieValue(hTrie, "olivedrab", 0x6B8E23);
@@ -488,6 +504,7 @@ stock Handle:InitColorTrie() {
 	SetTrieValue(hTrie, "sandybrown", 0xF4A460);
 	SetTrieValue(hTrie, "seagreen", 0x2E8B57);
 	SetTrieValue(hTrie, "seashell", 0xFFF5EE);
+	SetTrieValue(hTrie, "selfmade", 0x70B04A); // same as Self-Made item quality in TF2
 	SetTrieValue(hTrie, "sienna", 0xA0522D);
 	SetTrieValue(hTrie, "silver", 0xC0C0C0);
 	SetTrieValue(hTrie, "skyblue", 0x87CEEB);
@@ -497,11 +514,16 @@ stock Handle:InitColorTrie() {
 	SetTrieValue(hTrie, "snow", 0xFFFAFA);
 	SetTrieValue(hTrie, "springgreen", 0x00FF7F);
 	SetTrieValue(hTrie, "steelblue", 0x4682B4);
+	SetTrieValue(hTrie, "strange", 0xCF6A32); // same as Strange item quality in TF2
 	SetTrieValue(hTrie, "tan", 0xD2B48C);
 	SetTrieValue(hTrie, "teal", 0x008080);
 	SetTrieValue(hTrie, "thistle", 0xD8BFD8);
 	SetTrieValue(hTrie, "tomato", 0xFF6347);
 	SetTrieValue(hTrie, "turquoise", 0x40E0D0);
+	SetTrieValue(hTrie, "unique", 0xFFD700); // same as Unique item quality in TF2
+	SetTrieValue(hTrie, "unusual", 0x8650AC); // same as Unusual item quality in TF2
+	SetTrieValue(hTrie, "valve", 0xA50F79); // same as Valve item quality in TF2
+	SetTrieValue(hTrie, "vintage", 0x476291); // same as Vintage item quality in TF2
 	SetTrieValue(hTrie, "violet", 0xEE82EE);
 	SetTrieValue(hTrie, "wheat", 0xF5DEB3);
 	SetTrieValue(hTrie, "white", 0xFFFFFF);
