@@ -4,10 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.6.1"
+			"Latest"	"1.6.2"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed a bug relating to custom colors"
+		"Notes" " - Fixed a bug that caused garbage text to be printed"
+		"Notes" " - Fixed a bug that caused the rainbowize_colors.ini file to never be closed"
 	}
 	
 	"Files"

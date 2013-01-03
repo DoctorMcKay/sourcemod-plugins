@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/rainbowize.txt"
-#define PLUGIN_VERSION		"1.6.1"
+#define PLUGIN_VERSION		"1.6.2"
 
 public Plugin:myinfo = {
 	name        = "[TF2] Rainbowize",
@@ -67,6 +67,7 @@ public OnPluginStart() {
 			PushArrayString(colors, "6600FF");
 			PushArrayString(colors, "8B00FF");
 		}
+		CloseHandle(file);
 	}
 }
 
@@ -195,12 +196,12 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 	new parts = ExplodeString(message, " ", buffers, sizeof(buffers), sizeof(buffers[]));
 	new bool:first = true;
 	new bool:random = GetConVarBool(randomCvar);
-	decl String:final[256];
 	new colorIndex = 0;
 	decl String:color[12];
 	if(random) {
 		colorIndex = GetRandomInt(0, GetArraySize(colors) - 1);
 	}
+	new String:final[256];
 	for(new i = 0; i < parts; i++) {
 		if(first) {
 			first = false;
