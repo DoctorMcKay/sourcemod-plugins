@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/votescramble.txt"
-#define PLUGIN_VERSION		"1.0.0"
+#define PLUGIN_VERSION		"1.0.1"
 
 public Plugin:myinfo = {
     name		= "[TF2] Better Vote Scramble",
@@ -156,7 +156,7 @@ public Handler_CastVote(Handle:menu, MenuAction:action, param1, param2) {
 
 public Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast) {
 	if(scrambleTeams) {
-		ServerCommand("mp_scrambleteams");
+		ServerCommand("mp_scrambleteams 2");
 		PrintToChatAll("\x04[SM] \x01Scrambling the teams due to vote.");
 		scrambleTeams = false;
 	}
