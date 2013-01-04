@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/votescramble.txt"
-#define PLUGIN_VERSION		"1.0.1"
+#define PLUGIN_VERSION		"1.1.0"
 
 public Plugin:myinfo = {
     name		= "[TF2] Better Vote Scramble",
@@ -31,6 +31,7 @@ public OnPluginStart() {
 	AddCommandListener(Command_Say, "say");
 	AddCommandListener(Command_Say, "say_team");
 	HookEvent("teamplay_round_start", Event_RoundStart);
+	LoadTranslations("core.phrases");
 }
 
 public OnClientConnected(client) {
@@ -42,24 +43,29 @@ public Action:Command_Say(client, const String:command[], argc) {
 	GetCmdArgString(message, sizeof(message));
 	StripQuotes(message);
 	TrimString(message);
-	if(StrEqual(message, "votescramble", false) || StrEqual(message, "!votescramble", false)) {
-		if(votedToScramble[client]) {
-			PrintToChatDelay(client, "\x04[SM] \x01You have already voted to scramble the teams.");
-			return Plugin_Continue;
-		}
-		if(IsVoteInProgress()) {
-			PrintToChatDelay(client, "\x04[SM] \x01Please wait for the current vote to end.");
-			return Plugin_Continue;
-		}
-		if(scrambleTeams) {
-			PrintToChatDelay(client, "\x04[SM] \x01A previous scramble vote has succeeded. Teams will be scrambled when the round ends.");
-			return Plugin_Continue;
-		}
-		votedToScramble[client] = true;
-		PrintToChatAllDelay(client, "{green}[SM] {teamcolor}%N {default}has voted to scramble the teams. [{lightgreen}%i{default}/{lightgreen}%i {default}votes required]", client, GetTotalVotes(), GetConVarInt(cvarVotesRequired));
-		if(GetTotalVotes() >= GetConVarInt(cvarVotesRequired)) {
-			InitiateVote();
-		}
+	if(!StrEqual(message, "votescramble", false) && !StrEqual(message, "!votescramble", false)) {
+		return Plugin_Continue;
+	}
+	if(!CheckCommandAccess(client, "votescramble", 0)) {
+		ReplyToCommand(client, "[SM] %t.", "No Access");
+		return Plugin_Continue;
+	}
+	if(votedToScramble[client]) {
+		PrintToChatDelay(client, "\x04[SM] \x01You have already voted to scramble the teams.");
+		return Plugin_Continue;
+	}
+	if(IsVoteInProgress()) {
+		PrintToChatDelay(client, "\x04[SM] \x01Please wait for the current vote to end.");
+		return Plugin_Continue;
+	}
+	if(scrambleTeams) {
+		PrintToChatDelay(client, "\x04[SM] \x01A previous scramble vote has succeeded. Teams will be scrambled when the round ends.");
+		return Plugin_Continue;
+	}
+	votedToScramble[client] = true;
+	PrintToChatAllDelay(client, "{green}[SM] {teamcolor}%N {default}has voted to scramble the teams. [{lightgreen}%i{default}/{lightgreen}%i {default}votes required]", client, GetTotalVotes(), GetConVarInt(cvarVotesRequired));
+	if(GetTotalVotes() >= GetConVarInt(cvarVotesRequired)) {
+		InitiateVote();
 	}
 	return Plugin_Continue;
 }
