@@ -4,11 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.0.1"
+			"Latest"	"1.0.2"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Removed SourceTV warning from OnMapStart"
+		"Notes" " - Fixed a problem with directory permissions"
+		"Notes" " - Fixed a bug that caused cheaters' names to be listed twice in demos"
 	}
 	
 	"Files"

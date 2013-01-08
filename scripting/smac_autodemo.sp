@@ -11,7 +11,7 @@
 #include <bzip2>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/smac-autodemo.txt"
-#define PLUGIN_VERSION		"1.0.1"
+#define PLUGIN_VERSION		"1.0.2"
 
 public Plugin:myinfo = {
 	name        = "[ANY] SMAC AutoDemo",
@@ -48,7 +48,7 @@ public OnPluginStart() {
 	decl String:path[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, path, sizeof(path), "recordings");
 	if(!DirExists(path)) {
-		CreateDirectory(path, 755);
+		CreateDirectory(path, FPERM_U_READ|FPERM_U_WRITE|FPERM_U_EXEC|FPERM_G_READ|FPERM_G_EXEC|FPERM_O_READ|FPERM_O_EXEC);
 	}
 	
 	lockedConVars = CreateTrie();
@@ -131,6 +131,9 @@ public Action:SMAC_OnCheatDetected(client, const String:module[]) {
 	if(FindSourceTV() == -1) {
 		SMAC_Log("SourceTV is not present so an AutoDemo could not be recorded.");
 		return Plugin_Continue;
+	}
+	if(currentDemoClients != INVALID_HANDLE && FindValueInArray(currentDemoClients, client) != -1) {
+		return Plugin_Continue; // we're already recording this player
 	}
 	CreateTimer(2.0, Timer_Delay, GetClientUserId(client)); // delay for a couple seconds in case the client gets kicked or banned
 	return Plugin_Continue;
