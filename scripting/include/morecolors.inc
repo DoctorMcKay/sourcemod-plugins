@@ -7,7 +7,7 @@
 #endif
 #define _colors_included
 
-#define MORE_COLORS_VERSION		"1.5.0"
+#define MORE_COLORS_VERSION		"1.5.1"
 #define MAX_MESSAGE_LENGTH		250
 
 #define COLOR_RED				0xFF4040
@@ -332,6 +332,7 @@ stock CReplyToCommandEx(client, author, const String:message[], any:...) {
  * @return				True if the color exists, false otherwise
  */
 stock bool:CColorExists(const String:color[]) {
+	CCheckTrie();
 	return GetTrieValue(CTrie, color, 0);
 }
 
