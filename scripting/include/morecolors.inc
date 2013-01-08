@@ -7,7 +7,7 @@
 #endif
 #define _colors_included
 
-#define MORE_COLORS_VERSION		"1.6.1"
+#define MORE_COLORS_VERSION		"1.5.1"
 #define MAX_MESSAGE_LENGTH		250
 
 #define COLOR_RED				0xFF4040
@@ -98,7 +98,7 @@ stock CPrintToChatEx(client, author, const String:message[], any:...) {
 	Format(buffer, sizeof(buffer), "\x01%s", message);
 	VFormat(buffer2, sizeof(buffer2), buffer, 4);
 	CReplaceColorCodes(buffer2, author);
-	CSendMessage(client, buffer2, author);
+	CSendMessage(client, buffer2);
 }
 
 /**
@@ -129,38 +129,35 @@ stock CPrintToChatAllEx(author, const String:message[], any:...) {
 		Format(buffer, sizeof(buffer), "\x01%s", message);
 		VFormat(buffer2, sizeof(buffer2), buffer, 3);
 		CReplaceColorCodes(buffer2, author);
-		CSendMessage(i, buffer2, author);
+		CSendMessage(i, buffer2);
 	}
 }
 
 /**
  * Sends a SayText2 usermessage
- * 
  * @param client	Client to send usermessage to
  * @param message	Message to send
  * @noreturn
  */
-stock CSendMessage(client, const String:message[], author=0) {
-	if(author == 0) {
-		author = client;
-	}
+stock CSendMessage(client, const String:message[]) {
 	new UserMsg:index = GetUserMessageId("SayText2");
 	if(index == INVALID_MESSAGE_ID) {
 		PrintToChat(client, message);
 		return;
 	}
 	new Handle:bf = StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
-	BfWriteByte(bf, author); // Message author
-	BfWriteByte(bf, true);
+	BfWriteByte(bf, client);
+	BfWriteByte(bf, 0);
 	BfWriteString(bf, message);
 	EndMessage();
 }
 
 /**
  * This function should only be used right in front of
- * CPrintToChatAll or CPrintToChatAllEx. It causes those functions
- * to skip the specified client when printing the message.
- * After printing the message, the client will no longer be skipped.
+ * CPrintToChatAll or CPrintToChatAllEx and it tells
+ * to those funcions to skip specified client when printing
+ * message to all clients. After message is printed client will
+ * no more be skipped.
  * 
  * @param client   Client index
  * @noreturn
@@ -209,18 +206,9 @@ stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxle
 		if(!IsClientInGame(author)) {
 			ThrowError("Client %i is not in game", author);
 		}
-		decl String:game[32];
-		GetGameFolderName(game, sizeof(game));
-		if(StrEqual(game, "dod")) {
-			switch(GetClientTeam(author)) {
-				case 1: ReplaceString(buffer, maxlen, "{teamcolor}", "\x07CCCCCC", false);
-				case 2: ReplaceString(buffer, maxlen, "{teamcolor}", "\x074D7942", false);
-				case 3: ReplaceString(buffer, maxlen, "{teamcolor}", "\x07FF4040", false);
-				default: ReplaceString(buffer, maxlen, "{teamcolor}", "\x04", false);
-			}
-		} else {
-			ReplaceString(buffer, maxlen, "{teamcolor}", "\x03", false);
-		}
+		decl String:team[16];
+		Format(team, sizeof(team), "\x07%06X", CGetTeamColor(author));
+		ReplaceString(buffer, maxlen, "{teamcolor}", team, false);
 	}
 	decl String:part[maxlen], String:find[32], String:replace[16];
 	new value, first, last;
