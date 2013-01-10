@@ -4,10 +4,13 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.5.4"
+			"Latest"	"1.6.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed a problem with HUD position limits"
+		"Notes" " - Fixed some rounding inaccuracy"
+		"Notes" " - Items that have prices that are 1+ buds will display keys instead of refined in parenthesis"
+		"Notes" " - Keys no longer display their prices as '1.00 Keys'"
+		"Notes" " - Buds no longer display their prices as '1.00 Buds'"
 	}
 	
 	"Files"
