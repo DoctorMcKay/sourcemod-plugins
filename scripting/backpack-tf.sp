@@ -8,11 +8,11 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/backpack-tf.txt"
-#define PLUGIN_VERSION		"1.5.4"
+#define PLUGIN_VERSION		"1.6.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v2/"
 #define STEAM_URL			"http://www.doctormckay.com/steamapi/itemnames.php" // please don't use this page for anything besides this plugin, I don't want my server to crash... code used to generate it is here: http://pastebin.com/GV5HUtMZ ... don't make me limit requests to this page by IP... I will do it if necessary
-#define ITEM_EARBUDS		"143"
-#define ITEM_KEY			"5021"
+#define ITEM_EARBUDS		143
+#define ITEM_KEY			5021
 #define ITEM_CRATE			5022
 #define ITEM_SALVAGED_CRATE	5068
 #define ITEM_HAUNTED_SCRAP	267
@@ -199,14 +199,18 @@ public OnBackpackTFComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessfu
 	FileToKeyValues(backpackTFPricelist, path);
 	lastCacheTime = cacheTime;
 	cacheTime = KvGetNum(backpackTFPricelist, "current_time");
+	decl String:buffer[32];
 	
+	IntToString(ITEM_KEY, buffer, sizeof(buffer));
 	PrepPriceKv();
-	KvJumpToKey(backpackTFPricelist, ITEM_KEY);
+	KvJumpToKey(backpackTFPricelist, buffer);
 	KvJumpToKey(backpackTFPricelist, QUALITY_UNIQUE);
 	KvJumpToKey(backpackTFPricelist, "0");
 	KvGetString(backpackTFPricelist, "price", keyPrice, sizeof(keyPrice));
+	
+	IntToString(ITEM_EARBUDS, buffer, sizeof(buffer));
 	PrepPriceKv();
-	KvJumpToKey(backpackTFPricelist, ITEM_EARBUDS);
+	KvJumpToKey(backpackTFPricelist, buffer);
 	KvJumpToKey(backpackTFPricelist, QUALITY_UNIQUE);
 	KvJumpToKey(backpackTFPricelist, "0");
 	KvGetString(backpackTFPricelist, "price", budsPrice, sizeof(budsPrice));
@@ -241,7 +245,7 @@ public OnBackpackTFComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessfu
 	PrepPriceKv();
 	KvGotoFirstSubKey(backpackTFPricelist);
 	new bool:isNegative = false;
-	decl String:defindex[8], String:section[32], String:quality[32], String:name[64], String:difference[32], String:message[128];
+	decl String:defindex[8], String:section[32], String:quality[32], String:name[64], String:difference[32], String:message[128], String:lastUpdate[32];
 	new Handle:array = CreateArray(128);
 	PushArrayString(array, "Type !pc for a price check.");
 	if(GetConVarBool(cvarDisplayChangedPrices)) {
@@ -255,7 +259,8 @@ public OnBackpackTFComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessfu
 				KvGotoFirstSubKey(backpackTFPricelist);
 				do {
 					// loop through instances (series #s, effects)
-					if(KvGetNum(backpackTFPricelist, "last_update") < lastCacheTime) {
+					KvGetString(backpackTFPricelist, "last_update", lastUpdate, sizeof(lastUpdate));
+					if(strlen(lastUpdate) == 0 || StringToInt(lastUpdate) == 0 || StringToInt(lastUpdate) < lastCacheTime) {
 						continue; // hasn't updated
 					}
 					KvGetString(backpackTFPricelist, "last_change", difference, sizeof(difference));
@@ -275,9 +280,9 @@ public OnBackpackTFComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessfu
 					
 					isNegative = (difference[0] == '-');
 					if(isNegative) {
-						GetPriceString(difference[1], difference, sizeof(difference));
+						GetPriceString(difference[1], difference, sizeof(difference), StringToInt(defindex), section);
 					} else {
-						GetPriceString(difference, difference, sizeof(difference));
+						GetPriceString(difference, difference, sizeof(difference), StringToInt(defindex), section);
 					}
 					
 					Format(message, sizeof(message), "%s%s%s: %s%s", quality, StrEqual(quality, "") ? "" : " ", name, isNegative ? "-" : "+", difference);
@@ -464,7 +469,7 @@ public Action:Command_PriceCheck(client, args) {
 		do {
 			KvGetString(backpackTFPricelist, "price", price, sizeof(price));
 			CleanString(price, sizeof(price));
-			GetPriceString(price, price, sizeof(price));
+			GetPriceString(price, price, sizeof(price), defindex, section);
 			if(StrEqual(section, QUALITY_UNUSUAL) && !onlyOneUnusual) {
 				if(!unusualDisplayed) {
 					AddMenuItem(menu, index, "Unusual: View Effects");
@@ -516,15 +521,15 @@ public Handler_PriceListMenu(Handle:menu, MenuAction:action, client, param) {
 	if(action != MenuAction_Select) {
 		return;
 	}
-	decl String:selection[32];
+	decl String:defindex[32];
 	new Handle:menu2 = CreateMenu(Handler_PriceListMenu);
-	GetMenuItem(menu, param, selection, sizeof(selection));
+	GetMenuItem(menu, param, defindex, sizeof(defindex));
 	decl String:name[64];
-	GetTrieString(itemNameTrie, selection, name, sizeof(name));
+	GetTrieString(itemNameTrie, defindex, name, sizeof(name));
 	ReplaceString(name, sizeof(name), "The ", "");
 	SetMenuTitle(menu2, "Price Check: Unusual %s\nPrices are estimates only\nPrices courtesy of backpack.tf\n ", name);
 	PrepPriceKv();
-	KvJumpToKey(backpackTFPricelist, selection);
+	KvJumpToKey(backpackTFPricelist, defindex);
 	KvJumpToKey(backpackTFPricelist, QUALITY_UNUSUAL);
 	KvGotoFirstSubKey(backpackTFPricelist);
 	decl String:effect[8], String:effectName[64], String:message[128], String:price[64];
@@ -536,21 +541,42 @@ public Handler_PriceListMenu(Handle:menu, MenuAction:action, client, param) {
 		}
 		KvGetString(backpackTFPricelist, "price", price, sizeof(price));
 		CleanString(price, sizeof(price));
-		GetPriceString(price, price, sizeof(price));
+		GetPriceString(price, price, sizeof(price), StringToInt(defindex), QUALITY_UNUSUAL);
 		Format(message, sizeof(message), "%s: %s", effectName, price);
 		AddMenuItem(menu2, "", message, ITEMDRAW_DISABLED);
 	} while(KvGotoNextKey(backpackTFPricelist));
 	DisplayMenu(menu2, client, GetConVarInt(cvarMenuHoldTime));
 }
 
-GetPriceString(const String:price[], String:priceString[], maxlen) {
+GetPriceString(const String:price[], String:priceString[], maxlen, defindex, const String:quality[]) {
 	new Float:key = StringToFloat(keyPrice);
 	new Float:buds = StringToFloat(budsPrice);
 	new Float:prc = StringToFloat(price);
-	if(prc >= buds) {
-		Format(priceString, maxlen, "%.2f Buds (%s Refined)", prc / buds, price);
-	} else if(prc >= key) {
-		Format(priceString, maxlen, "%.2f Keys (%s Refined)", prc / key, price);
+	if(prc >= buds && !(defindex == ITEM_EARBUDS && StrEqual(quality, QUALITY_UNIQUE))) {
+		// Get the price in buds, and fix any rounding errors if necessary
+		new Float:budsPrc = FloatDiv(prc, buds);
+		new Float:budsPricePart = FloatFraction(budsPrc);
+		if(FloatCompare(budsPricePart, 0.95) == 1 || FloatCompare(budsPricePart, 0.05) == -1) {
+			budsPrc = float(RoundToNearest(budsPrc));
+		}
+		
+		// Get the price in keys, and fix any rounding errors if necessary
+		new Float:keyPrc = FloatDiv(prc, key);
+		new Float:keyPricePart = FloatFraction(keyPrc);
+		if(FloatCompare(keyPricePart, 0.95) == 1 || FloatCompare(keyPricePart, 0.05) == -1) {
+			keyPrc = float(RoundToNearest(keyPrc));
+		}
+		
+		Format(priceString, maxlen, "%.2f Bud%s (%.2f Keys)", budsPrc, (FloatCompare(budsPrc, 1.0) == 0) ? "" : "s", keyPrc);
+	} else if(prc >= key && !(defindex == ITEM_KEY && StrEqual(quality, QUALITY_UNIQUE))) {
+		// Get the price in keys, and fix any rounding errors if necessary
+		new Float:keyPrc = FloatDiv(prc, key);
+		new Float:keyPricePart = FloatFraction(keyPrc);
+		if(FloatCompare(keyPricePart, 0.95) == 1 || FloatCompare(keyPricePart, 0.05) == -1) {
+			keyPrc = float(RoundToNearest(keyPrc));
+		}
+		
+		Format(priceString, maxlen, "%.2f Key%s (%s Refined)", keyPrc, (FloatCompare(keyPrc, 1.0) == 0) ? "" : "s", price);
 	} else {
 		Format(priceString, maxlen, "%s Refined", price);
 	}
