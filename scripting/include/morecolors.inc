@@ -7,8 +7,10 @@
 #endif
 #define _colors_included
 
-#define MORE_COLORS_VERSION		"1.6.1"
-#define MAX_MESSAGE_LENGTH		250
+#include <regex>
+
+#define MORE_COLORS_VERSION		"1.6.2"
+#define MAX_MESSAGE_LENGTH		256
 
 #define COLOR_RED				0xFF4040
 #define COLOR_BLUE				0x99CCFF
@@ -146,7 +148,7 @@ stock CSendMessage(client, const String:message[], author=0) {
 	}
 	new UserMsg:index = GetUserMessageId("SayText2");
 	if(index == INVALID_MESSAGE_ID) {
-		PrintToChat(client, message);
+		PrintToChat(client, "%s", message);
 		return;
 	}
 	new Handle:bf = StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
@@ -222,35 +224,61 @@ stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxle
 			ReplaceString(buffer, maxlen, "{teamcolor}", "\x03", false);
 		}
 	}
-	decl String:part[maxlen], String:find[32], String:replace[16];
-	new value, first, last;
-	new index = 0;
-	for(new i = 0; i < 100; i++) { // conditions are failsafe, we'll return in the loop
-		first = FindCharInString(buffer[index], '{');
-		last = FindCharInString(buffer[index], '}');
-		if(first == -1 || last == -1) {
-			return; // no opening or closing brace
+	new cursor = 0;
+	new value, Handle:regex;
+	decl String:tag[32], String:buff[32], String:output[maxlen];
+	strcopy(output, maxlen, buffer);
+	// Since the string's size is going to be changing, output will hold the replaced string and we'll search buffer
+	
+	for(new i = 0; i < 1000; i++) { // The RegEx extension is quite flaky, so we have to loop here :/. This loop is supposed to be infinite and broken by return, but conditions have been added to be safe.
+		regex = CompileRegex("{[a-zA-Z]+}");
+		if(MatchRegex(regex, buffer[cursor]) < 1) {
+			CloseHandle(regex);
+			strcopy(buffer, maxlen, output);
+			return;
 		}
-		first++;
-		last--;
-		for(new j = 0; j <= last - first + 1; j++) { // everything from this point on is really confusing
-			if(j == last - first + 1) {
-				part[j] = 0;
-				break;
-			}
-			part[j] = buffer[index + first + j];
+		GetRegexSubString(regex, 0, tag, sizeof(tag));
+		CStrToLower(tag);
+		cursor = StrContains(buffer[cursor], tag, false) + cursor + 1;
+		strcopy(buff, sizeof(buff), tag);
+		ReplaceString(buff, sizeof(buff), "{", "");
+		ReplaceString(buff, sizeof(buff), "}", "");
+		
+		if(!GetTrieValue(CTrie, buff, value)) {
+			CloseHandle(regex);
+			continue;
 		}
-		index += last + 2;
-		StrToLower(part);
-		if(GetTrieValue(CTrie, part, value)) {
-			Format(find, sizeof(find), "{%s}", part);
-			Format(replace, sizeof(replace), "\x07%06X", value);
-			if(!removeTags) {
-				ReplaceString(buffer, maxlen, find, replace, false);
-			} else {
-				ReplaceString(buffer, maxlen, find, "", false);
-			}
+		
+		if(removeTags) {
+			ReplaceString(output, maxlen, tag, "", false);
+		} else {
+			Format(buff, sizeof(buff), "\x07%06X", value);
+			ReplaceString(output, maxlen, tag, buff, false);
 		}
+		CloseHandle(regex);
+	}
+	LogError("[MORE COLORS] Infinite loop broken.");
+}
+
+/**
+ * Gets a part of a string
+ * 
+ * @param input			String to get the part from
+ * @param output		Buffer to write to
+ * @param maxlen		Max length of output buffer
+ * @param start			Position to start at
+ * @param numChars		Number of characters to return, or 0 for the end of the string
+ * @noreturn
+ */
+stock CSubString(const String:input[], String:output[], maxlen, start, numChars=0) {
+	new i = 0;
+	for(;;) {
+		if(i == maxlen - 1 || i >= numChars || input[start + i] == '\0') {
+			output[i] = '\0';
+			return;
+		}
+		output[i] = input[start + i];
+		i++;
 	}
 }
 
@@ -260,7 +288,7 @@ stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxle
  * @param buffer		String to convert
  * @noreturn
  */
-stock StrToLower(String:buffer[]) {
+stock CStrToLower(String:buffer[]) {
 	new len = strlen(buffer);
 	for(new i = 0; i < len; i++) {
 		buffer[i] = CharToLower(buffer[i]);
