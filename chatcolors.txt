@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.1.0"
+			"Latest"	"2.2.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added library registration so other plugins can use dependencies"
+		"Notes" " - Added CCC_OnUserConfigPreLoaded forward so other plugins can block the config file from being loaded"
 	}
 	
 	"Files"
