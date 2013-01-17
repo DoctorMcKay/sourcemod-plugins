@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolors.txt"
-#define PLUGIN_VERSION		"2.1.0"
+#define PLUGIN_VERSION		"2.2.0"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors",
@@ -20,6 +20,7 @@ public Plugin:myinfo = {
 new Handle:colorForward;
 new Handle:nameForward;
 new Handle:tagForward;
+new Handle:preLoadedForward;
 new Handle:loadedForward;
 
 new String:tag[MAXPLAYERS + 1][32];
@@ -73,6 +74,7 @@ public OnPluginStart() {
 	colorForward = CreateGlobalForward("CCC_OnChatColor", ET_Event, Param_Cell);
 	nameForward = CreateGlobalForward("CCC_OnNameColor", ET_Event, Param_Cell);
 	tagForward = CreateGlobalForward("CCC_OnTagApplied", ET_Event, Param_Cell);
+	preLoadedForward = CreateGlobalForward("CCC_OnUserConfigPreLoaded", ET_Event, Param_Cell);
 	loadedForward = CreateGlobalForward("CCC_OnUserConfigLoaded", ET_Ignore, Param_Cell);
 	LoadConfig();
 }
@@ -114,8 +116,18 @@ ClearValues(client) {
 	Format(defaultChatColor[client], sizeof(defaultChatColor[]), "");
 }
 
+public OnClientConnected(client) {
+	ClearValues(client);
+}
+
+public OnClientDisconnect(client) {
+	ClearValues(client); // On connect and on disconnect, just to be safe
+}
+
 public OnClientPostAdminCheck(client) {
-	ClearValues(client); // clear the old values!
+	if(!ConfigForward(client)) {
+		return; // Another plugin wants to block this
+	}
 	// check the Steam ID first
 	decl String:auth[32];
 	GetClientAuthString(client, auth, sizeof(auth));
@@ -254,6 +266,17 @@ bool:TagForward(author) {
 	new Action:result = Plugin_Continue;
 	Call_StartForward(tagForward);
 	Call_PushCell(author);
+	Call_Finish(result);
+	if(result == Plugin_Handled || result == Plugin_Stop) {
+		return false;
+	}
+	return true;
+}
+
+bool:ConfigForward(client) {
+	new Action:result = Plugin_Continue;
+	Call_StartForward(preLoadedForward);
+	Call_PushCell(client);
 	Call_Finish(result);
 	if(result == Plugin_Handled || result == Plugin_Stop) {
 		return false;

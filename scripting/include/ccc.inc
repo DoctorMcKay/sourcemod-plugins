@@ -192,6 +192,15 @@ forward Action:CCC_OnChatColor(client);
 forward Action:CCC_OnTagApplied(client);
 
 /**
+ * Called when a client's colors and tag are about to be loaded from the config file
+ * At this point, the client has NO COLORS
+ * 
+ * @param client		Client index
+ * @return				Plugin_Handled or Plugin_Stop to prevent loading, Plugin_Continue or Plugin_Changed to allow
+ */
+forward Action:CCC_OnUserConfigPreLoaded(client);
+
+/**
  * Called when a client's colors and tag have been loaded from the config file
  * 
  * @param client		Client index
