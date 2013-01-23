@@ -9,7 +9,7 @@
 
 #include <regex>
 
-#define MORE_COLORS_VERSION		"1.6.2"
+#define MORE_COLORS_VERSION		"1.7.0"
 #define MAX_MESSAGE_LENGTH		256
 
 #define COLOR_RED				0xFF4040
@@ -17,8 +17,11 @@
 #define COLOR_GRAY				0xCCCCCC
 #define COLOR_GREEN				0x3EFF3E
 
-new bool:CSkipList[MAXPLAYERS + 1] = {false, ...};
-new Handle:CTrie = INVALID_HANDLE;
+#define GAME_DODS				0
+
+new bool:CSkipList[MAXPLAYERS + 1];
+new Handle:CTrie;
+new CTeamColors[][] = {{0xCCCCCC, 0x4D7942, 0xFF4040}}; // Multi-dimensional array for games that don't support SayText2. First index is the game index (as defined by the GAME_ defines), second index is team. 0 = spectator, 1 = team1, 2 = team2
 
 /**
  * Prints a message to a specific client in the chat area.
@@ -107,7 +110,7 @@ stock CPrintToChatEx(client, author, const String:message[], any:...) {
  * Prints a message to all clients in the chat area.
  * Supports color tags and teamcolor tag.
  *
- * @param author	  Author index whos color will be used for teamcolor tag.
+ * @param author	  Author index whose color will be used for teamcolor tag.
  * @param message   Message (formatting rules).
  * @noreturn
  * 
@@ -146,15 +149,41 @@ stock CSendMessage(client, const String:message[], author=0) {
 	if(author == 0) {
 		author = client;
 	}
+	decl String:buffer[MAX_MESSAGE_LENGTH], String:game[16];
+	GetGameFolderName(game, sizeof(game));
+	strcopy(buffer, sizeof(buffer), message);
 	new UserMsg:index = GetUserMessageId("SayText2");
 	if(index == INVALID_MESSAGE_ID) {
-		PrintToChat(client, "%s", message);
+		if(StrEqual(game, "dod")) {
+			new team = GetClientTeam(author);
+			if(team == 0) {
+				ReplaceString(buffer, sizeof(buffer), "\x03", "\x04", false);
+			} else {
+				decl String:temp[16];
+				Format(temp, sizeof(temp), "\x07%06X", CTeamColors[GAME_DODS][team - 1]);
+				ReplaceString(buffer, sizeof(buffer), "\x03", temp, false);
+			}
+		}
+		PrintToChat(client, "%s", buffer);
 		return;
 	}
-	new Handle:bf = StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
-	BfWriteByte(bf, author); // Message author
-	BfWriteByte(bf, true);
-	BfWriteString(bf, message);
+	if(StrEqual(game, "csgo")) {
+		Format(buffer, sizeof(buffer), "\x01\x0B%s", buffer);
+	}
+	new Handle:buf = StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
+	if(GetUserMessageType() == UM_Protobuf) {
+		PbSetInt(buf, "ent_idx", author);
+		PbSetBool(buf, "chat", true);
+		PbSetString(buf, "msg_name", buffer);
+		PbAddString(buf, "params", "");
+		PbAddString(buf, "params", "");
+		PbAddString(buf, "params", "");
+		PbAddString(buf, "params", "");
+	} else {
+		BfWriteByte(buf, author); // Message author
+		BfWriteByte(buf, true); // Chat message
+		BfWriteString(buf, buffer); // Message text
+	}
 	EndMessage();
 }
 
@@ -211,18 +240,7 @@ stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxle
 		if(!IsClientInGame(author)) {
 			ThrowError("Client %i is not in game", author);
 		}
-		decl String:game[32];
-		GetGameFolderName(game, sizeof(game));
-		if(StrEqual(game, "dod")) {
-			switch(GetClientTeam(author)) {
-				case 1: ReplaceString(buffer, maxlen, "{teamcolor}", "\x07CCCCCC", false);
-				case 2: ReplaceString(buffer, maxlen, "{teamcolor}", "\x074D7942", false);
-				case 3: ReplaceString(buffer, maxlen, "{teamcolor}", "\x07FF4040", false);
-				default: ReplaceString(buffer, maxlen, "{teamcolor}", "\x04", false);
-			}
-		} else {
-			ReplaceString(buffer, maxlen, "{teamcolor}", "\x03", false);
-		}
+		ReplaceString(buffer, maxlen, "{teamcolor}", "\x03", false);
 	}
 	new cursor = 0;
 	new value, Handle:regex;
