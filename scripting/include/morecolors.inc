@@ -9,7 +9,7 @@
 
 #include <regex>
 
-#define MORE_COLORS_VERSION		"1.7.0"
+#define MORE_COLORS_VERSION		"1.7.1"
 #define MAX_MESSAGE_LENGTH		256
 
 #define COLOR_RED				0xFF4040
@@ -171,7 +171,7 @@ stock CSendMessage(client, const String:message[], author=0) {
 		Format(buffer, sizeof(buffer), "\x01\x0B%s", buffer);
 	}
 	new Handle:buf = StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
-	if(GetUserMessageType() == UM_Protobuf) {
+	if(GetFeatureStatus(FeatureType_Native, "GetUserMessageType") == FeatureStatus_Available && GetUserMessageType() == UM_Protobuf) {
 		PbSetInt(buf, "ent_idx", author);
 		PbSetBool(buf, "chat", true);
 		PbSetString(buf, "msg_name", buffer);
