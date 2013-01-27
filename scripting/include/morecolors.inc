@@ -9,7 +9,7 @@
 
 #include <regex>
 
-#define MORE_COLORS_VERSION		"1.7.1"
+#define MORE_COLORS_VERSION		"1.7.2"
 #define MAX_MESSAGE_LENGTH		256
 
 #define COLOR_RED				0xFF4040
@@ -157,7 +157,7 @@ stock CSendMessage(client, const String:message[], author=0) {
 		if(StrEqual(game, "dod")) {
 			new team = GetClientTeam(author);
 			if(team == 0) {
-				ReplaceString(buffer, sizeof(buffer), "\x03", "\x04", false);
+				ReplaceString(buffer, sizeof(buffer), "\x03", "\x04", false); // Unassigned gets green
 			} else {
 				decl String:temp[16];
 				Format(temp, sizeof(temp), "\x07%06X", CTeamColors[GAME_DODS][team - 1]);
@@ -166,9 +166,6 @@ stock CSendMessage(client, const String:message[], author=0) {
 		}
 		PrintToChat(client, "%s", buffer);
 		return;
-	}
-	if(StrEqual(game, "csgo")) {
-		Format(buffer, sizeof(buffer), "\x01\x0B%s", buffer);
 	}
 	new Handle:buf = StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
 	if(GetFeatureStatus(FeatureType_Native, "GetUserMessageType") == FeatureStatus_Available && GetUserMessageType() == UM_Protobuf) {
