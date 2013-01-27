@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.2.0"
+			"Latest"	"2.3.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added CCC_OnUserConfigPreLoaded forward so other plugins can block the config file from being loaded"
+		"Notes" " - Added support for CS:GO"
 	}
 	
 	"Files"
