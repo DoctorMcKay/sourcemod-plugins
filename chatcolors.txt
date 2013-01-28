@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.3.0"
+			"Latest"	"2.3.1"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added support for CS:GO"
+		"Notes" " - Actually added support for CS:GO this time"
 	}
 	
 	"Files"

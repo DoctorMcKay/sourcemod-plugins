@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolors.txt"
-#define PLUGIN_VERSION		"2.3.0"
+#define PLUGIN_VERSION		"2.3.1"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors",
@@ -191,11 +191,6 @@ public OnClientPostAdminCheck(client) {
 }
 
 public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:message[]) {
-	decl String:game[64];
-	GetGameFolderName(game, sizeof(game));
-	if(StrEqual(game, "csgo")) {
-		Format(name, MAXLENGTH_NAME, "\x01\x0B%s", name);
-	}
 	if(NameForward(author)) {
 		if(StrEqual(usernameColor[author], "G", false)) {
 			Format(name, MAXLENGTH_NAME, "\x04%s", name);
@@ -241,6 +236,11 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 		} else if(strlen(chatColor[author]) == 8) {
 			Format(message, MaxMessageLength, "\x08%s%s", chatColor[author], message);
 		}
+	}
+	decl String:game[64];
+	GetGameFolderName(game, sizeof(game));
+	if(StrEqual(game, "csgo")) {
+		Format(name, MAXLENGTH_NAME, "\x01\x0B%s", name);
 	}
 	return Plugin_Changed;
 }
