@@ -8,7 +8,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/backpack-tf.txt"
-#define PLUGIN_VERSION		"1.7.0"
+#define PLUGIN_VERSION		"1.6.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v2/"
 #define STEAM_URL			"http://www.doctormckay.com/steamapi/itemnames.php" // please don't use this page for anything besides this plugin, I don't want my server to crash... code used to generate it is here: http://pastebin.com/GV5HUtMZ ... don't make me limit requests to this page by IP... I will do it if necessary
 #define ITEM_EARBUDS		143
@@ -47,16 +47,11 @@ new Handle:cvarDisplayChangedPrices;
 new Handle:cvarHudXPos;
 new Handle:cvarHudYPos;
 new Handle:cvarMenuHoldTime;
-new Handle:cvarDisplayOnWebsite;
 new Handle:cvarUpdater;
 
 new Handle:hudText;
 
 new bool:noPrices = true;
-
-new Handle:hostname;
-new Handle:hostport;
-new Handle:sv_password;
 
 public OnPluginStart() {
 	cvarBPCommand = CreateConVar("backpack_tf_bp_command", "1", "Enables the !bp command for use with backpack.tf");
@@ -65,12 +60,7 @@ public OnPluginStart() {
 	cvarHudXPos = CreateConVar("backpack_tf_update_notification_x_pos", "0.01", "X position for HUD text", _, true, -1.0, true, 1.0);
 	cvarHudYPos = CreateConVar("backpack_tf_update_notification_y_pos", "0.01", "Y position for HUD text", _, true, -1.0, true, 1.0);
 	cvarMenuHoldTime = CreateConVar("backpack_tf_menu_open_time", "0", "Time to keep the price panel open for, 0 = forever");
-	cvarDisplayOnWebsite = CreateConVar("backpack_tf_display_on_website", "1", "Enable to display your server on backpack.tf's server list");
 	cvarUpdater = CreateConVar("backpack_tf_auto_update", "1", "Enables automatic updating (has no effect if Updater is not installed)");
-	
-	hostname = FindConVar("hostname");
-	hostport = FindConVar("hostport");
-	sv_password = FindConVar("sv_password");
 	
 	RegAdminCmd("sm_bp", Command_Backpack, 0, "Usage: sm_bp <player>");
 	RegAdminCmd("sm_backpack", Command_Backpack, 0, "Usage: sm_backpack <player>");
@@ -182,70 +172,7 @@ DownloadPrices() {
 	noPrices = true;
 	new HTTPRequestHandle:request = Steam_CreateHTTPRequest(HTTPMethod_GET, BACKPACK_TF_URL);
 	Steam_SetHTTPRequestGetOrPostParameter(request, "vdf", "1");
-	if(GetConVarBool(cvarDisplayOnWebsite)) {
-		decl String:name[128], String:encName[128], String:map[128], String:encMap[128], String:ip[64], String:port[64], octets[4], String:password[64];
-		GetConVarString(hostname, name, sizeof(name));
-		GetCurrentMap(map, sizeof(map));
-		Steam_GetPublicIP(octets);
-		Format(ip, sizeof(ip), "%d.%d.%d.%d", octets[0], octets[1], octets[2], octets[3]);
-		IntToString(GetConVarInt(hostport), port, sizeof(port));
-		GetConVarString(sv_password, password, sizeof(password));
-		
-		UrlEncodeString(encName, sizeof(encName), name);
-		UrlEncodeString(encMap, sizeof(encMap), map);
-		
-		Steam_SetHTTPRequestGetOrPostParameter(request, "hostname", encName);
-		Steam_SetHTTPRequestGetOrPostParameter(request, "map", encMap);
-		Steam_SetHTTPRequestGetOrPostParameter(request, "ip", ip);
-		Steam_SetHTTPRequestGetOrPostParameter(request, "port", port);
-		Steam_SetHTTPRequestGetOrPostParameter(request, "password", (strlen(password) == 0) ? "0" : "1");
-	}
 	Steam_SendHTTPRequest(request, OnBackpackTFComplete);
-}
-
-// Borrowed from Dynamic MOTD
-UrlEncodeString(String:output[], size, const String:input[])
-{
-	new icnt = 0;
-	new ocnt = 0;
-	
-	for(;;)
-	{
-		if (ocnt == size)
-		{
-			output[ocnt-1] = '\0';
-			return;
-		}
-		
-		new c = input[icnt];
-		if (c == '\0')
-		{
-			output[ocnt] = '\0';
-			return;
-		}
-		
-		// Use '+' instead of '%20'.
-		// Still follows spec and takes up less of our limited buffer.
-		if (c == ' ')
-		{
-			output[ocnt++] = '+';
-		}
-		else if ((c < '0' && c != '-' && c != '.') ||
-			(c < 'A' && c > '9') ||
-			(c > 'Z' && c < 'a' && c != '_') ||
-			(c > 'z' && c != '~')) 
-		{
-			output[ocnt++] = '%';
-			Format(output[ocnt], size-strlen(output[ocnt]), "%x", c);
-			ocnt += 2;
-		}
-		else
-		{
-			output[ocnt++] = c;
-		}
-		
-		icnt++;
-	}
 }
 
 public Action:Timer_Update(Handle:timer) {

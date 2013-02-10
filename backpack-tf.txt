@@ -4,10 +4,13 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.7.0"
+			"Latest"	"1.6.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added backpack_tf_display_on_website cvar, which if enabled will send the server's hostname, current map, IP, port and passworded status (yes/no, not the actual password) to backpack.tf so your server can be displayed on the backpack.tf server list"
+		"Notes" " - Fixed some rounding inaccuracy"
+		"Notes" " - Items that have prices that are 1+ buds will display keys instead of refined in parenthesis"
+		"Notes" " - Keys no longer display their prices as '1.00 Keys'"
+		"Notes" " - Buds no longer display their prices as '1.00 Buds'"
 	}
 	
 	"Files"
