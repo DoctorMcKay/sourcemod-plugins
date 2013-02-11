@@ -8,7 +8,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/backpack-tf.txt"
-#define PLUGIN_VERSION		"1.6.0"
+#define PLUGIN_VERSION		"1.7.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v2/"
 #define STEAM_URL			"http://www.doctormckay.com/steamapi/itemnames.php" // please don't use this page for anything besides this plugin, I don't want my server to crash... code used to generate it is here: http://pastebin.com/GV5HUtMZ ... don't make me limit requests to this page by IP... I will do it if necessary
 #define ITEM_EARBUDS		143
@@ -50,6 +50,7 @@ new Handle:cvarMenuHoldTime;
 new Handle:cvarUpdater;
 
 new Handle:hudText;
+new Handle:tagsTimer;
 
 new bool:noPrices = true;
 
@@ -123,6 +124,37 @@ public OnPluginStart() {
 	hudText = CreateHudSynchronizer();
 	
 	CreateTimer(3600.0, Timer_Update, _, TIMER_REPEAT); // please please please do not change this value, once an hour is plenty
+	
+	new Handle:tags = FindConVar("sv_tags");
+	HookConVarChange(tags, OnTagsChanged);
+	OnTagsChanged(tags, "", "");
+}
+
+public OnTagsChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
+	if(tagsTimer != INVALID_HANDLE) {
+		CloseHandle(tagsTimer);
+	}
+	tagsTimer = CreateTimer(1.0, Timer_TagsCheck, convar); // Since the game adds each tag individually, let's wait till all tags are added
+}
+
+public Action:Timer_TagsCheck(Handle:timer, any:convar) {
+	tagsTimer = INVALID_HANDLE;
+	decl String:value[512];
+	GetConVarString(convar, value, sizeof(value));
+	TrimString(value);
+	if(strlen(value) == 0) {
+		SetConVarString(convar, "backpack.tf");
+		return;
+	}
+	decl String:tags[64][64];
+	new total = ExplodeString(value, ",", tags, sizeof(tags), sizeof(tags[]));
+	for(new i = 0; i < total; i++) {
+		if(StrEqual(tags[i], "backpack.tf")) {
+			return; // Tag found, nothing to do here
+		}
+	}
+	StrCat(value, sizeof(value), ",backpack.tf");
+	SetConVarString(convar, value);
 }
 
 public Steam_FullyLoaded() {

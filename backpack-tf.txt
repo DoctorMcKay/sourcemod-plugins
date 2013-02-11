@@ -4,13 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.6.0"
+			"Latest"	"1.7.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed some rounding inaccuracy"
-		"Notes" " - Items that have prices that are 1+ buds will display keys instead of refined in parenthesis"
-		"Notes" " - Keys no longer display their prices as '1.00 Keys'"
-		"Notes" " - Buds no longer display their prices as '1.00 Buds'"
+		"Notes" " - Added backpack.tf tag to sv_tags for purpose of displaying servers on backpack.tf"
 	}
 	
 	"Files"
