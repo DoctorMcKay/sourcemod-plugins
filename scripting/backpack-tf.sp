@@ -8,7 +8,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/backpack-tf.txt"
-#define PLUGIN_VERSION		"1.7.0"
+#define PLUGIN_VERSION		"1.7.1"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v2/"
 #define STEAM_URL			"http://www.doctormckay.com/steamapi/itemnames.php" // please don't use this page for anything besides this plugin, I don't want my server to crash... code used to generate it is here: http://pastebin.com/GV5HUtMZ ... don't make me limit requests to this page by IP... I will do it if necessary
 #define ITEM_EARBUDS		143
@@ -50,7 +50,7 @@ new Handle:cvarMenuHoldTime;
 new Handle:cvarUpdater;
 
 new Handle:hudText;
-new Handle:tagsTimer;
+new Handle:sv_tags;
 
 new bool:noPrices = true;
 
@@ -62,6 +62,8 @@ public OnPluginStart() {
 	cvarHudYPos = CreateConVar("backpack_tf_update_notification_y_pos", "0.01", "Y position for HUD text", _, true, -1.0, true, 1.0);
 	cvarMenuHoldTime = CreateConVar("backpack_tf_menu_open_time", "0", "Time to keep the price panel open for, 0 = forever");
 	cvarUpdater = CreateConVar("backpack_tf_auto_update", "1", "Enables automatic updating (has no effect if Updater is not installed)");
+	
+	sv_tags = FindConVar("sv_tags");
 	
 	RegAdminCmd("sm_bp", Command_Backpack, 0, "Usage: sm_bp <player>");
 	RegAdminCmd("sm_backpack", Command_Backpack, 0, "Usage: sm_backpack <player>");
@@ -124,26 +126,18 @@ public OnPluginStart() {
 	hudText = CreateHudSynchronizer();
 	
 	CreateTimer(3600.0, Timer_Update, _, TIMER_REPEAT); // please please please do not change this value, once an hour is plenty
-	
-	new Handle:tags = FindConVar("sv_tags");
-	HookConVarChange(tags, OnTagsChanged);
-	OnTagsChanged(tags, "", "");
 }
 
-public OnTagsChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
-	if(tagsTimer != INVALID_HANDLE) {
-		CloseHandle(tagsTimer);
-	}
-	tagsTimer = CreateTimer(1.0, Timer_TagsCheck, convar); // Since the game adds each tag individually, let's wait till all tags are added
+public OnConfigsExecuted() {
+	CreateTimer(2.0, Timer_AddTag); // Let everything load first
 }
 
-public Action:Timer_TagsCheck(Handle:timer, any:convar) {
-	tagsTimer = INVALID_HANDLE;
+public Action:Timer_AddTag(Handle:timer) {
 	decl String:value[512];
-	GetConVarString(convar, value, sizeof(value));
+	GetConVarString(sv_tags, value, sizeof(value));
 	TrimString(value);
 	if(strlen(value) == 0) {
-		SetConVarString(convar, "backpack.tf");
+		SetConVarString(sv_tags, "backpack.tf");
 		return;
 	}
 	decl String:tags[64][64];
@@ -154,7 +148,7 @@ public Action:Timer_TagsCheck(Handle:timer, any:convar) {
 		}
 	}
 	StrCat(value, sizeof(value), ",backpack.tf");
-	SetConVarString(convar, value);
+	SetConVarString(sv_tags, value);
 }
 
 public Steam_FullyLoaded() {
@@ -717,13 +711,14 @@ public OnAllPluginsLoaded() {
 	new Handle:convar;
 	if(LibraryExists("updater")) {
 		Updater_AddPlugin(UPDATE_URL);
-		new String:newVersion[10];
+		decl String:newVersion[12];
 		Format(newVersion, sizeof(newVersion), "%sA", PLUGIN_VERSION);
 		convar = CreateConVar("backpack_tf_version", newVersion, "backpack.tf Price Check Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);
 	} else {
 		convar = CreateConVar("backpack_tf_version", PLUGIN_VERSION, "backpack.tf Price Check Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);	
 	}
 	HookConVarChange(convar, Callback_VersionConVarChanged);
+	Callback_VersionConVarChanged(convar, "", ""); // Check the cvar value
 }
 
 public OnLibraryAdded(const String:name[]) {
@@ -733,7 +728,13 @@ public OnLibraryAdded(const String:name[]) {
 }
 
 public Callback_VersionConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
-	ResetConVar(convar);
+	if(LibraryExists("updater")) {
+		decl String:version[12];
+		Format(version, sizeof(version), "%sA", PLUGIN_VERSION);
+		SetConVarString(convar, version);
+	} else {
+		SetConVarString(convar, PLUGIN_VERSION);
+	}
 }
 
 public Action:Updater_OnPluginDownloading() {
