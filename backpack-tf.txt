@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.7.1"
+			"Latest"	"1.7.2"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed issue that caused sv_tags to be repeatedly changed when it was too long to fit the backpack.tf tag"
+		"Notes" " - Removed the \"A\" from the version cvar if the Updater cvar is set to 0"
 	}
 	
 	"Files"
