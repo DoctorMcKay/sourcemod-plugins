@@ -8,7 +8,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/backpack-tf.txt"
-#define PLUGIN_VERSION		"1.7.1"
+#define PLUGIN_VERSION		"1.7.2"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v2/"
 #define STEAM_URL			"http://www.doctormckay.com/steamapi/itemnames.php" // please don't use this page for anything besides this plugin, I don't want my server to crash... code used to generate it is here: http://pastebin.com/GV5HUtMZ ... don't make me limit requests to this page by IP... I will do it if necessary
 #define ITEM_EARBUDS		143
@@ -62,6 +62,7 @@ public OnPluginStart() {
 	cvarHudYPos = CreateConVar("backpack_tf_update_notification_y_pos", "0.01", "Y position for HUD text", _, true, -1.0, true, 1.0);
 	cvarMenuHoldTime = CreateConVar("backpack_tf_menu_open_time", "0", "Time to keep the price panel open for, 0 = forever");
 	cvarUpdater = CreateConVar("backpack_tf_auto_update", "1", "Enables automatic updating (has no effect if Updater is not installed)");
+	HookConVarChange(cvarUpdater, Callback_VersionConVarChanged); // For purposes of removing the "A" if updater is disabled
 	
 	sv_tags = FindConVar("sv_tags");
 	
@@ -728,7 +729,7 @@ public OnLibraryAdded(const String:name[]) {
 }
 
 public Callback_VersionConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
-	if(LibraryExists("updater")) {
+	if(LibraryExists("updater") && GetConVarBool(cvarUpdater)) {
 		decl String:version[12];
 		Format(version, sizeof(version), "%sA", PLUGIN_VERSION);
 		SetConVarString(convar, version);
