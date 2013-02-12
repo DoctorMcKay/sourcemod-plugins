@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolors.txt"
-#define PLUGIN_VERSION		"2.3.1"
+#define PLUGIN_VERSION		"2.4.0"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors",
@@ -22,6 +22,7 @@ new Handle:nameForward;
 new Handle:tagForward;
 new Handle:preLoadedForward;
 new Handle:loadedForward;
+new Handle:configReloadedForward;
 
 new String:tag[MAXPLAYERS + 1][32];
 new String:tagColor[MAXPLAYERS + 1][12];
@@ -76,6 +77,7 @@ public OnPluginStart() {
 	tagForward = CreateGlobalForward("CCC_OnTagApplied", ET_Event, Param_Cell);
 	preLoadedForward = CreateGlobalForward("CCC_OnUserConfigPreLoaded", ET_Event, Param_Cell);
 	loadedForward = CreateGlobalForward("CCC_OnUserConfigLoaded", ET_Ignore, Param_Cell);
+	configReloadedForward = CreateGlobalForward("CCC_OnConfigReloaded", ET_Ignore);
 	LoadConfig();
 }
 
@@ -101,6 +103,8 @@ public Action:Command_ReloadConfig(client, args) {
 	LoadConfig();
 	LogAction(client, -1, "Reloaded Custom Chat Colors config file");
 	ReplyToCommand(client, "[CCC] Reloaded config file.");
+	Call_StartForward(configReloadedForward);
+	Call_Finish();
 	return Plugin_Handled;
 }
 
@@ -148,6 +152,7 @@ public OnClientPostAdminCheck(client) {
 				break;
 			}
 			if(!FindFlagByChar(configFlag[0], flag)) {
+				LogError("Invalid flag given for section \"%s\"", section);
 				continue;
 			}
 			if(GetAdminFlag(admin, flag)) {
