@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolors.txt"
-#define PLUGIN_VERSION		"2.4.0"
+#define PLUGIN_VERSION		"2.4.1"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors",
@@ -147,12 +147,17 @@ public OnClientPostAdminCheck(client) {
 		do {
 			KvGetSectionName(configFile, section, sizeof(section));
 			KvGetString(configFile, "flag", configFlag, sizeof(configFlag));
-			if(StrEqual(configFlag, "") && StrContains(section, "STEAM_", false) == -1) {
+			if(strlen(configFlag) > 1) {
+				LogError("Multiple flags given in section \"%s\", which is not allowed. Using first character.");
+			}
+			if(strlen(configFlag) == 0 && StrContains(section, "STEAM_", false) == -1) {
 				found = true;
 				break;
 			}
 			if(!FindFlagByChar(configFlag[0], flag)) {
-				LogError("Invalid flag given for section \"%s\"", section);
+				if(strlen(configFlag) > 0) {
+					LogError("Invalid flag given for section \"%s\", skipping", section);
+				}
 				continue;
 			}
 			if(GetAdminFlag(admin, flag)) {

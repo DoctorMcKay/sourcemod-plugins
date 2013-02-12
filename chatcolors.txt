@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.3.1"
+			"Latest"	"2.4.1"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Actually added support for CS:GO this time"
+		"Notes" " - Fixed error message when not specifying a flag"
 	}
 	
 	"Files"
