@@ -208,6 +208,13 @@ forward Action:CCC_OnUserConfigPreLoaded(client);
  */
 forward CCC_OnUserConfigLoaded(client);
 
+/**
+ * Called when the configuration file is reloaded with the sm_reloadccc command
+ * 
+ * @noreturn
+ */
+forward CCC_OnConfigReloaded();
+
 public SharedPlugin:__pl_ccc = {
 	name = "ccc",
 	file = "custom-chatcolors.smx",
