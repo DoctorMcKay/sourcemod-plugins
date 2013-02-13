@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.1.4"
+			"Latest"	"1.1.5"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed some dumb bugs"
+		"Notes" " - Fixed an error that occurred if a client left before their data is retreived from the database"
 	}
 	
 	"Files"

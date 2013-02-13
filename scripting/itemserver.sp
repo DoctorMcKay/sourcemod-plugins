@@ -10,7 +10,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/itemserver.txt"
-#define PLUGIN_VERSION		"1.1.4"
+#define PLUGIN_VERSION		"1.1.5"
 
 public Plugin:myinfo = {
 	name        = "[TF2] Local Item Server",
@@ -69,10 +69,14 @@ public OnTableCreated(Handle:parent, Handle:hndl, const String:error[], any:data
 public OnClientAuthorized(client, const String:auth[]) {
 	decl String:qry[256];
 	Format(qry, sizeof(qry), "SELECT * FROM `players` WHERE steamid = '%s'", auth);
-	SQL_TQuery(db, OnRowChecked, qry, client);
+	SQL_TQuery(db, OnRowChecked, qry, GetClientUserId(client));
 }
 
-public OnRowChecked(Handle:parent, Handle:hndl, const String:error[], any:client) {
+public OnRowChecked(Handle:parent, Handle:hndl, const String:error[], any:userid) {
+	new client = GetClientOfUserId(userid);
+	if(client == 0) {
+		return;
+	}
 	if(strlen(error) > 0) {
 		LogError("Problem checking row for %L: %s", client, error);
 		return;
@@ -138,7 +142,7 @@ public Event_InventoryApplication(Handle:event, const String:name[], bool:dontBr
 		Format(qry, sizeof(qry), "UPDATE `players` SET %s_slot_0 = '%i', %s_slot_1 = '%i', %s_slot_2 = '%i', %s_slot_3 = '%i', %s_slot_4 = '%i' WHERE steamid = '%s'", className, defindexes[0], className, defindexes[1], className, defindexes[2], className, defindexes[3], className, defindexes[4], auth);
 		SQL_TQuery(db, OnQueryExecuted, qry);
 	} else {
-		if(GetEntProp(client, Prop_Send, "m_bLoadoutUnavailable") == 1) {
+		if(GetEntProp(client, Prop_Send, "m_bLoadoutUnavailable") == 1) { // TODO: This prop appears to not always reflect the client's inventory status
 			new Handle:pack = CreateDataPack();
 			WritePackString(pack, className);
 			WritePackCell(pack, GetClientUserId(client));
