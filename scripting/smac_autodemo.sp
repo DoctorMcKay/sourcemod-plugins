@@ -11,7 +11,7 @@
 #include <bzip2>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/smac-autodemo.txt"
-#define PLUGIN_VERSION		"1.0.2"
+#define PLUGIN_VERSION		"1.1.0"
 
 public Plugin:myinfo = {
 	name        = "[ANY] SMAC AutoDemo",
@@ -75,7 +75,7 @@ public OnLockedConVarChanged(Handle:convar, const String:oldValue[], const Strin
 }
 
 public OnMapStart() {
-	CreateTimer(1.0, Timer_UpdateHud, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer((hudTimestamp == INVALID_HANDLE) ? 12.0 : 1.0, Timer_UpdateHud, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public OnClientConnected(client) {
@@ -101,14 +101,16 @@ public Action:Timer_UpdateHud(Handle:timer) {
 	if(client == -1) {
 		return; // SourceTV not present
 	}
-	decl String:timestamp[128];
-	FormatTime(timestamp, sizeof(timestamp), "%H:%M:%S %m/%d/%Y");
-	SetHudTextParams(0.8, 0.91, 1.1, 0, 255, 0, 255);
-	ShowSyncHudText(client, hudTimestamp, timestamp);
+	if(hudTimestamp != INVALID_HANDLE) {
+		decl String:timestamp[128];
+		FormatTime(timestamp, sizeof(timestamp), "%H:%M:%S %m/%d/%Y");
+		SetHudTextParams(0.8, 0.91, 1.1, 0, 255, 0, 255);
+		ShowSyncHudText(client, hudTimestamp, timestamp);
+	}
 	if(currentDemoClients == INVALID_HANDLE) {
 		return;
 	}
-	new String:cheaters[MAX_NAME_LENGTH * 6];
+	decl String:cheaters[MAX_NAME_LENGTH * 6];
 	Format(cheaters, sizeof(cheaters), "Suspected cheater(s): ");
 	new bool:first = true;
 	for(new i = 0; i < GetArraySize(currentDemoClients); i++) {
@@ -119,8 +121,12 @@ public Action:Timer_UpdateHud(Handle:timer) {
 			Format(cheaters, sizeof(cheaters), "%s, %N", cheaters, GetArrayCell(currentDemoClients, i));
 		}
 	}
-	SetHudTextParams(-1.0, 0.09, 1.1, 0, 255, 0, 255);
-	ShowSyncHudText(client, hudCheaters, cheaters);
+	if(hudCheaters != INVALID_HANDLE) {
+		SetHudTextParams(-1.0, 0.09, 1.1, 0, 255, 0, 255);
+		ShowSyncHudText(client, hudCheaters, cheaters);
+	} else {
+		PrintToChat(client, "\x01\x0B\x04%s", cheaters);
+	}
 }
 
 public Action:SMAC_OnCheatDetected(client, const String:module[]) {
