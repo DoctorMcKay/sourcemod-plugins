@@ -9,7 +9,7 @@
 
 #include <regex>
 
-#define MORE_COLORS_VERSION		"1.7.2"
+#define MORE_COLORS_VERSION		"1.7.3"
 #define MAX_MESSAGE_LENGTH		256
 
 #define COLOR_RED				0xFF4040
@@ -325,7 +325,7 @@ stock bool:CAddColor(const String:name[], color) {
 	}
 	decl String:newName[64];
 	strcopy(newName, sizeof(newName), name);
-	StrToLower(newName);
+	CStrToLower(newName);
 	SetTrieValue(CTrie, newName, color);
 	return true;
 }
