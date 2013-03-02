@@ -6,11 +6,12 @@
 
 #undef REQUIRE_PLUGIN
 #include <ccc>
+#include <scp>
 #include <sourcebans>
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/steamrep.txt"
-#define PLUGIN_VERSION		"1.0.0"
+#define PLUGIN_VERSION		"1.1.0"
 #define STEAMREP_URL		"http://steamrep.com/id2rep.php"
 #define STEAM_API_URL		"http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/"
 
@@ -21,7 +22,8 @@ enum LogLevel {
 }
 
 enum TagType {
-	TagType_Scammer = 0,
+	TagType_None = 0,
+	TagType_Scammer,
 	TagType_TradeBanned,
 	TagType_TradeProbation
 }
@@ -49,10 +51,7 @@ new Handle:cvarUpdater;
 
 new Handle:sv_visiblemaxplayers;
 
-new bool:isTaggedScammer[MAXPLAYERS + 1];
-new bool:isTaggedTradeBan[MAXPLAYERS + 1];
-new bool:isTaggedProbation[MAXPLAYERS + 1];
-new bool:cccHasLoaded[MAXPLAYERS + 1];
+new TagType:clientTag[MAXPLAYERS + 1];
 new bool:messageDisplayed[MAXPLAYERS + 1];
 
 public OnPluginStart() {
@@ -62,7 +61,7 @@ public OnPluginStart() {
 	cvarKickTaggedScammers = CreateConVar("steamrep_checker_kick_tagged_scammers", "1", "Kick chat-tagged scammers if the server gets full?", _, true, 0.0, true, 1.0);
 	cvarValveBanDealMethod = CreateConVar("steamrep_checker_valve_ban_deal_method", "2", "How to deal with Valve trade-banned players (requires API key to be set)\n0 = Disabled\n1 = Prefix chat with [TRADE BANNED] tag and warn users in chat (requires Custom Chat Colors)\n2 = Kick\n3 = Ban Steam ID\n4 = Ban IP\n5 = Ban Steam ID + IP", _, true, 0.0, true, 5.0);
 	cvarValveCautionDealMethod = CreateConVar("steamrep_checker_valve_probation_deal_method", "1", "How to deal with Valve trade-probation players (requires API key to be set)\n0 = Disabled\n1 = Prefix chat with [TRADE PROBATION] tag and warn users in chat (requires Custom Chat Colors)\n2 = Kick\n3 = Ban Steam ID\n4 = Ban IP\n5 = Ban Steam ID + IP", _, true, 0.0, true, 5.0);
-	cvarSteamAPIKey = CreateConVar("steamrep_checker_steam_api_key", "", "API key obtained from http://steamcommunity.com/dev (only required for Valve trade-ban or trade-probation detection");
+	cvarSteamAPIKey = CreateConVar("steamrep_checker_steam_api_key", "", "API key obtained from http://steamcommunity.com/dev (only required for Valve trade-ban or trade-probation detection", FCVAR_PROTECTED);
 	cvarSendIP = CreateConVar("steamrep_checker_send_ip", "0", "Send IP addresses of connecting players to SteamRep?", _, true, 0.0, true, 1.0);
 	cvarExcludedTags = CreateConVar("steamrep_checker_untrusted_tags", "", "Input the tags of any community whose bans you do not trust here.");
 	cvarSpawnMessage = CreateConVar("steamrep_checker_spawn_message", "1", "Display messages upon first spawn that this server is protected by SteamRep?", _, true, 0.0, true, 1.0);
@@ -74,15 +73,14 @@ public OnPluginStart() {
 	sv_visiblemaxplayers = FindConVar("sv_visiblemaxplayers");
 	
 	HookEvent("player_spawn", Event_PlayerSpawn);
+	HookEvent("player_changename", Event_PlayerChangeName);
 	
 	RegConsoleCmd("sm_rep", Command_Rep, "Checks a user's SteamRep");
 	RegConsoleCmd("sm_sr", Command_Rep, "Checks a user's SteamRep");
 }
 
 public OnClientConnected(client) {
-	isTaggedScammer[client] = false;
-	isTaggedTradeBan[client] = false;
-	isTaggedProbation[client] = false;
+	clientTag[client] = TagType_None;
 }
 
 public OnClientPostAdminCheck(client) {
@@ -109,7 +107,7 @@ PerformKicks() {
 	if(GetClientCount(false) >= (GetConVarInt(sv_visiblemaxplayers) - 1) && GetConVarBool(cvarKickTaggedScammers)) {
 		if(GetConVarInt(cvarDealMethod) == 1) {
 			for(new i = 1; i <= MaxClients; i++) {
-				if(IsClientInGame(i) && isTaggedScammer[i]) {
+				if(IsClientInGame(i) && clientTag[i] == TagType_Scammer) {
 					KickClient(i, "You were kicked to free a slot because you are a reported scammer");
 					return;
 				}
@@ -117,7 +115,7 @@ PerformKicks() {
 		}
 		if(GetConVarInt(cvarValveBanDealMethod) == 1) {
 			for(new i = 1; i <= MaxClients; i++) {
-				if(IsClientInGame(i) && isTaggedTradeBan[i]) {
+				if(IsClientInGame(i) && clientTag[i] == TagType_TradeBanned) {
 					KickClient(i, "You were kicked to free a slot because you are trade banned");
 					return;
 				}
@@ -125,7 +123,7 @@ PerformKicks() {
 		}
 		if(GetConVarInt(cvarValveCautionDealMethod) == 1) {
 			for(new i = 1; i <= MaxClients; i++) {
-				if(IsClientInGame(i) && isTaggedTradeBan[i]) {
+				if(IsClientInGame(i) && clientTag[i] == TagType_TradeProbation) {
 					KickClient(i, "You were kicked to free a slot because you are on trade probation");
 					return;
 				}
@@ -184,8 +182,8 @@ HandleScammer(client, const String:auth[]) {
 		}
 		case 1: {
 			// Chat tag
-			if(!LibraryExists("ccc")) {
-				LogItem(Log_Error, "Tried to tag %L, but Custom Chat Colors is not loaded.", client);
+			if(!LibraryExists("scp")) {
+				LogItem(Log_Info, "Simple Chat Processor (Redux) is not loaded, so tags will not be colored in chat.", client);
 				return;
 			}
 			LogItem(Log_Info, "Tagged %L as a scammer", client);
@@ -278,8 +276,8 @@ HandleValvePlayer(client, bool:banned) {
 		}
 		case 1: {
 			// Chat tag
-			if(!LibraryExists("ccc")) {
-				LogItem(Log_Error, "Tried to tag %L, but Custom Chat Colors is not loaded.", client);
+			if(!LibraryExists("scp")) {
+				LogItem(Log_Info, "Simple Chat Processor (Redux) is not loaded, so tags will not be colored in chat.", client);
 				return;
 			}
 			LogItem(Log_Info, "Tagged %L as %s", client, banned ? "trade banned" : "trade probation");
@@ -336,43 +334,43 @@ HandleValvePlayer(client, bool:banned) {
 	}
 }
 
-public CCC_OnUserConfigLoaded(client) {
-	cccHasLoaded[client] = true;
-	if(isTaggedScammer[client]) {
-		SetClientTag(client, TagType_Scammer);
-	} else if(isTaggedTradeBan[client]) {
-		SetClientTag(client, TagType_TradeBanned);
-	} else if(isTaggedProbation[client]) {
-		SetClientTag(client, TagType_TradeProbation);
-	}
-}
-
 SetClientTag(client, TagType:type) {
-	switch(type) {
-		case TagType_Scammer: isTaggedScammer[client] = true;
-		case TagType_TradeBanned: isTaggedTradeBan[client] = true;
-		case TagType_TradeProbation: isTaggedProbation[client] = true;
-	}
-	if(!cccHasLoaded[client]) {
-		return;
-	}
+	decl String:name[MAX_NAME_LENGTH];
 	switch(type) {
 		case TagType_Scammer: {
-			CCC_SetTag(client, "[SCAMMER] ");
-			CCC_SetColor(client, CCC_TagColor, 0xFF0000, false);
 			PrintToChatAll("\x07FF0000WARNING: \x03%N \x01is a reported scammer at SteamRep.com", client);
+			Format(name, sizeof(name), "[SCAMMER] %N", client);
+			SetClientInfo(client, "name", name);
 		}
 		case TagType_TradeBanned: {
-			CCC_SetTag(client, "[TRADE BANNED] ");
-			CCC_SetColor(client, CCC_TagColor, 0xFF0000, false);
-			PrintToChatAll("\x07FF0000WARNING: \x03%N \x01is trade banned", client);
+			PrintToChatAll("\x07FF0000WARNING: \x03%N \x01is trade banned", client); 
+			Format(name, sizeof(name), "[TRADE BANNED] %N", client);
+			SetClientInfo(client, "name", name);
 		}
 		case TagType_TradeProbation: {
-			CCC_SetTag(client, "[TRADE PROBATION] ");
-			CCC_SetColor(client, CCC_TagColor, 0xFF7F00, false);
 			PrintToChatAll("\x07FF7F00CAUTION: \x03%N \x01is on trade probation", client);
+			Format(name, sizeof(name), "[TRADE PROBATION] %N", client);
+			SetClientInfo(client, "name", name);
 		}
 	}
+	clientTag[client] = type;
+}
+
+public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:message[]) {
+	switch(clientTag[author]) {
+		case TagType_None: return Plugin_Continue;
+		case TagType_Scammer: ReplaceString(name, MAXLENGTH_NAME, "[SCAMMER]", "\x07FF0000[SCAMMER]\x03");
+		case TagType_TradeBanned: ReplaceString(name, MAXLENGTH_NAME, "[TRADE BANNED]", "\x07FF0000[TRADE BANNED]\x03");
+		case TagType_TradeProbation: ReplaceString(name, MAXLENGTH_NAME, "[TRADE PROBATION]", "\x07FF7F00[TRADE PROBATION]\x03");
+	}
+	return Plugin_Changed;
+}
+
+public Action:CCC_OnTagApplied(client) {
+	if(clientTag[client] != TagType_None) {
+		return Plugin_Handled;
+	}
+	return Plugin_Continue;
 }
 
 public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast) {
@@ -385,6 +383,22 @@ public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast) 
 	}
 	PrintToChat(client, "\x04[SR] \x01This server is protected by \x04SteamRep\x01. Visit \x04SteamRep.com\x01 for more information.");
 	messageDisplayed[client] = true;
+}
+
+public Event_PlayerChangeName(Handle:event, const String:name[], bool:dontBroadcast) {
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
+	if(clientTag[client] == TagType_None) {
+		return;
+	}
+	decl String:clientName[MAX_NAME_LENGTH];
+	GetEventString(event, "newname", clientName, sizeof(clientName));
+	if(clientTag[client] == TagType_Scammer && StrContains(clientName, "[SCAMMER]") != 0) {
+		KickClient(client, "Kicked from server\n\nDo not attempt to remove the [SCAMMER] tag");
+	} else if(clientTag[client] == TagType_TradeBanned && StrContains(clientName, "[TRADE BANNED]") != 0) {
+		KickClient(client, "Kicked from server\n\nDo not attempt to remove the [TRADE BANNED] tag");
+	} else if(clientTag[client] == TagType_TradeProbation && StrContains(clientName, "[TRADE PROBATION]") != 0) {
+		KickClient(client, "Kicked from server\n\nDo not attempt to remove the [TRADE PROBATION] tag");
+	}
 }
 
 public Action:Command_Rep(client, args) {
