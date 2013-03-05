@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolorsmysqlmodule.txt"
-#define PLUGIN_VERSION		"1.1.0"
+#define PLUGIN_VERSION		"1.1.1"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors MySQL Module",
@@ -126,6 +126,11 @@ public Action:Command_DumpData(client, args) {
 }
 
 public CCC_OnUserConfigLoaded(client) {
+	if(kv == INVALID_HANDLE) {
+		// Database not ready yet, let's wait till it is
+		CreateTimer(5.0, Timer_CheckDatabase, GetClientUserId(client), TIMER_REPEAT);
+		return;
+	}
 	decl String:auth[32];
 	GetClientAuthString(client, auth, sizeof(auth));
 	KvRewind(kv);
@@ -211,6 +216,18 @@ public CCC_OnUserConfigLoaded(client) {
 		}
 		CCC_SetColor(client, CCC_ChatColor, color, chatLen == 8);
 	}
+}
+
+public Action:Timer_CheckDatabase(Handle:timer, any:userid) {
+	new client = GetClientOfUserId(userid);
+	if(client == 0) {
+		return Plugin_Stop;
+	}
+	if(kv == INVALID_HANDLE) {
+		return Plugin_Continue;
+	}
+	CCC_OnUserConfigLoaded(client);
+	return Plugin_Stop;
 }
 
 /////////////////////////////////

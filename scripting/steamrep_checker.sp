@@ -11,7 +11,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/steamrep.txt"
-#define PLUGIN_VERSION		"1.1.0"
+#define PLUGIN_VERSION		"1.1.1"
 #define STEAMREP_URL		"http://steamrep.com/id2rep.php"
 #define STEAM_API_URL		"http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/"
 
@@ -85,7 +85,7 @@ public OnClientConnected(client) {
 
 public OnClientPostAdminCheck(client) {
 	PerformKicks();
-	if(CheckCommandAccess(client, "SkipSR", ADMFLAG_ROOT)) {
+	if(IsFakeClient(client) || CheckCommandAccess(client, "SkipSR", ADMFLAG_ROOT)) {
 		return;
 	}
 	decl String:auth[32];

@@ -4,13 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.1.0"
+			"Latest"	"1.1.1"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Removed optional Custom Chat Colors dependency"
-		"Notes" " - Updated scammer tagging to rename the client"
-		"Notes" " - Added optional Simple Chat Processor (Redux) dependecy that is used for coloring scammer tags in chat"
-		"Notes" " - Added blocking of tags applied by Custom Chat Colors for tagged scammers"
+		"Notes" " - Fixed a bug that caused bots to be checked (unsuccessfully)"
 	}
 	
 	"Files"
