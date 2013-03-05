@@ -11,7 +11,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/steamrep.txt"
-#define PLUGIN_VERSION		"1.1.1"
+#define PLUGIN_VERSION		"1.1.2"
 #define STEAMREP_URL		"http://steamrep.com/id2rep.php"
 #define STEAM_API_URL		"http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/"
 
@@ -208,7 +208,9 @@ HandleScammer(client, const String:auth[]) {
 			LogItem(Log_Info, "Banned %L by IP as a scammer", client);
 			if(LibraryExists("sourcebans")) {
 				// SourceBans doesn't currently expose a native to ban an IP!
-				ServerCommand("sm_banip #%d %d A scammer has connected from this IP. Steam ID: %s", GetClientUserId(client), GetConVarInt(cvarIPBanLength), clientAuth);
+				decl String:ip[64];
+				GetClientIP(client, ip, sizeof(ip));
+				ServerCommand("sm_banip \"%s\" %d A scammer has connected from this IP. Steam ID: %s", ip, GetConVarInt(cvarIPBanLength), clientAuth);
 			} else {
 				decl String:banMessage[256];
 				Format(banMessage, sizeof(banMessage), "A scammer has connected from this IP. Steam ID: %s", clientAuth);
@@ -219,8 +221,10 @@ HandleScammer(client, const String:auth[]) {
 			// Ban Steam ID + IP
 			LogItem(Log_Info, "Banned %L by Steam ID and IP as a scammer", client);
 			if(LibraryExists("sourcebans")) {
+				decl String:ip[64];
+				GetClientIP(client, ip, sizeof(ip));
 				SBBanPlayer(0, client, GetConVarInt(cvarSteamIDBanLength), "Player is a reported scammer via SteamRep.com");
-				ServerCommand("sm_banip #%d %d A scammer has connected from this IP. Steam ID: %s", GetClientUserId(client), GetConVarInt(cvarIPBanLength), clientAuth);
+				ServerCommand("sm_banip \"%s\" %d A scammer has connected from this IP. Steam ID: %s", ip, GetConVarInt(cvarIPBanLength), clientAuth);
 			} else {
 				BanClient(client, GetConVarInt(cvarSteamIDBanLength), BANFLAG_AUTHID, "Player is a reported scammer via SteamRep.com", "You are a reported scammer. Visit http://www.steamrep.com for more information", "steamrep_checker");
 				BanClient(client, GetConVarInt(cvarIPBanLength), BANFLAG_IP, "Player is a reported scammer via SteamRep.com", "You are a reported scammer. Visit http://www.steamrep.com for more information", "steamrep_checker");
