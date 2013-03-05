@@ -9,7 +9,7 @@
 
 #include <regex>
 
-#define MORE_COLORS_VERSION		"1.7.3"
+#define MORE_COLORS_VERSION		"1.7.4"
 #define MAX_MESSAGE_LENGTH		256
 
 #define COLOR_RED				0xFF4040
@@ -61,7 +61,7 @@ stock CPrintToChatAll(const String:message[], any:...) {
 	CCheckTrie();
 	decl String:buffer[MAX_MESSAGE_LENGTH], String:buffer2[MAX_MESSAGE_LENGTH];
 	for(new i = 1; i <= MaxClients; i++) {
-		if(!IsClientInGame(i) || IsFakeClient(i) || CSkipList[i]) {
+		if(!IsClientInGame(i) || CSkipList[i]) {
 			CSkipList[i] = false;
 			continue;
 		}
