@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.1.1"
+			"Latest"	"1.1.2"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed a bug that caused bots to be checked (unsuccessfully)"
+		"Notes" " - Fixed a bug that caused IP bans to not be saved in SourceBans"
 	}
 	
 	"Files"
