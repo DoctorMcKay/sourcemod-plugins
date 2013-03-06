@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.7.2"
+			"Latest"	"1.7.3"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Removed the \"A\" from the version cvar if the Updater cvar is set to 0"
+		"Notes" " - Added handling for backpack.tf rate-limiting"
 	}
 	
 	"Files"
