@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.7.3"
+			"Latest"	"1.7.4"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added handling for backpack.tf rate-limiting"
+		"Notes" " - Fixed a stupid error"
 	}
 	
 	"Files"
