@@ -8,7 +8,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/backpack-tf.txt"
-#define PLUGIN_VERSION		"1.7.3"
+#define PLUGIN_VERSION		"1.7.4"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v2/"
 #define STEAM_URL			"http://www.doctormckay.com/steamapi/itemnames.php" // please don't use this page for anything besides this plugin, I don't want my server to crash... code used to generate it is here: http://pastebin.com/GV5HUtMZ ... don't make me limit requests to this page by IP... I will do it if necessary
 #define ITEM_EARBUDS		143
@@ -218,7 +218,6 @@ public OnBackpackTFComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessfu
 	
 	Steam_WriteHTTPResponseBody(HTTPRequest, path);
 	Steam_ReleaseHTTPRequest(HTTPRequest);
-	PrintToServer("backpack.tf price list successfully downloaded!");
 	
 	if(backpackTFPricelist != INVALID_HANDLE) {
 		CloseHandle(backpackTFPricelist);
@@ -227,10 +226,12 @@ public OnBackpackTFComplete(HTTPRequestHandle:HTTPRequest, bool:requestSuccessfu
 	FileToKeyValues(backpackTFPricelist, path);
 	if(KvGetNum(backpackTFPricelist, "success") == 0) {
 		LogError("backpack.tf API failed. We are being rate-limited by backpack.tf.");
-		CreateTimer(60.0, Timer_Update);
+		CreateTimer(300.0, Timer_Update); // Going to have to wait 5 minutes... :(
 		CloseHandle(backpackTFPricelist);
 		backpackTFPricelist = INVALID_HANDLE;
+		return;
 	}
+	PrintToServer("backpack.tf price list successfully downloaded!");
 	lastCacheTime = cacheTime;
 	cacheTime = KvGetNum(backpackTFPricelist, "current_time");
 	decl String:buffer[32];
