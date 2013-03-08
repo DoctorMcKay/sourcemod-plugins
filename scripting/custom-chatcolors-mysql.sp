@@ -58,7 +58,7 @@ public OnTableCreated(Handle:owner, Handle:hndl, const String:error[], any:db) {
 		CloseHandle(db);
 		SetFailState("Error creating database table. %s", error);
 	}
-	SQL_TQuery(owner, OnDataReceived, "SELECT * FROM `custom_chatcolors` ORDER BY `index` ASC", db);
+	SQL_TQuery(db, OnDataReceived, "SELECT * FROM `custom_chatcolors` ORDER BY `index` ASC", db);
 }
 
 public OnDataReceived(Handle:owner, Handle:hndl, const String:error[], any:db) {
