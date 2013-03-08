@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.7.4"
+			"Latest"	"1.7.5"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed a stupid error"
+		"Notes" " - Removed Updater auto-reloading in preparation for v2.0.0"
 	}
 	
 	"Files"
