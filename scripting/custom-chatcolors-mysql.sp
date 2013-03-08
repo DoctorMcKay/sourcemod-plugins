@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolorsmysqlmodule.txt"
-#define PLUGIN_VERSION		"1.1.1"
+#define PLUGIN_VERSION		"1.1.2"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors MySQL Module",
@@ -47,24 +47,27 @@ public OnDatabaseConnected(Handle:owner, Handle:hndl, const String:error[], any:
 		}
 	}
 	if(kv == INVALID_HANDLE) {
-		SQL_TQuery(hndl, OnTableCreated, "CREATE TABLE IF NOT EXISTS `custom_chatcolors` (`index` int(11) NOT NULL, `identity` varchar(32) NOT NULL, `flag` char(1) DEFAULT NULL, `tag` varchar(32) DEFAULT NULL, `tagcolor` varchar(8) DEFAULT NULL, `namecolor` varchar(8) DEFAULT NULL, `textcolor` varchar(8) DEFAULT NULL, PRIMARY KEY (`index`)) ENGINE=MyISAM DEFAULT CHARSET=latin1");
+		SQL_TQuery(hndl, OnTableCreated, "CREATE TABLE IF NOT EXISTS `custom_chatcolors` (`index` int(11) NOT NULL, `identity` varchar(32) NOT NULL, `flag` char(1) DEFAULT NULL, `tag` varchar(32) DEFAULT NULL, `tagcolor` varchar(8) DEFAULT NULL, `namecolor` varchar(8) DEFAULT NULL, `textcolor` varchar(8) DEFAULT NULL, PRIMARY KEY (`index`)) ENGINE=MyISAM DEFAULT CHARSET=latin1", hndl);
 	} else {
-		SQL_TQuery(hndl, OnDataReceived, "SELECT * FROM `custom_chatcolors` ORDER BY `index` ASC");
+		SQL_TQuery(hndl, OnDataReceived, "SELECT * FROM `custom_chatcolors` ORDER BY `index` ASC", hndl);
 	}
 }
 
-public OnTableCreated(Handle:owner, Handle:hndl, const String:error[], any:data) {
+public OnTableCreated(Handle:owner, Handle:hndl, const String:error[], any:db) {
 	if(hndl == INVALID_HANDLE) {
+		CloseHandle(db);
 		SetFailState("Error creating database table. %s", error);
 	}
-	SQL_TQuery(owner, OnDataReceived, "SELECT * FROM `custom_chatcolors` ORDER BY `index` ASC");
+	SQL_TQuery(owner, OnDataReceived, "SELECT * FROM `custom_chatcolors` ORDER BY `index` ASC", db);
 }
 
-public OnDataReceived(Handle:owner, Handle:hndl, const String:error[], any:data) {
+public OnDataReceived(Handle:owner, Handle:hndl, const String:error[], any:db) {
 	if(hndl == INVALID_HANDLE) {
 		if(kv == INVALID_HANDLE) {
+			CloseHandle(db);
 			SetFailState("Unable to query database. %s", error);
 		} else {
+			CloseHandle(db);
 			LogError("Unable to query database. Falling back to saved values. %s", error);
 			return;
 		}
@@ -110,7 +113,7 @@ public OnDataReceived(Handle:owner, Handle:hndl, const String:error[], any:data)
 		}
 		KvRewind(kv);
 	}
-	CloseHandle(owner); // Close database connection
+	CloseHandle(db); // Close database connection
 }
 
 public Action:Command_DumpData(client, args) {
