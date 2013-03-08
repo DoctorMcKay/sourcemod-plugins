@@ -1,0 +1,48 @@
+"Phrases"
+{
+	"Price list updated"
+	{
+		"en"			"Price list updated."
+	}
+	"Type !pc for a price check"
+	{
+		"en"			"Type !pc for a price check."
+	}
+	"Up"
+	{
+		"en"			"Up"
+	}
+	"Down"
+	{
+		"en"			"Down"
+	}
+	"From"
+	{
+		"en"			"from"
+	}
+	"To"
+	{
+		"en"			"to"
+	}
+	"Price check"
+	{
+		"#format"		"{1:s}"
+		"en"			"Price check: {1}"
+	}
+	"Prices are estimates only"
+	{
+		"en"			"Prices are estimates only"
+	}
+	"Prices courtesy of backpack.tf"
+	{
+		"en"			"Prices courtesy of backpack.tf"
+	}
+	"Please allow backpack.tf time to load"
+	{
+		"en"			"Please allow backpack.tf time to load"
+	}
+	"The price list has not loaded yet"
+	{
+		"en"			"The price list has not loaded yet"
+	}
+}
