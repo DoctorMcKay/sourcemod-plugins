@@ -4,26 +4,28 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.0.0"
+			"Latest"	"2.0.1"
+			"Previous"	"2.0.0"
 		}
+		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Updated plugin to use v3 of the backpack.tf IGetPrices API"
-		"Notes" " - Plugin now requires a backpack.tf API key which can be obtained at http://backpack.tf/api/register/ and should be set in backpack_tf_api_key"
-		"Notes" " - Added backpack_tf_update_notification_red, backpack_tf_update_notification_green, and backpack_tf_update_notification_blue cvars to control HUD text color"
-		"Notes" " - Added backpack_tf_update_notification_message_time cvar to control HUD message duration"
-		"Notes" " - Added backpack_tf_add_tag cvar which allows you to disable automatic sv_tags appending"
-		"Notes" " - Plugin now generates a config file under cfg/sourcemod/plugin.backpack-tf.cfg"
-		"Notes" " - Added translation file under sourcemod/translations/backpack-tf.phrases.txt"
-		"Notes" " - Added price ranges"
-		"Notes" " - Improved HUD notifications"
-		"Notes" " - Removed dependecy on doctormckay.com web server"
-		"Notes" " - Various improvements"
+		"Notes" " - Added Polish translations"
 	}
 	
 	"Files"
 	{
+		"Patch"
+		{
+			"Plugin"		"Path_SM/plugins/backpack-tf.smx"
+			"Plugin"		"Path_SM/translations/pl/backpack-tf.phrases.txt"
+			
+			"Source"		"Path_SM/scripting/backpack-tf.sp"
+		}
+		
 		"Plugin"	"Path_SM/plugins/backpack-tf.smx"
 		"Plugin"	"Path_SM/translations/backpack-tf.phrases.txt"
+		"Plugin"	"Path_SM/translations/pl/backpack-tf.phrases.txt"
+		
 		"Source"	"Path_SM/scripting/backpack-tf.sp"
 	}
 }

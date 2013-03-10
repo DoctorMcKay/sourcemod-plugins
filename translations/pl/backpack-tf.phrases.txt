@@ -1,0 +1,47 @@
+"Phrases"
+{
+	"Price list updated"
+	{
+		"pl"			"Cennik zaktualizowany."
+	}
+	"Type !pc for a price check"
+	{
+		"pl"			"Wpisz !pc aby otworzyć cennik."
+	}
+	"Up"
+	{
+		"pl"			"Wzrost"
+	}
+	"Down"
+	{
+		"pl"			"Spadek"
+	}
+	"From"
+	{
+		"pl"			"z"
+	}
+	"To"
+	{
+		"pl"			"na"
+	}
+	"Price check"
+	{
+		"pl"			"Przedmiot: {1}"
+	}
+	"Prices are estimates only"
+	{
+		"pl"			"Są to tylko ceny sugerowane"
+	}
+	"Prices courtesy of backpack.tf"
+	{
+		"pl"			"Pochodzą ze strony backpack.tf"
+	}
+	"Please allow backpack.tf time to load"
+	{
+		"pl"			"Poczekaj na załadowanie się backpack.tf"
+	}
+	"The price list has not loaded yet"
+	{
+		"pl"			"Cennik nie został jeszcze załadowany"
+	}
+}
