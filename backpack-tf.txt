@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.0.1"
-			"Previous"	"2.0.0"
+			"Latest"	"2.0.2"
+			"Previous"	"2.0.1"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added Polish translations"
+		"Notes" " - Fixed a minor bug"
 	}
 	
 	"Files"
@@ -17,7 +17,6 @@
 		"Patch"
 		{
 			"Plugin"		"Path_SM/plugins/backpack-tf.smx"
-			"Plugin"		"Path_SM/translations/pl/backpack-tf.phrases.txt"
 			
 			"Source"		"Path_SM/scripting/backpack-tf.sp"
 		}
