@@ -3,10 +3,10 @@
 #define REQUIRE_EXTENSIONS
 #include <sourcemod>
 #include <colors>
-#include <socket>
+#include <socket> // Compiled with this version of colors.inc: https://forums.alliedmods.net/showpost.php?p=1883578&postcount=311
 #include <clientprefs>
 
-#define PLUGIN_VERSION "2.5.0"
+#define PLUGIN_VERSION "2.5.1"
 
 new Handle:advertCvar;
 new Handle:joinAdvertCvar;
@@ -50,6 +50,11 @@ public Plugin:myinfo = {
 	version     = PLUGIN_VERSION,
 	url         = "http://www.doctormckay.com"
 };
+
+public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) {
+	MarkNativeAsOptional("GetUserMessageType"); // For colors.inc
+	return APLRes_Success;
+}
 
 public OnPluginStart() {
 	RegConsoleCmd("sm_dj", Command_MusicMenu, "Listen to music");
