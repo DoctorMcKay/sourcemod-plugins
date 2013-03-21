@@ -4,26 +4,30 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.0.2"
-			"Previous"	"2.0.1"
+			"Latest"	"2.0.3"
+			"Previous"	"2.0.2"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed a minor bug"
+		"Notes" " - Added Danish and Dutch translations"
 	}
 	
 	"Files"
 	{
 		"Patch"
 		{
-			"Plugin"		"Path_SM/plugins/backpack-tf.smx"
+			"Plugin"	"Path_SM/plugins/backpack-tf.smx"
+			"Plugin"	"Path_SM/translations/da/backpack-tf.phrases.txt"
+			"Plugin"	"Path_SM/translations/nl/backpack-tf.phrases.txt"
 			
-			"Source"		"Path_SM/scripting/backpack-tf.sp"
+			"Source"	"Path_SM/scripting/backpack-tf.sp"
 		}
 		
 		"Plugin"	"Path_SM/plugins/backpack-tf.smx"
 		"Plugin"	"Path_SM/translations/backpack-tf.phrases.txt"
 		"Plugin"	"Path_SM/translations/pl/backpack-tf.phrases.txt"
+		"Plugin"	"Path_SM/translations/da/backpack-tf.phrases.txt"
+		"Plugin"	"Path_SM/translations/nl/backpack-tf.phrases.txt"
 		
 		"Source"	"Path_SM/scripting/backpack-tf.sp"
 	}

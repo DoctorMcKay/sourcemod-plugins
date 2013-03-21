@@ -1,0 +1,66 @@
+// Exported from SourceMod Translator
+// Date: 2013-03-21 04:18:10 UTC
+// Language: Danish (da)
+// 
+// To view other translations for this plugin, please visit:
+// http://translator.mitchdempsey.com/sourcemod_plugins/122
+//
+"Phrases"
+{
+
+	"From"
+	{
+		"da"		"fra"
+	}
+
+	"Down"
+	{
+		"da"		"Ned"
+	}
+
+	"Prices are estimates only"
+	{
+		"da"		"Priser er kun cirka priser"
+	}
+
+	"Prices courtesy of backpack.tf"
+	{
+		"da"		"Priser takket vær backpack.tf"
+	}
+
+	"To"
+	{
+		"da"		"til"
+	}
+
+	"Price list updated"
+	{
+		"da"		"Pris liste opdateret"
+	}
+
+	"Price check"
+	{
+		"da"		"Pris tjek: {1}"
+	}
+
+	"The price list has not loaded yet"
+	{
+		"da"		"Pris listen er ikke blevet indlæst endnu"
+	}
+
+	"Up"
+	{
+		"da"		"Op"
+	}
+
+	"Please allow backpack.tf time to load"
+	{
+		"da"		"GIv venligst backpack.tf tid til at indlæse"
+	}
+
+	"Type !pc for a price check"
+	{
+		"da"		"Skriv !pc for at lave et pris tjek."
+	}
+
+}
