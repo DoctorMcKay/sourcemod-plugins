@@ -1,47 +1,66 @@
+// Exported from SourceMod Translator
+// Date: 2013-03-21 04:18:10 UTC
+// Language: Polish (pl)
+// 
+// To view other translations for this plugin, please visit:
+// http://translator.mitchdempsey.com/sourcemod_plugins/122
+//
 "Phrases"
 {
+
 	"Price list updated"
 	{
-		"pl"			"Cennik zaktualizowany."
+		"pl"		"Cennik zaktualizowany."
 	}
+
 	"Type !pc for a price check"
 	{
-		"pl"			"Wpisz !pc aby otworzyć cennik."
+		"pl"		"Wpisz !pc aby otworzyć cennik."
 	}
+
 	"Up"
 	{
-		"pl"			"Wzrost"
+		"pl"		"Wzrost"
 	}
+
 	"Down"
 	{
-		"pl"			"Spadek"
+		"pl"		"Spadek"
 	}
+
 	"From"
 	{
-		"pl"			"z"
+		"pl"		"z"
 	}
+
 	"To"
 	{
-		"pl"			"na"
+		"pl"		"na"
 	}
+
 	"Price check"
 	{
-		"pl"			"Przedmiot: {1}"
+		"pl"		"Przedmiot: {1}"
 	}
+
 	"Prices are estimates only"
 	{
-		"pl"			"Są to tylko ceny sugerowane"
+		"pl"		"Są to tylko ceny sugerowane"
 	}
+
 	"Prices courtesy of backpack.tf"
 	{
-		"pl"			"Pochodzą ze strony backpack.tf"
+		"pl"		"Pochodzą ze strony backpack.tf"
 	}
+
 	"Please allow backpack.tf time to load"
 	{
-		"pl"			"Poczekaj na załadowanie się backpack.tf"
+		"pl"		"Poczekaj na załadowanie się backpack.tf"
 	}
+
 	"The price list has not loaded yet"
 	{
-		"pl"			"Cennik nie został jeszcze załadowany"
+		"pl"		"Cennik nie został jeszcze załadowany"
 	}
+
 }
