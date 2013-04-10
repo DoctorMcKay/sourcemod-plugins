@@ -9,7 +9,7 @@
 
 #include <regex>
 
-#define MORE_COLORS_VERSION		"1.7.4"
+#define MORE_COLORS_VERSION		"1.7.5"
 #define MAX_MESSAGE_LENGTH		256
 
 #define COLOR_RED				0xFF4040
@@ -240,13 +240,13 @@ stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxle
 		ReplaceString(buffer, maxlen, "{teamcolor}", "\x03", false);
 	}
 	new cursor = 0;
-	new value, Handle:regex;
+	new value;
 	decl String:tag[32], String:buff[32], String:output[maxlen];
 	strcopy(output, maxlen, buffer);
 	// Since the string's size is going to be changing, output will hold the replaced string and we'll search buffer
 	
+	new Handle:regex = CompileRegex("{[a-zA-Z]+}");
 	for(new i = 0; i < 1000; i++) { // The RegEx extension is quite flaky, so we have to loop here :/. This loop is supposed to be infinite and broken by return, but conditions have been added to be safe.
-		regex = CompileRegex("{[a-zA-Z]+}");
 		if(MatchRegex(regex, buffer[cursor]) < 1) {
 			CloseHandle(regex);
 			strcopy(buffer, maxlen, output);
@@ -260,7 +260,6 @@ stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxle
 		ReplaceString(buff, sizeof(buff), "}", "");
 		
 		if(!GetTrieValue(CTrie, buff, value)) {
-			CloseHandle(regex);
 			continue;
 		}
 		
@@ -270,7 +269,6 @@ stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxle
 			Format(buff, sizeof(buff), "\x07%06X", value);
 			ReplaceString(output, maxlen, tag, buff, false);
 		}
-		CloseHandle(regex);
 	}
 	LogError("[MORE COLORS] Infinite loop broken.");
 }
