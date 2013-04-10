@@ -8,7 +8,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolorsclantagmodule.txt"
-#define PLUGIN_VERSION		"1.0.0"
+#define PLUGIN_VERSION		"1.0.1"
 
 public Plugin:myinfo = {
 	name        = "[CS] Custom Chat Colors Clan Tag Module",
@@ -62,6 +62,7 @@ public Action:Timer_SetClanTag(Handle:timer, any:userid) {
 		CCC_SetColor(client, CCC_TagColor, COLOR_NONE, false);
 	}
 	
+	StrCat(tag, sizeof(tag), " ");
 	CCC_SetTag(client, tag);
 }
 
