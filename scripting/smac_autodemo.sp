@@ -11,7 +11,7 @@
 #include <bzip2>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/smac-autodemo.txt"
-#define PLUGIN_VERSION		"1.1.0"
+#define PLUGIN_VERSION		"1.2.0"
 
 public Plugin:myinfo = {
 	name        = "[ANY] SMAC AutoDemo",
@@ -150,6 +150,7 @@ public Action:Timer_Delay(Handle:timer, any:userid) {
 	if(client == 0) {
 		return; // client left
 	}
+	ServerCommand("exec sourcemod/smac_recording.cfg");
 	if(currentDemoClients != INVALID_HANDLE) {
 		SMAC_Log("Demo recording already in progress. See %s for a recording of %L", currentDemoFilename, client);
 		PushArrayCell(currentDemoClients, client);
