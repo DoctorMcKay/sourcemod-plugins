@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.0.3"
-			"Previous"	"2.0.2"
+			"Latest"	"2.0.4"
+			"Previous"	"2.0.3"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added Danish and Dutch translations"
+		"Notes" " - Improved Updater integration"
 	}
 	
 	"Files"
@@ -17,8 +17,6 @@
 		"Patch"
 		{
 			"Plugin"	"Path_SM/plugins/backpack-tf.smx"
-			"Plugin"	"Path_SM/translations/da/backpack-tf.phrases.txt"
-			"Plugin"	"Path_SM/translations/nl/backpack-tf.phrases.txt"
 			
 			"Source"	"Path_SM/scripting/backpack-tf.sp"
 		}
