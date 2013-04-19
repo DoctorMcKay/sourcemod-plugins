@@ -4,11 +4,7 @@
 #include <sdktools>
 #include <steamtools>
 
-#undef REQUIRE_PLUGIN
-#include <updater>
-
-#define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/backpack-tf.txt"
-#define PLUGIN_VERSION		"2.0.3"
+#define PLUGIN_VERSION		"2.0.4"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -48,7 +44,6 @@ new Handle:cvarHudHoldTime;
 new Handle:cvarMenuHoldTime;
 new Handle:cvarAPIKey;
 new Handle:cvarTag;
-new Handle:cvarUpdater;
 
 new Handle:hudText;
 new Handle:sv_tags;
@@ -56,6 +51,11 @@ new Handle:sv_tags;
 new Float:budsToKeys;
 new Float:keysToRef;
 new Float:refToUsd;
+
+#define UPDATE_FILE		"backpack-tf.txt"
+#define CONVAR_PREFIX	"backpack_tf"
+
+#include "mckayupdater.sp"
 
 public OnPluginStart() {
 	cvarBPCommand = CreateConVar("backpack_tf_bp_command", "1", "Enables the !bp command for use with backpack.tf");
@@ -70,9 +70,6 @@ public OnPluginStart() {
 	cvarMenuHoldTime = CreateConVar("backpack_tf_menu_open_time", "0", "Time to keep the price panel open for, 0 = forever");
 	cvarAPIKey = CreateConVar("backpack_tf_api_key", "", "API key obtained at http://backpack.tf/api/register/");
 	cvarTag = CreateConVar("backpack_tf_add_tag", "1", "If 1, adds the backpack.tf tag to your server's sv_tags, which is required to be listed on http://backpack.tf/servers", _, true, 0.0, true, 1.0);
-	cvarUpdater = CreateConVar("backpack_tf_auto_update", "1", "Enables automatic updating (has no effect if Updater is not installed)");
-	HookConVarChange(cvarUpdater, Callback_VersionConVarChanged); // For purposes of removing the "A" if updater is disabled
-	
 	AutoExecConfig();
 	
 	LoadTranslations("backpack-tf.phrases");
@@ -843,43 +840,4 @@ FindTargetEx(client, const String:target[], bool:nobots = false, bool:immunity =
 		}
 		return -1;
 	}
-}
-
-/////////////////////////////////
-
-public OnAllPluginsLoaded() {
-	new Handle:convar;
-	if(LibraryExists("updater")) {
-		Updater_AddPlugin(UPDATE_URL);
-		decl String:newVersion[12];
-		Format(newVersion, sizeof(newVersion), "%sA", PLUGIN_VERSION);
-		convar = CreateConVar("backpack_tf_version", newVersion, "backpack.tf Price Check Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);
-	} else {
-		convar = CreateConVar("backpack_tf_version", PLUGIN_VERSION, "backpack.tf Price Check Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);	
-	}
-	HookConVarChange(convar, Callback_VersionConVarChanged);
-	Callback_VersionConVarChanged(convar, "", ""); // Check the cvar value
-}
-
-public OnLibraryAdded(const String:name[]) {
-	if(StrEqual(name, "updater")) {
-		Updater_AddPlugin(UPDATE_URL);
-	}
-}
-
-public Callback_VersionConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
-	if(LibraryExists("updater") && GetConVarBool(cvarUpdater)) {
-		decl String:version[12];
-		Format(version, sizeof(version), "%sA", PLUGIN_VERSION);
-		SetConVarString(convar, version);
-	} else {
-		SetConVarString(convar, PLUGIN_VERSION);
-	}
-}
-
-public Action:Updater_OnPluginDownloading() {
-	if(!GetConVarBool(cvarUpdater)) {
-		return Plugin_Handled;
-	}
-	return Plugin_Continue;
 }
