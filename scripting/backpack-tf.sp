@@ -4,7 +4,7 @@
 #include <sdktools>
 #include <steamtools>
 
-#define PLUGIN_VERSION		"2.0.4"
+#define PLUGIN_VERSION		"2.0.5"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002

@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.0.4"
-			"Previous"	"2.0.3"
+			"Latest"	"2.0.5"
+			"Previous"	"2.0.4"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Improved Updater integration"
+		"Notes" " - Fixed a problem with Updater code"
 	}
 	
 	"Files"
