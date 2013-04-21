@@ -81,6 +81,10 @@ public OnLibraryRemoved(const String:name[]) {
 }
 
 public CheckUpdaterStatus(Handle:convar, const String:name[], const String:value[]) {
+	if(cvarVersion == INVALID_HANDLE) {
+		return; // Version cvar not created yet
+	}
+	
 	if(LibraryExists("updater") && GetConVarBool(cvarEnableUpdater)) {
 		decl String:url[512], String:version[12];
 		Format(url, sizeof(url), "%s/%s", UPDATER_BASE_URL, UPDATE_FILE);

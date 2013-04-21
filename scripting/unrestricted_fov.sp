@@ -5,7 +5,7 @@
 #include <clientprefs>
 #include <easy_commands>
 
-#define PLUGIN_VERSION	"1.0.0"
+#define PLUGIN_VERSION	"1.0.1"
 
 public Plugin:myinfo = {
 	name		= "[ANY] Unrestricted FOV",
