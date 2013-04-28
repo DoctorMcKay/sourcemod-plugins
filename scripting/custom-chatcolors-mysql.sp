@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolorsmysqlmodule.txt"
-#define PLUGIN_VERSION		"1.1.2"
+#define PLUGIN_VERSION		"1.1.3"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors MySQL Module",
@@ -47,7 +47,7 @@ public OnDatabaseConnected(Handle:owner, Handle:hndl, const String:error[], any:
 		}
 	}
 	if(kv == INVALID_HANDLE) {
-		SQL_TQuery(hndl, OnTableCreated, "CREATE TABLE IF NOT EXISTS `custom_chatcolors` (`index` int(11) NOT NULL, `identity` varchar(32) NOT NULL, `flag` char(1) DEFAULT NULL, `tag` varchar(32) DEFAULT NULL, `tagcolor` varchar(8) DEFAULT NULL, `namecolor` varchar(8) DEFAULT NULL, `textcolor` varchar(8) DEFAULT NULL, PRIMARY KEY (`index`)) ENGINE=MyISAM DEFAULT CHARSET=latin1", hndl);
+		SQL_TQuery(hndl, OnTableCreated, "CREATE TABLE IF NOT EXISTS `custom_chatcolors` (`index` int(11) NOT NULL, `identity` varchar(32) NOT NULL, `flag` char(1) DEFAULT NULL, `tag` varchar(32) DEFAULT NULL, `tagcolor` varchar(8) DEFAULT NULL, `namecolor` varchar(8) DEFAULT NULL, `textcolor` varchar(8) DEFAULT NULL, PRIMARY KEY (`index`), UNIQUE KEY `identity` (`identity`)) ENGINE=MyISAM DEFAULT CHARSET=latin1", hndl);
 	} else {
 		SQL_TQuery(hndl, OnDataReceived, "SELECT * FROM `custom_chatcolors` ORDER BY `index` ASC", hndl);
 	}
