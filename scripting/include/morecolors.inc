@@ -9,7 +9,7 @@
 
 #include <regex>
 
-#define MORE_COLORS_VERSION		"1.7.5"
+#define MORE_COLORS_VERSION		"1.7.6"
 #define MAX_MESSAGE_LENGTH		256
 
 #define COLOR_RED				0xFF4040
@@ -245,7 +245,7 @@ stock CReplaceColorCodes(String:buffer[], author=0, bool:removeTags=false, maxle
 	strcopy(output, maxlen, buffer);
 	// Since the string's size is going to be changing, output will hold the replaced string and we'll search buffer
 	
-	new Handle:regex = CompileRegex("{[a-zA-Z]+}");
+	new Handle:regex = CompileRegex("{[a-zA-Z0-9]+}");
 	for(new i = 0; i < 1000; i++) { // The RegEx extension is quite flaky, so we have to loop here :/. This loop is supposed to be infinite and broken by return, but conditions have been added to be safe.
 		if(MatchRegex(regex, buffer[cursor]) < 1) {
 			CloseHandle(regex);
