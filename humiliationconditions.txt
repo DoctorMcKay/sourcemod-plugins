@@ -1,0 +1,18 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.0.0"
+		}
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Initial release"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/humiliationconditions.smx"
+		"Source"	"Path_SM/scripting/humiliationconditions.sp"
+	}
+}
