@@ -97,7 +97,7 @@ public CheckUpdaterStatus(Handle:convar, const String:name[], const String:value
 	}
 }
 
-public Action:Updater_OnPluginDownloading() {
+public Action:Updater_OnPluginChecking() {
 	if(!GetConVarBool(cvarEnableUpdater)) {
 		return Plugin_Handled;
 	}
