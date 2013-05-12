@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.0.1"
+			"Latest"	"1.2.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed a problem with Updater code"
+		"Notes" " - Players' FOVs are no longer reset when exiting a sniper scope"
 	}
 	
 	"Files"
