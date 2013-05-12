@@ -6,7 +6,7 @@
 #include <socket> // Compiled with this version of colors.inc: https://forums.alliedmods.net/showpost.php?p=1883578&postcount=311
 #include <clientprefs>
 
-#define PLUGIN_VERSION "2.5.1"
+#define PLUGIN_VERSION "2.5.2"
 
 new Handle:advertCvar;
 new Handle:joinAdvertCvar;
@@ -723,6 +723,7 @@ public OnSocketDisconnected(Handle:socket, any:pack) {
 	BuildPath(Path_SM, path, sizeof(path), "data/smdj.txt");
 	new Handle:file = OpenFile(path, "r");
 	ReadFileLine(file, line, sizeof(line));
+	CloseHandle(file);
 	if(StrEqual(line, "Bad auth token", false)) {
 		SetFailState("Invalid auth token given");
 		return;
