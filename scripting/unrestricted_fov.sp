@@ -2,10 +2,11 @@
 
 #include <sourcemod>
 #include <sdktools>
+#include <tf2>
 #include <clientprefs>
 #include <easy_commands>
 
-#define PLUGIN_VERSION	"1.0.1"
+#define PLUGIN_VERSION	"1.1.0"
 
 public Plugin:myinfo = {
 	name		= "[ANY] Unrestricted FOV",
@@ -69,6 +70,20 @@ public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast) 
 		return;
 	}
 	
+	decl String:cookie[12];
+	GetClientCookie(client, cookieFOV, cookie, sizeof(cookie));
+	new fov = StringToInt(cookie);
+	if(fov < GetConVarInt(cvarFOVMin) || fov > GetConVarInt(cvarFOVMax)) {
+		return;
+	}
+	SetEntProp(client, Prop_Send, "m_iFOV", fov);
+	SetEntProp(client, Prop_Send, "m_iDefaultFOV", fov);
+}
+
+public TF2_OnConditionRemoved(client, TFCond:condition) {
+	if(condition != TFCond_Zoomed) {
+		return;
+	}
 	decl String:cookie[12];
 	GetClientCookie(client, cookieFOV, cookie, sizeof(cookie));
 	new fov = StringToInt(cookie);
