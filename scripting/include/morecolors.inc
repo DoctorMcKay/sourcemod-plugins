@@ -404,6 +404,7 @@ stock CShowActivity(client, const String:message[], any:...) {
  * Shows admin activity with colors
  * 
  * @param client		Client performing an action
+ * @param tag			Tag to prepend to the message (color tags supported)
  * @param message		Message (formatting rules)
  * @noreturn
  */
@@ -428,6 +429,7 @@ stock CShowActivityEx(client, const String:tag[], const String:message[], any:..
  * Shows admin activity with colors
  * 
  * @param client		Client performing an action
+ * @param tag			Tag to prepend to the message (color tags supported)
  * @param message		Message (formatting rules)
  * @noreturn
  */
