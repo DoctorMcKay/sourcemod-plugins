@@ -9,7 +9,7 @@
 
 #include <regex>
 
-#define MORE_COLORS_VERSION		"1.7.6"
+#define MORE_COLORS_VERSION		"1.8.0"
 #define MAX_MESSAGE_LENGTH		256
 
 #define COLOR_RED				0xFF4040
@@ -376,6 +376,76 @@ stock CReplyToCommandEx(client, author, const String:message[], any:...) {
 	} else {
 		CPrintToChatEx(client, author, buffer);
 	}
+}
+
+/**
+ * Shows admin activity with colors
+ * 
+ * @param client		Client performing an action
+ * @param message		Message (formatting rules)
+ * @noreturn
+ */
+stock CShowActivity(client, const String:message[], any:...) {
+	CCheckTrie();
+	if(client <= 0 || client > MaxClients) {
+		ThrowError("Invalid client index %d", client);
+	}
+	if(!IsClientInGame(client)) {
+		ThrowError("Client %d is not in game", client);
+	}
+	decl String:buffer[MAX_MESSAGE_LENGTH], String:buffer2[MAX_MESSAGE_LENGTH];
+	Format(buffer, sizeof(buffer), "\x01%s", message);
+	VFormat(buffer2, sizeof(buffer2), buffer, 3);
+	CReplaceColorCodes(buffer2);
+	ShowActivity(client, "%s", buffer2);
+}
+
+/**
+ * Shows admin activity with colors
+ * 
+ * @param client		Client performing an action
+ * @param message		Message (formatting rules)
+ * @noreturn
+ */
+stock CShowActivityEx(client, const String:tag[], const String:message[], any:...) {
+	CCheckTrie();
+	if(client <= 0 || client > MaxClients) {
+		ThrowError("Invalid client index %d", client);
+	}
+	if(!IsClientInGame(client)) {
+		ThrowError("Client %d is not in game", client);
+	}
+	decl String:buffer[MAX_MESSAGE_LENGTH], String:buffer2[MAX_MESSAGE_LENGTH];
+	Format(buffer, sizeof(buffer), "\x01%s", message);
+	VFormat(buffer2, sizeof(buffer2), buffer, 3);
+	CReplaceColorCodes(buffer2);
+	strcopy(buffer, sizeof(buffer), tag);
+	CReplaceColorCodes(buffer);
+	ShowActivityEx(client, tag, "%s", buffer2);
+}
+
+/**
+ * Shows admin activity with colors
+ * 
+ * @param client		Client performing an action
+ * @param message		Message (formatting rules)
+ * @noreturn
+ */
+stock CShowActivity2(client, const String:tag[], const String:message[], any:...) {
+	CCheckTrie();
+	if(client <= 0 || client > MaxClients) {
+		ThrowError("Invalid client index %d", client);
+	}
+	if(!IsClientInGame(client)) {
+		ThrowError("Client %d is not in game", client);
+	}
+	decl String:buffer[MAX_MESSAGE_LENGTH], String:buffer2[MAX_MESSAGE_LENGTH];
+	Format(buffer, sizeof(buffer), "\x01%s", message);
+	VFormat(buffer2, sizeof(buffer2), buffer, 3);
+	CReplaceColorCodes(buffer2);
+	strcopy(buffer, sizeof(buffer), tag);
+	CReplaceColorCodes(buffer);
+	ShowActivity2(client, buffer, "%s", buffer2);
 }
 
 /**
