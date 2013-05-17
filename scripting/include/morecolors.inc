@@ -9,7 +9,7 @@
 
 #include <regex>
 
-#define MORE_COLORS_VERSION		"1.8.0"
+#define MORE_COLORS_VERSION		"1.8.1"
 #define MAX_MESSAGE_LENGTH		256
 
 #define COLOR_RED				0xFF4040
@@ -369,7 +369,7 @@ stock CReplyToCommand(client, const String:message[], any:...) {
 stock CReplyToCommandEx(client, author, const String:message[], any:...) {
 	decl String:buffer[MAX_MESSAGE_LENGTH * 2];
 	SetGlobalTransTarget(client);
-	VFormat(buffer, sizeof(buffer), message, 3);
+	VFormat(buffer, sizeof(buffer), message, 4);
 	if(GetCmdReplySource() == SM_REPLY_TO_CONSOLE) {
 		CRemoveTags(buffer, sizeof(buffer));
 		PrintToConsole(client, buffer);
@@ -387,10 +387,10 @@ stock CReplyToCommandEx(client, author, const String:message[], any:...) {
  */
 stock CShowActivity(client, const String:message[], any:...) {
 	CCheckTrie();
-	if(client <= 0 || client > MaxClients) {
+	if(client < 0 || client > MaxClients) {
 		ThrowError("Invalid client index %d", client);
 	}
-	if(!IsClientInGame(client)) {
+	if(client != 0 && !IsClientInGame(client)) {
 		ThrowError("Client %d is not in game", client);
 	}
 	decl String:buffer[MAX_MESSAGE_LENGTH], String:buffer2[MAX_MESSAGE_LENGTH];
@@ -410,15 +410,15 @@ stock CShowActivity(client, const String:message[], any:...) {
  */
 stock CShowActivityEx(client, const String:tag[], const String:message[], any:...) {
 	CCheckTrie();
-	if(client <= 0 || client > MaxClients) {
+	if(client < 0 || client > MaxClients) {
 		ThrowError("Invalid client index %d", client);
 	}
-	if(!IsClientInGame(client)) {
+	if(client != 0 && !IsClientInGame(client)) {
 		ThrowError("Client %d is not in game", client);
 	}
 	decl String:buffer[MAX_MESSAGE_LENGTH], String:buffer2[MAX_MESSAGE_LENGTH];
 	Format(buffer, sizeof(buffer), "\x01%s", message);
-	VFormat(buffer2, sizeof(buffer2), buffer, 3);
+	VFormat(buffer2, sizeof(buffer2), buffer, 4);
 	CReplaceColorCodes(buffer2);
 	strcopy(buffer, sizeof(buffer), tag);
 	CReplaceColorCodes(buffer);
@@ -435,15 +435,15 @@ stock CShowActivityEx(client, const String:tag[], const String:message[], any:..
  */
 stock CShowActivity2(client, const String:tag[], const String:message[], any:...) {
 	CCheckTrie();
-	if(client <= 0 || client > MaxClients) {
+	if(client < 0 || client > MaxClients) {
 		ThrowError("Invalid client index %d", client);
 	}
-	if(!IsClientInGame(client)) {
+	if(client != 0 && !IsClientInGame(client)) {
 		ThrowError("Client %d is not in game", client);
 	}
 	decl String:buffer[MAX_MESSAGE_LENGTH], String:buffer2[MAX_MESSAGE_LENGTH];
 	Format(buffer, sizeof(buffer), "\x01%s", message);
-	VFormat(buffer2, sizeof(buffer2), buffer, 3);
+	VFormat(buffer2, sizeof(buffer2), buffer, 4);
 	CReplaceColorCodes(buffer2);
 	strcopy(buffer, sizeof(buffer), tag);
 	CReplaceColorCodes(buffer);
