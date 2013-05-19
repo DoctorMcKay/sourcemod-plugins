@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.0.5"
-			"Previous"	"2.0.4"
+			"Latest"	"2.1.0"
+			"Previous"	"2.0.5"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed a problem with Updater code"
+		"Notes" " - Added new robot Unusual effects"
 	}
 	
 	"Files"

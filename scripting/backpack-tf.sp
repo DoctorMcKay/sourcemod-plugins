@@ -4,7 +4,7 @@
 #include <sdktools>
 #include <steamtools>
 
-#define PLUGIN_VERSION		"2.0.5"
+#define PLUGIN_VERSION		"2.1.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -133,6 +133,16 @@ public OnPluginStart() {
 	SetTrieString(unusualNameTrie, "45", "Harvest Moon");
 	SetTrieString(unusualNameTrie, "46", "It's A Secret To Everybody");
 	SetTrieString(unusualNameTrie, "47", "Stormy 13th Hour");
+	SetTrieString(unusualNameTrie, "63", "Phosphorous");
+	SetTrieString(unusualNameTrie, "64", "Sulphurous");
+	SetTrieString(unusualNameTrie, "65", "Memory Leak");
+	SetTrieString(unusualNameTrie, "66", "Overclocked");
+	SetTrieString(unusualNameTrie, "67", "Electrostatic");
+	SetTrieString(unusualNameTrie, "68", "Power Surge");
+	SetTrieString(unusualNameTrie, "69", "Anti-Freeze");
+	SetTrieString(unusualNameTrie, "70", "Time Warp");
+	SetTrieString(unusualNameTrie, "71", "Green Black Hole");
+	SetTrieString(unusualNameTrie, "72", "Roboactive");
 	
 	hudText = CreateHudSynchronizer();
 }
