@@ -2,11 +2,13 @@
 
 #include <sourcemod>
 #include <sdktools>
-#include <tf2>
 #include <clientprefs>
 #include <easy_commands>
 
-#define PLUGIN_VERSION	"1.1.0"
+#undef REQUIRE_EXTENSIONS
+#include <tf2>
+
+#define PLUGIN_VERSION	"1.1.1"
 
 public Plugin:myinfo = {
 	name		= "[ANY] Unrestricted FOV",
