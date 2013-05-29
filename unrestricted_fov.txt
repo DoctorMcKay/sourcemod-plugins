@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.1.1"
+			"Latest"	"1.2.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Made the TF2 extension dependency optional"
+		"Notes" " - Custom FOV is no longer reset after teleporting"
 	}
 	
 	"Files"

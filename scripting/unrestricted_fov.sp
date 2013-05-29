@@ -8,7 +8,7 @@
 #undef REQUIRE_EXTENSIONS
 #include <tf2>
 
-#define PLUGIN_VERSION	"1.1.1"
+#define PLUGIN_VERSION	"1.2.0"
 
 public Plugin:myinfo = {
 	name		= "[ANY] Unrestricted FOV",
@@ -72,6 +72,20 @@ public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast) 
 		return;
 	}
 	
+	decl String:cookie[12];
+	GetClientCookie(client, cookieFOV, cookie, sizeof(cookie));
+	new fov = StringToInt(cookie);
+	if(fov < GetConVarInt(cvarFOVMin) || fov > GetConVarInt(cvarFOVMax)) {
+		return;
+	}
+	SetEntProp(client, Prop_Send, "m_iFOV", fov);
+	SetEntProp(client, Prop_Send, "m_iDefaultFOV", fov);
+}
+
+public TF2_OnConditionAdded(client, TFCond:condition) {
+	if(condition != TFCond_TeleportedGlow) {
+		return;
+	}
 	decl String:cookie[12];
 	GetClientCookie(client, cookieFOV, cookie, sizeof(cookie));
 	new fov = StringToInt(cookie);
