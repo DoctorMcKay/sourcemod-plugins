@@ -6,7 +6,7 @@
 #undef REQUIRE_EXTENSIONS
 #include <steamtools>
 
-#define PLUGIN_VERSION			"1.0.0"
+#define PLUGIN_VERSION			"1.0.1"
 
 #define IsClientF2P(%1)			(Steam_CheckClientSubscription(%1, 0) && !Steam_CheckClientDLC(%1, 459))
 
@@ -31,6 +31,11 @@ new bool:isTF;
 new bool:steamToolsLoaded;
 
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) {
+	MarkNativeAsOptional("Steam_GetNumClientSubscriptions");
+	MarkNativeAsOptional("Steam_GetClientSubscription");
+	MarkNativeAsOptional("Steam_GetNumClientDLCs");
+	MarkNativeAsOptional("Steam_GetClientDLC");
+	
 	if(SQL_CheckConfig("citybans")) {
 		db = SQL_Connect("citybans", true, error, err_max);
 	} else if(SQL_CheckConfig("default")) {
