@@ -4,11 +4,7 @@
 #include <sdkhooks>
 #include <sdktools>
 
-#undef REQUIRE_PLUGIN
-#include <updater>
-
-#define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/no_enemy_in_spawn.txt"
-#define PLUGIN_VERSION		"1.0.0"
+#define PLUGIN_VERSION		"1.1.0"
 
 public Plugin:myinfo = {
 	name = "[TF2] No Enemies In Spawn",
@@ -19,13 +15,16 @@ public Plugin:myinfo = {
 };
 
 new Handle:cvarMessage;
-new Handle:cvarUpdater;
 
 new bool:roundRunning = true;
 
+#define UPDATE_FILE		"no_enemy_in_spawn.txt"
+#define CONVAR_PREFIX	"no_enemy_in_spawn"
+
+#include "mckayupdater.sp"
+
 public OnPluginStart() {
-	cvarMessage = CreateConVar("no_enemy_in_spawn_message", "You may not enter the enemy team's spawn", "Message to display when a player is slayed for entering the enemy spawn (blank for none)");
-	cvarUpdater = CreateConVar("no_enemy_in_spawn_auto_update", "1", "Enables automatic updating (has no effect if Updater is not installed)");
+	cvarMessage = CreateConVar("no_enemy_in_spawn_message", "You may not enter the enemy team's spawn.", "Message to display when a player is slayed for entering the enemy spawn (blank for none)");
 	HookEvent("teamplay_round_start", Event_RoundStart);
 	HookEvent("teamplay_round_win", Event_RoundEnd);
 	HookEvent("teamplay_round_stalemate", Event_RoundEnd);
@@ -34,7 +33,7 @@ public OnPluginStart() {
 public OnMapStart() {
 	new i = -1;
 	while((i = FindEntityByClassname(i, "func_respawnroom")) != -1) {
-		SDKHook(i, SDKHook_StartTouchPost, OnStartTouchRespawnRoom);
+		SDKHook(i, SDKHook_TouchPost, OnTouchRespawnRoom);
 	}
 }
 
@@ -46,7 +45,7 @@ public Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadcast) {
 	roundRunning = false;
 }
 
-public OnStartTouchRespawnRoom(entity, other) {
+public OnTouchRespawnRoom(entity, other) {
 	if(other < 1 || other > MaxClients || !IsPlayerAlive(other) || !roundRunning) {
 		return;
 	}
@@ -58,40 +57,4 @@ public OnStartTouchRespawnRoom(entity, other) {
 			PrintCenterText(other, message);
 		}
 	}
-}
-
-/////////////////////////////////
-
-public OnAllPluginsLoaded() {
-	new Handle:convar;
-	if(LibraryExists("updater")) {
-		Updater_AddPlugin(UPDATE_URL);
-		new String:newVersion[10];
-		Format(newVersion, sizeof(newVersion), "%sA", PLUGIN_VERSION);
-		convar = CreateConVar("no_enemy_in_spawn_version", newVersion, "No Enemy In Spawn Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);
-	} else {
-		convar = CreateConVar("no_enemy_in_spawn_version", PLUGIN_VERSION, "No Enemy In Spawn Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);	
-	}
-	HookConVarChange(convar, Callback_VersionConVarChanged);
-}
-
-public OnLibraryAdded(const String:name[]) {
-	if(StrEqual(name, "updater")) {
-		Updater_AddPlugin(UPDATE_URL);
-	}
-}
-
-public Callback_VersionConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
-	ResetConVar(convar);
-}
-
-public Action:Updater_OnPluginDownloading() {
-	if(!GetConVarBool(cvarUpdater)) {
-		return Plugin_Handled;
-	}
-	return Plugin_Continue;
-}
-
-public Updater_OnPluginUpdated() {
-	ReloadPlugin();
 }
