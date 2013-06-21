@@ -11,7 +11,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/steamrep.txt"
-#define PLUGIN_VERSION		"1.1.2"
+#define PLUGIN_VERSION		"1.1.3"
 #define STEAMREP_URL		"http://steamrep.com/id2rep.php"
 #define STEAM_API_URL		"http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/"
 
@@ -144,7 +144,7 @@ public OnSteamRepChecked(HTTPRequestHandle:request, bool:successful, HTTPStatusC
 		Steam_ReleaseHTTPRequest(request);
 		return;
 	}
-	decl String:data[128];
+	decl String:data[4096];
 	Steam_GetHTTPResponseBodyData(request, data, sizeof(data));
 	Steam_ReleaseHTTPRequest(request);
 	LogItem(Log_Debug, "Received rep for %L: '%s'", client, data);
