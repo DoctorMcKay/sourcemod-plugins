@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolors.txt"
-#define PLUGIN_VERSION		"2.4.1"
+#define PLUGIN_VERSION		"2.4.2"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors",
@@ -378,6 +378,9 @@ public Native_SetColor(Handle:plugin, numParams) {
 			}
 			case COLOR_TEAM: {
 				Format(color, sizeof(color), "T");
+			}
+			case COLOR_NONE: {
+				Format(color, sizeof(color), "");
 			}
 		}
 	} else {

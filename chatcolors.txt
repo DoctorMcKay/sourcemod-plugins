@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.4.1"
+			"Latest"	"2.4.2"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed error message when not specifying a flag"
+		"Notes" " - Fixed a bug with the color setting native"
 	}
 	
 	"Files"
