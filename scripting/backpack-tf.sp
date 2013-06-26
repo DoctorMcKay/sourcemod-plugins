@@ -4,7 +4,7 @@
 #include <sdktools>
 #include <steamtools>
 
-#define PLUGIN_VERSION		"2.1.0"
+#define PLUGIN_VERSION		"2.2.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -102,6 +102,7 @@ public OnPluginStart() {
 	SetTrieString(qualityNameTrie, "600", "Uncraftable"); // custom for backpack.tf
 	
 	unusualNameTrie = CreateTrie();
+	// Original effects
 	SetTrieString(unusualNameTrie, "6", "Green Confetti");
 	SetTrieString(unusualNameTrie, "7", "Purple Confetti");
 	SetTrieString(unusualNameTrie, "8", "Haunted Ghosts");
@@ -116,6 +117,7 @@ public OnPluginStart() {
 	SetTrieString(unusualNameTrie, "17", "Sunbeams");
 	SetTrieString(unusualNameTrie, "18", "Circling Peace Sign");
 	SetTrieString(unusualNameTrie, "19", "Circling Heart");
+	// Batch 2
 	SetTrieString(unusualNameTrie, "29", "Stormy Storm");
 	SetTrieString(unusualNameTrie, "30", "Blizzardy Storm");
 	SetTrieString(unusualNameTrie, "31", "Nuts n' Bolts");
@@ -124,6 +126,7 @@ public OnPluginStart() {
 	SetTrieString(unusualNameTrie, "34", "Bubbling");
 	SetTrieString(unusualNameTrie, "35", "Smoking");
 	SetTrieString(unusualNameTrie, "36", "Steaming");
+	// Halloween
 	SetTrieString(unusualNameTrie, "37", "Flaming Lantern");
 	SetTrieString(unusualNameTrie, "38", "Cloudy Moon");
 	SetTrieString(unusualNameTrie, "39", "Cauldron Bubbles");
@@ -133,6 +136,15 @@ public OnPluginStart() {
 	SetTrieString(unusualNameTrie, "45", "Harvest Moon");
 	SetTrieString(unusualNameTrie, "46", "It's A Secret To Everybody");
 	SetTrieString(unusualNameTrie, "47", "Stormy 13th Hour");
+	// Batch 3
+	SetTrieString(unusualNameTrie, "56", "Kill-a-Watt");
+	SetTrieString(unusualNameTrie, "57", "Terror-Watt");
+	SetTrieString(unusualNameTrie, "58", "Cloud 9");
+	SetTrieString(unusualNameTrie, "59", "Aces High");
+	SetTrieString(unusualNameTrie, "60", "Dead Presidents");
+	SetTrieString(unusualNameTrie, "61", "Miami Nights");
+	SetTrieString(unusualNameTrie, "62", "Disco Beat Down");
+	// Robo-effects
 	SetTrieString(unusualNameTrie, "63", "Phosphorous");
 	SetTrieString(unusualNameTrie, "64", "Sulphurous");
 	SetTrieString(unusualNameTrie, "65", "Memory Leak");
