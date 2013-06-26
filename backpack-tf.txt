@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.1.0"
-			"Previous"	"2.0.5"
+			"Latest"	"2.2.0"
+			"Previous"	"2.1.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added new robot Unusual effects"
+		"Notes" " - Added new Unusual effects"
 	}
 	
 	"Files"
@@ -17,7 +17,6 @@
 		"Patch"
 		{
 			"Plugin"	"Path_SM/plugins/backpack-tf.smx"
-			
 			"Source"	"Path_SM/scripting/backpack-tf.sp"
 		}
 		
