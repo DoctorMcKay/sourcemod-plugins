@@ -14,6 +14,7 @@ if($_POST['method'] >= 1 && $_POST['method'] <= 3) {
 		$name = mysql_real_escape_string($_POST['name']);
 		$steamid = mysql_real_escape_string($_POST['steamid']);
 		$songs = mysql_real_escape_string($_POST['songs']);
+		$name = str_replace('"', '', $name);
 		if(mysql_num_rows(mysql_query("SELECT * FROM `smdj_playlists` WHERE steamid = '$steamid' AND name = '$name'"))) {
 			die('Already exists');
 		}
@@ -51,11 +52,16 @@ if(isset($_GET['getlist'])) {
 	exit;
 }
 require('./header.php');
+if(isset($_GET['volume']) && $_GET['volume'] >= 10 && $_GET['volume'] <= 200) {
+	$volume = $_GET['volume'];
+} else {
+	$volume = 100;
+}
 ?>
 <h3><?php echo $q['name']; ?></h3>
 <object type="application/x-shockwave-flash" data="player_mp3_multi.swf" width="300" height="200">
     <param name="movie" value="player_mp3_multi.swf" />
-    <param name="FlashVars" value="playlist=<?php echo urlencode('playlist.php?id=' . $q['id'] . '&getlist&shuffle=' . $_GET['shuffle']); ?>&amp;autoplay=1&amp;showvolume=1&amp;width=300&amp;height=200" />
+    <param name="FlashVars" value="playlist=<?php echo urlencode('playlist.php?id=' . $q['id'] . '&getlist&shuffle=' . $_GET['shuffle']); ?>&amp;autoplay=1&amp;volume=<?php echo $volume; ?>&amp;showvolume=1&amp;width=300&amp;height=200" />
 </object><br /><br />
 <a href="index.php">Song Selection</a>
 <?php require('./footer.php'); ?>

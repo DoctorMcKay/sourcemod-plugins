@@ -26,6 +26,6 @@ error_reporting(0);							// Comment this line out for debugging
 if($uploadmethod != 'local' && $uploadmethod != 'ftp') die('Error in configuration: invalid value for $uploadmethod');
 $con = mysql_connect($config['host'], $config['user'], $config['pass']) or die('Couldn\'t connect to MySQL server');
 mysql_select_db($config['name'], $con) or die('Couldn\'t select the database');
-mysql_query("CREATE TABLE IF NOT EXISTS `smdj_songs` (id INTEGER NOT NULL, title VARCHAR(33) NOT NULL, url VARCHAR(255) NOT NULL)");
-mysql_query("CREATE TABLE IF NOT EXISTS `smdj_playlists` (id INTEGER NOT NULL, name VARCHAR(33) NOT NULL, steamid VARCHAR(33) NOT NULL, songs TEXT NOT NULL)");
+mysql_query("CREATE TABLE IF NOT EXISTS `smdj_songs` (id INTEGER NOT NULL, title VARCHAR(33) NOT NULL, url VARCHAR(255) NOT NULL, PRIMARY KEY (id))");
+mysql_query("CREATE TABLE IF NOT EXISTS `smdj_playlists` (id INTEGER NOT NULL, name VARCHAR(33) NOT NULL, steamid VARCHAR(33) NOT NULL, songs TEXT NOT NULL, PRIMARY KEY (id))");
 ?>

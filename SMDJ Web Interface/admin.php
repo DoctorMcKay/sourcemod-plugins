@@ -122,7 +122,7 @@ if($_GET['error'] == 1) { echo '<div class="error">The song title and MP3 URL ar
 if($_GET['done'] == 1) { echo '<div class="success">The song has been added.</div>'; }
 if($_GET['done'] == 2) { echo '<div class="success">The song has been updated.</div>'; }
 if($_GET['done'] == 3) { echo '<div class="success">The song has been deleted.</div>'; }
-$version_check = file_get_contents('http://sm.doctormckay.com/smdj_version.php');
+$version_check = file_get_contents('https://bitbucket.org/Doctor_McKay/public-plugins/raw/default/smdj_version.txt');
 if($version_check !== false && $version_check != SMDJ_VERSION) echo '<div class="error">The SMDJ Web Interface is out-of-date. You are running v' . SMDJ_VERSION . ', and the most recent version is v' . $version_check . '</div><br />';
 if($_GET['id']) {
 	if(!mysql_num_rows($query = mysql_query("SELECT * FROM `smdj_songs` WHERE id = '" . mysql_real_escape_string($_GET['id']) . "'"))) {
