@@ -48,10 +48,15 @@ if(mysql_num_rows($query = mysql_query("SELECT * FROM `smdj_songs` WHERE id = '"
 	} else {
 		$loop = 1;
 	}
+	if(isset($_GET['volume']) && $_GET['volume'] >= 10 && $_GET['volume'] <= 200) {
+		$volume = $_GET['volume'];
+	} else {
+		$volume = 100;
+	}
 	echo '<h3>' . $query['title'] . '</h3>';
 	echo '<object type="application/x-shockwave-flash" data="player_mp3_maxi.swf" width="200" height="20">
      <param name="movie" value="player_mp3_maxi.swf" />
-     <param name="FlashVars" value="mp3=' . urlencode($query['url']) . '&amp;autoplay=1&amp;volume=100&amp;showvolume=1&amp;loop=' . $loop . '" />
+     <param name="FlashVars" value="mp3=' . urlencode($query['url']) . '&amp;autoplay=1&amp;volume=' . $volume . '&amp;showvolume=1&amp;loop=' . $loop . '" />
 	</object>';
 	echo '<br /><br />';
 	echo '<a href="index.php">Song Selection</a>';

@@ -6,7 +6,7 @@
 #include <socket> // Compiled with this version of colors.inc: https://forums.alliedmods.net/showpost.php?p=1883578&postcount=311
 #include <clientprefs>
 
-#define PLUGIN_VERSION "2.5.2"
+#define PLUGIN_VERSION "2.6.0"
 
 new Handle:advertCvar;
 new Handle:joinAdvertCvar;
@@ -16,6 +16,7 @@ new Handle:helpAdvertCvar;
 new Handle:authKeyCvar;
 new Handle:defaultRepeatCvar;
 new Handle:defaultShuffleCvar;
+new Handle:defaultVolumeCvar;
 new Handle:debugCvar;
 
 new Handle:songMenu;
@@ -28,6 +29,7 @@ new Handle:playlistSongs;
 
 new Handle:repeatCookie;
 new Handle:shuffleCookie;
+new Handle:volumeCookie;
 
 new bool:warningShown[MAXPLAYERS + 1];
 new bool:advertShown[MAXPLAYERS + 1];
@@ -77,6 +79,7 @@ public OnPluginStart() {
 	helpAdvertCvar = CreateConVar("smdj_help_advert", "1", "Sets whether a user is notified how to install Flash when they pick their first song");
 	defaultRepeatCvar = CreateConVar("smdj_repeat_default", "1", "Whether repeat should be enabled or disabled for new clients");
 	defaultShuffleCvar = CreateConVar("smdj_shuffle_default", "0", "Whether shuffle should be enabled or disabled for new clients");
+	defaultVolumeCvar = CreateConVar("smdj_volume_default", "100", "Default volume for new clients, 10 - 200", _, true, 10.0, true, 200.0);
 	debugCvar = CreateConVar("smdj_debug", "0", "Set to 1 for debugging", FCVAR_DONTRECORD);
 	new Handle:version = CreateConVar("smdj_version", PLUGIN_VERSION, "SourceMod DJ Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);
 	HookConVarChange(version, Callback_VersionChanged);
@@ -90,15 +93,10 @@ public OnPluginStart() {
 	playlistSongs = CreateArray(1024);
 	repeatCookie = RegClientCookie("smdj_repeat", "", CookieAccess_Private);
 	shuffleCookie = RegClientCookie("smdj_shuffle", "", CookieAccess_Private);
-	TagsCheck("SMDJ");
-	HookConVarChange(FindConVar("sv_tags"), Callback_TagsChanged);
+	volumeCookie = RegClientCookie("smdj_volume", "", CookieAccess_Private);
 	hudText = CreateHudSynchronizer();
 	forwardOnStartListen = CreateGlobalForward("SMDJ_OnStartListen", ET_Ignore, Param_Cell, Param_String);
 	LoadTranslations("common.phrases");
-}
-
-public Callback_TagsChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
-	TagsCheck("SMDJ");
 }
 
 public Callback_VersionChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
@@ -141,6 +139,11 @@ public OnClientCookiesCached(client) {
 	if(!StrEqual(value, "0") && !StrEqual(value, "1")) {
 		GetConVarString(defaultShuffleCvar, value, sizeof(value));
 		SetClientCookie(client, shuffleCookie, value);
+	}
+	GetClientCookie(client, volumeCookie, value, sizeof(value));
+	if(StrEqual(value, "")) {
+		GetConVarString(defaultVolumeCvar, value, sizeof(value));
+		SetClientCookie(client, volumeCookie, value);
 	}
 }
 
@@ -249,6 +252,17 @@ public Action:Command_MusicMenu(client, args) {
 	AddMenuItem(menu, "info", "Music Info");
 	AddMenuItem(menu, "stopMusic", "Stop Music");
 	AddMenuItem(menu, "repeat", repeat);
+	decl String:volume[64];
+	Format(volume, sizeof(volume), "Volume: ");
+	GetClientCookie(client, volumeCookie, value, sizeof(value));
+	for(new i = 10; i <= StringToInt(value); i += 10) {
+		if(i == 100) {
+			StrCat(volume, sizeof(volume), "|");
+		} else {
+			StrCat(volume, sizeof(volume), "l");
+		}
+	}
+	AddMenuItem(menu, "volume", volume);
 	if(CheckCommandAccess(client, "SMDJPlayToOthers", ADMFLAG_SLAY)) {
 		AddMenuItem(menu, "playToOthers", "Play to Others");
 	}
@@ -271,6 +285,16 @@ public Handler_TopMenu(Handle:menu, MenuAction:action, client, param) {
 				SetClientCookie(client, repeatCookie, "1");
 			}
 			Command_MusicMenu(client, 0);
+		} else if(StrEqual(selection, "volume")) {
+			decl String:value[8];
+			GetClientCookie(client, volumeCookie, value, sizeof(value));
+			new vol = StringToInt(value) + 10;
+			if(vol > 200) {
+				vol = 10;
+			}
+			IntToString(vol, value, sizeof(value));
+			SetClientCookie(client, volumeCookie, value);
+			Command_MusicMenu(client, 0);
 		} else if(StrEqual(selection, "songList")) {
 			DisplayMenu(songMenu, client, 0);
 		} else if(StrEqual(selection, "playlists")) {
@@ -287,9 +311,10 @@ public Handler_TopMenu(Handle:menu, MenuAction:action, client, param) {
 			new Handle:menu2 = CreateMenu(Handler_SongToOthers);
 			SetMenuTitle(menu2, "Select Song");
 			decl String:title[33], String:index[4];
+			AddMenuItem(menu2, "-1", "( Stop Playing Music )");
 			for(new i = 0; i < GetArraySize(songIds); i++) {
 				GetArrayString(songTitles, i, title, sizeof(title));
-				Format(index, sizeof(index), "%i", i);
+				IntToString(i, index, sizeof(index));
 				AddMenuItem(menu2, index, title);
 			}
 			SetMenuExitBackButton(menu2, true);
@@ -356,13 +381,22 @@ public Handler_SelectTarget(Handle:menu, MenuAction:action, client, param) {
 		return;
 	}
 	decl String:title[33];
-	GetArrayString(songTitles, songToPlay[client], title, sizeof(title)); // songToPlay is array index
-	for(new i = 0; i < total; i++) {
-		PrintToChat(target_list[i], "\x04[SMDJ] \x01You are now listening to \x05%s", title);
-		PlaySong(target_list[i], songToPlay[client], false, true);
-		LogAction(client, target_list[i], "%L played song \"%s\" to %L", client, title, i);
+	if(songToPlay[client] != -1) {
+		GetArrayString(songTitles, songToPlay[client], title, sizeof(title)); // songToPlay is array index
+		ShowActivity2(client, "\x04[SMDJ] \x05", "\x01Played song \x05%s \x01to \x05%s", title, target_name);
+	} else {
+		ShowActivity2(client, "\x04[SMDJ] \x05", "\x01Stopped playing music on \x05%s", target_name);
 	}
-	ShowActivity2(client, "\x04[SMDJ] \x05", "\x01Played song \x05%s \x01to \x05%s", title, target_name);
+	for(new i = 0; i < total; i++) {
+		if(songToPlay[target_list[i]] == -1) {
+			OpenURL(target_list[i], -1);
+			LogAction(client, target_list[i], "%L turned off music on %L", client, target_list[i]);
+		} else {
+			PrintToChat(target_list[i], "\x04[SMDJ] \x01You are now listening to \x05%s", title);
+			PlaySong(target_list[i], songToPlay[client], false, true);
+			LogAction(client, target_list[i], "%L played song \"%s\" to %L", client, title, target_list[i]);
+		}
+	}
 }
 
 ShowPlaylistMenu(client) {
@@ -531,15 +565,19 @@ public Action:Command_Say(client, const String:command[], argc) {
 
 NewPlaylistMenu(client, position = 0) {
 	new Handle:menu = CreateMenu(Handler_NewPlaylist);
-	SetMenuTitle(menu, "New Playlist: %s (%i songs)", newPlaylistName[client], GetArraySize(playlistArray[client]));
+	SetMenuTitle(menu, "New Playlist: %s (%i songs)\nGo to the first page to finalize or cancel", newPlaylistName[client], GetArraySize(playlistArray[client]));
 	AddMenuItem(menu, "done", "( Create Playlist )", (GetArraySize(playlistArray[client]) > 0) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 	AddMenuItem(menu, "cancel", "( Cancel )");
-	decl String:title[33], String:id[4];
+	decl String:title[35], String:id[4];
 	for(new i = 0; i < GetArraySize(songIds); i++) {
 		Format(id, sizeof(id), "%i", GetArrayCell(songIds, i));
 		GetArrayString(songTitles, i, title, sizeof(title));
-		AddMenuItem(menu, id, title, (FindValueInArray(playlistArray[client], GetArrayCell(songIds, i)) == -1) ? ITEMDRAW_DEFAULT: ITEMDRAW_DISABLED);
+		if(FindValueInArray(playlistArray[client], GetArrayCell(songIds, i)) != -1) {
+			Format(title, sizeof(title), "[#%i] %s", FindValueInArray(playlistArray[client], GetArrayCell(songIds, i)) + 1, title);
+		}
+		AddMenuItem(menu, id, title);
 	}
+	SetMenuExitButton(menu, false);
 	DisplayMenuAtItem(menu, client, position, 0);
 }
 
@@ -591,7 +629,11 @@ public Handler_NewPlaylist(Handle:menu, MenuAction:action, client, param) {
 		PrintToChat(client, "\x04[SMDJ] \x01You have cancelled creating your playlist.");
 		return;
 	}
-	PushArrayCell(playlistArray[client], StringToInt(selection));
+	if(FindValueInArray(playlistArray[client], StringToInt(selection)) != -1) {
+		RemoveFromArray(playlistArray[client], FindValueInArray(playlistArray[client], StringToInt(selection)));
+	} else {
+		PushArrayCell(playlistArray[client], StringToInt(selection));
+	}
 	NewPlaylistMenu(client, GetMenuSelectionPosition());
 }
 
@@ -822,9 +864,10 @@ PlaySong(client, index, bool:playlist = false, bool:silent = false) {
 		if(GetConVarBool(advertCvar) && !silent) {
 			CPrintToChatAllEx(client, "{green}[SMDJ] {teamcolor}%N {default}is listening to {olive}a personal playlist", client);
 		}
-		decl String:shuffle[8];
+		decl String:shuffle[8], String:volume[8];
 		GetClientCookie(client, shuffleCookie, shuffle, sizeof(shuffle));
-		OpenURL(client, index, StringToInt(shuffle), true);
+		GetClientCookie(client, volumeCookie, volume, sizeof(volume));
+		OpenURL(client, index, StringToInt(shuffle), true, StringToInt(volume));
 		return;
 	}
 	new id = GetArrayCell(songIds, index);
@@ -833,16 +876,17 @@ PlaySong(client, index, bool:playlist = false, bool:silent = false) {
 	if(GetConVarBool(advertCvar) && !silent) {
 		CPrintToChatAllEx(client, "{green}[SMDJ] {teamcolor}%N {default}is listening to {olive}%s", client, title);
 	}
-	decl String:repeat[8];
+	decl String:repeat[8], String:volume[8];
 	GetClientCookie(client, repeatCookie, repeat, sizeof(repeat));
-	OpenURL(client, id, StringToInt(repeat));
+	GetClientCookie(client, volumeCookie, volume, sizeof(volume));
+	OpenURL(client, id, StringToInt(repeat), false, StringToInt(volume));
 	Call_StartForward(forwardOnStartListen);
 	Call_PushCell(client);
 	Call_PushString(title);
 	Call_Finish();
 }
 
-OpenURL(client, songId, repeat = 1, bool:playlist = false) {
+OpenURL(client, songId, repeat = 1, bool:playlist = false, volume = 100) {
 	new Handle:panel = CreateKeyValues("data");
 	
 	KvSetString(panel, "title", "SMDJ");
@@ -854,7 +898,6 @@ OpenURL(client, songId, repeat = 1, bool:playlist = false) {
 		decl String:url[256];
 		GetConVarString(djUrlCvar, url, sizeof(url));
 		ReplaceString(url, sizeof(url), "http://", "", false);
-		ReplaceString(url, sizeof(url), "https://", "", false);
 		decl String:parts[16][64];
 		new String:path[256];
 		new total = ExplodeString(url, "/", parts, sizeof(parts), sizeof(parts[]));
@@ -864,10 +907,10 @@ OpenURL(client, songId, repeat = 1, bool:playlist = false) {
 		if(songId == -2) {
 			Format(url, sizeof(url), "http://%s:%i%s/shuffle.php", parts[0], GetConVarInt(djUrlPortCvar), path);
 		} else if(!playlist) {
-			Format(url, sizeof(url), "http://%s:%i%s/index.php?play=%i&repeat=%i", parts[0], GetConVarInt(djUrlPortCvar), path, songId, repeat);
+			Format(url, sizeof(url), "http://%s:%i%s/index.php?play=%i&repeat=%i&volume=%i", parts[0], GetConVarInt(djUrlPortCvar), path, songId, repeat, volume);
 		} else {
 			// repeat is shuffle
-			Format(url, sizeof(url), "http://%s:%i%s/playlist.php?id=%i&shuffle=%i", parts[0], GetConVarInt(djUrlPortCvar), path, songId, repeat);
+			Format(url, sizeof(url), "http://%s:%i%s/playlist.php?id=%i&shuffle=%i&volume=%i", parts[0], GetConVarInt(djUrlPortCvar), path, songId, repeat, volume);
 		}
 		KvSetString(panel, "msg", url);
 	}
@@ -893,7 +936,7 @@ public Action:Command_MusicHelp(client, args) {
 	for(new i = 1; i < total; i++) {
 		Format(path, sizeof(path), "/%s", parts[i]);
 	}
-	Format(url, sizeof(url), "http://%s:%i%s/help.php", parts[0], 80, path);
+	Format(url, sizeof(url), "http://%s:%i%s/help.php", parts[0], GetConVarInt(djUrlPortCvar), path);
 	ShowMOTDPanel(client, "SMDJ Help", url, MOTDPANEL_TYPE_URL);
 	return Plugin_Handled;
 }
@@ -934,18 +977,4 @@ public Action:Command_Debug_DumpArrays(client, args) {
 	CloseHandle(file);
 	ReplyToCommand(client, "[SMDJ] The arrays have been dumped to data/smdj_arrays_dump.txt");
 	return Plugin_Handled;
-}
-
-// Code pulled from TF2 Stats: https://forums.alliedmods.net/showthread.php?t=109006
-TagsCheck(const String:tag[]) { 
-	new Handle:hTags = FindConVar("sv_tags"); 
-	decl String:tags[255]; 
-	GetConVarString(hTags, tags, sizeof(tags)); 
-	if (!(StrContains(tags, tag, false)>-1)) { 
-		decl String:newTags[255]; 
-		Format(newTags, sizeof(newTags), "%s,%s", tags, tag); 
-		SetConVarString(hTags, newTags); 
-		GetConVarString(hTags, tags, sizeof(tags)); 
-	}
-	CloseHandle(hTags); 
 }
