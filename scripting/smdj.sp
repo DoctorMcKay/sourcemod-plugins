@@ -847,6 +847,9 @@ public Handler_PlaySong(Handle:menu, MenuAction:action, client, param) {
 }
 
 PlaySong(client, index, bool:playlist = false, bool:silent = false) {
+	if(GetClientTeam(client) == 0) {
+		return;
+	}
 	if(!warningShown[client] && GetConVarBool(helpAdvertCvar)) {
 		PrintHintText(client, "If you cannot hear the music, type !musichelp");
 		//CPrintToChat(client, "{green}[SMDJ] {default}You must have Adobe Flash Player for Other Browsers installed to listen to music. Type {olive}!musichelp {default}for help.");
