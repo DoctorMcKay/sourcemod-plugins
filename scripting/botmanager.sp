@@ -5,7 +5,7 @@
 #include <tf2>
 #include <tf2_stocks>
 
-#define PLUGIN_VERSION			"1.0.0"
+#define PLUGIN_VERSION			"1.1.0"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Bot Manager",
@@ -32,6 +32,18 @@ new Handle:fwdBotKick;
 #define CONVAR_PREFIX	"bot_manager"
 
 #include "mckayupdater.sp"
+
+public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) {
+	decl String:game[64];
+	GetGameFolderName(game, sizeof(game));
+	if(!StrEqual(game, "tf")) {
+		strcopy(error, err_max, "Bot Manager only works on Team Fortress 2");
+		return APLRes_Failure;
+	}
+	
+	RegPluginLibrary("botmanager");
+	return APLRes_Success;
+}
 
 public OnPluginStart() {
 	cvarBotQuota = CreateConVar("sm_bot_quota", "0", "Number of players to keep in the server");
