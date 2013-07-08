@@ -4,10 +4,13 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.4.3"
+			"Latest"	"3.0.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Properly clear colors when reloaded"
+		"Notes" " - Removed deprecated natives"
+		"Notes" " - Added CCC_OnColor and CCC_OnChatMessage forwards"
+		"Notes" " - Deprecated CCC_OnTagApplied, CCC_OnNameColor, and CCC_OnChatColor forwards"
+		"Notes" " - Improved Updater integration"
 	}
 	
 	"Files"
