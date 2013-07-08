@@ -7,7 +7,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolors.txt"
-#define PLUGIN_VERSION		"2.4.2"
+#define PLUGIN_VERSION		"2.4.3"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors",
@@ -95,6 +95,7 @@ LoadConfig() {
 		if(!IsClientInGame(i) || IsFakeClient(i)) {
 			continue;
 		}
+		ClearValues(i);
 		OnClientPostAdminCheck(i);
 	}
 }

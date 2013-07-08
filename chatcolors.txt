@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.4.2"
+			"Latest"	"2.4.3"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed a bug with the color setting native"
+		"Notes" " - Properly clear colors when reloaded"
 	}
 	
 	"Files"
