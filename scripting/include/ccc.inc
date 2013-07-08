@@ -90,87 +90,13 @@ native CCC_ResetColor(client, CCC_ColorType:type);
 native CCC_ResetTag(client);
 
 /**
- * Gets a client's name color and returns it as a color code that can be prefixed to text
- * 
- * @param client		Client index
- * @param buffer		Buffer to store the color code
- * @param maxlen		Maximum length of buffer
- * @noreturn
- * 
- * On error/errors:		Invalid client index or client is not in game
- */
-#pragma deprecated Use CCC_GetColor instead, will be removed in the future
-native CCC_GetNameColor(client, String:buffer[], maxlen);
-
-/**
- * Gets a client's chat color and returns it as a color code that can be prefixed to text
- * 
- * @param client		Client index
- * @param buffer		Buffer to store the color code
- * @param maxlen		Maximum length of buffer
- * @noreturn
- * 
- * On error/errors:		Invalid client index or client is not in game
- */
-#pragma deprecated Use CCC_GetColor instead, will be removed in the future
-native CCC_GetChatColor(client, String:buffer[], maxlen);
-
-/**
- * Gets a client's tag color and returns it as a color code that can be prefixed to text
- * 
- * @param client		Client index
- * @param buffer		Buffer to store the color code
- * @param maxlen		Maximum length of buffer
- * @noreturn
- * 
- * On error/errors:		Invalid client index or client is not in game
- */
-#pragma deprecated Use CCC_GetColor instead, will be removed in the future
-native CCC_GetTagColor(client, String:buffer[], maxlen);
-
-/**
- * Sets a client's name color
- * 
- * @param client		Client index
- * @param color			String containing the color in hex format, or "O" or "G"
- * @return				true if color was updated successfully, false otherwise
- * 
- * On error/errors:		Invalid client index or client is not in game
- */
-#pragma deprecated Use CCC_SetColor instead, will be removed in the future
-native bool:CCC_SetNameColor(client, const String:color[]);
-
-/**
- * Sets a client's chat color
- * 
- * @param client		Client index
- * @param color			String containing the color in hex format, or "O" or "G" or "T"
- * @return				true if color was updated successfully, false otherwise
- * 
- * On error/errors:		Invalid client index or client is not in game
- */
-#pragma deprecated Use CCC_SetColor instead, will be removed in the future
-native bool:CCC_SetChatColor(client, const String:color[]);
-
-/**
- * Sets a client's tag color
- * 
- * @param client		Client index
- * @param color			String containing the color in hex format, or "O" or "G" or "T"
- * @return				true if color was updated successfully, false otherwise
- * 
- * On error/errors:		Invalid client index or client is not in game
- */
-#pragma deprecated Use CCC_SetColor instead, will be removed in the future
-native bool:CCC_SetTagColor(client, const String:color[]);
-
-/**
  * Called when a cilent's name is about to be colored
  * DO NOT START A NEW USERMESSAGE (i.e. PrintToChat, PrintToChatAll) WITHIN THIS FORWARD
  * 
  * @param client		Client index
- * @return				Plugin_Handled or Plugin_Stop to prevent coloring, Plugin_Continue or Plugin_Changed to allow coloring
+ * @return				Plugin_Handled to prevent coloring, Plugin_Continue to allow coloring
  */
+#pragma deprecated Use CCC_OnColor instead
 forward Action:CCC_OnNameColor(client);
 
 /**
@@ -178,8 +104,9 @@ forward Action:CCC_OnNameColor(client);
  * DO NOT START A NEW USERMESSAGE (i.e. PrintToChat, PrintToChatAll) WITHIN THIS FORWARD
  * 
  * @param client		Client index
- * @return				Plugin_Handled or Plugin_Stop to prevent coloring, Plugin_Continue or Plugin_Changed to allow coloring
+ * @return				Plugin_Handled to prevent coloring, Plugin_Continue to allow coloring
  */
+#pragma deprecated Use CCC_OnColor instead
 forward Action:CCC_OnChatColor(client);
 
 /**
@@ -187,9 +114,31 @@ forward Action:CCC_OnChatColor(client);
  * DO NOT START A NEW USERMESSAGE (i.e. PrintToChat, PrintToChatAll) WITHIN THIS FORWARD
  * 
  * @param client		Client index
- * @return				Plugin_Handled or Plugin_Stop to prevent coloring, Plugin_Continue or Plugin_Changed to allow coloring
+ * @return				Plugin_Handled to prevent tagging, Plugin_Continue to allow tagging
  */
+#pragma deprecated Use CCC_OnColor instead
 forward Action:CCC_OnTagApplied(client);
+
+/**
+ * Called when a client's name is about to be tagged
+ * DO NOT START A NEW USERMESSAGE (i.e. PrintToChat, PrintToChatAll) WITHIN THIS FORWARD
+ * 
+ * @param client		Client index
+ * @param message		Chat message that will be printed
+ * @param type			What type of color will be applied. If this is CCC_TagColor, it controls whether the tag will be applied at all, not whether the tag will be colored.
+ * @return				Plugin_Handled to prevent coloring, Plugin_Continue to allow coloring
+ */
+forward Action:CCC_OnColor(client, const String:message[], CCC_ColorType:type);
+
+/**
+ * Called when a message has been fully colored and will be sent, unless further plugins modify it through Simple Chat Processor
+ * 
+ * @param author		Author client index
+ * @param message		Message
+ * @param maxlen		Maximum length of message buffer
+ * @noreturn
+ */
+forward CCC_OnChatMessage(author, String:message[], maxlen);
 
 /**
  * Called when a client's colors and tag are about to be loaded from the config file
@@ -233,9 +182,5 @@ public __pl_ccc_SetNTVOptional() {
 	MarkNativeAsOptional("CCC_ResetTag");
 	MarkNativeAsOptional("CCC_ResetColor");
 	MarkNativeAsOptional("CCC_ResetTag");
-	MarkNativeAsOptional("CCC_GetNameColor");
-	MarkNativeAsOptional("CCC_GetChatColor");
-	MarkNativeAsOptional("CCC_GetTagColor");
-	MarkNativeAsOptional("CCC_GetTag");
 }
 #endif

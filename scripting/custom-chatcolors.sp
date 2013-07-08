@@ -3,11 +3,7 @@
 #include <sourcemod>
 #include <scp>
 
-#undef REQUIRE_PLUGIN
-#include <updater>
-
-#define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/chatcolors.txt"
-#define PLUGIN_VERSION		"2.4.3"
+#define PLUGIN_VERSION		"3.0.0"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors",
@@ -20,6 +16,8 @@ public Plugin:myinfo = {
 new Handle:colorForward;
 new Handle:nameForward;
 new Handle:tagForward;
+new Handle:applicationForward;
+new Handle:messageForward;
 new Handle:preLoadedForward;
 new Handle:loadedForward;
 new Handle:configReloadedForward;
@@ -35,7 +33,6 @@ new String:defaultUsernameColor[MAXPLAYERS + 1][12];
 new String:defaultChatColor[MAXPLAYERS + 1][12];
 
 new Handle:configFile;
-new Handle:updaterCvar;
 
 enum CCC_ColorType {
 	CCC_TagColor,
@@ -48,6 +45,11 @@ enum CCC_ColorType {
 #define COLOR_OLIVE		-3
 #define COLOR_TEAM		-4
 
+#define UPDATE_FILE		"chatcolors.txt"
+#define CONVAR_PREFIX	"custom_chat_colors"
+
+#include "mckayupdater.sp"
+
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) {
 	MarkNativeAsOptional("Updater_AddPlugin");
 	CreateNative("CCC_GetColor", Native_GetColor);
@@ -59,22 +61,16 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) 
 	
 	RegPluginLibrary("ccc");
 	
-	/* Deprecated */
-	CreateNative("CCC_GetNameColor", Native_GetNameColor);
-	CreateNative("CCC_GetChatColor", Native_GetChatColor);
-	CreateNative("CCC_GetTagColor", Native_GetTagColor);
-	CreateNative("CCC_SetNameColor", Native_SetNameColor);
-	CreateNative("CCC_SetChatColor", Native_SetChatColor);
-	CreateNative("CCC_SetTagColor", Native_SetTagColor);
 	return APLRes_Success;
 } 
 
 public OnPluginStart() {
 	RegAdminCmd("sm_reloadccc", Command_ReloadConfig, ADMFLAG_CONFIG, "Reloads Custom Chat Colors config file");
-	updaterCvar = CreateConVar("custom_chat_colors_auto_update", "1", "Enables automatic updating (has no effect if Updater is not installed)");
 	colorForward = CreateGlobalForward("CCC_OnChatColor", ET_Event, Param_Cell);
 	nameForward = CreateGlobalForward("CCC_OnNameColor", ET_Event, Param_Cell);
 	tagForward = CreateGlobalForward("CCC_OnTagApplied", ET_Event, Param_Cell);
+	applicationForward = CreateGlobalForward("CCC_OnColor", ET_Event, Param_Cell, Param_String, Param_Cell);
+	messageForward = CreateGlobalForward("CCC_OnChatMessage", ET_Ignore, Param_Cell, Param_String, Param_Cell);
 	preLoadedForward = CreateGlobalForward("CCC_OnUserConfigPreLoaded", ET_Event, Param_Cell);
 	loadedForward = CreateGlobalForward("CCC_OnUserConfigLoaded", ET_Ignore, Param_Cell);
 	configReloadedForward = CreateGlobalForward("CCC_OnConfigReloaded", ET_Ignore);
@@ -202,7 +198,7 @@ public OnClientPostAdminCheck(client) {
 }
 
 public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:message[]) {
-	if(NameForward(author)) {
+	if(CheckForward(author, message, CCC_NameColor)) {
 		if(StrEqual(usernameColor[author], "G", false)) {
 			Format(name, MAXLENGTH_NAME, "\x04%s", name);
 		} else if(StrEqual(usernameColor[author], "O", false)) {
@@ -217,7 +213,7 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 	} else {
 		Format(name, MAXLENGTH_NAME, "\x03%s", name); // team color by default!
 	}
-	if(TagForward(author)) {
+	if(CheckForward(author, message, CCC_TagColor)) {
 		if(strlen(tag[author]) > 0) {
 			if(StrEqual(tagColor[author], "T", false)) {
 				Format(name, MAXLENGTH_NAME, "\x03%s%s", tag[author], name);
@@ -234,8 +230,10 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 			}
 		}
 	}
-	if(strlen(chatColor[author]) > 0 && ColorForward(author)) {
-		new MaxMessageLength = MAXLENGTH_MESSAGE - strlen(name) - 5; // MAXLENGTH_MESSAGE = maximum characters in a chat message, including name. Subtract the characters in the name, and 5 to account for the colon, spaces, and null terminator
+	
+	new MaxMessageLength = MAXLENGTH_MESSAGE - strlen(name) - 5; // MAXLENGTH_MESSAGE = maximum characters in a chat message, including name. Subtract the characters in the name, and 5 to account for the colon, spaces, and null terminator
+	
+	if(strlen(chatColor[author]) > 0 && CheckForward(author, message, CCC_ChatColor)) {
 		if(StrEqual(chatColor[author], "T", false)) {
 			Format(message, MaxMessageLength, "\x03%s", message);
 		} else if(StrEqual(chatColor[author], "G", false)) {
@@ -253,7 +251,35 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 	if(StrEqual(game, "csgo")) {
 		Format(name, MAXLENGTH_NAME, "\x01\x0B%s", name);
 	}
+	
+	Call_StartForward(messageForward);
+	Call_PushCell(author);
+	Call_PushStringEx(message, MaxMessageLength, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+	Call_PushCell(MaxMessageLength);
+	Call_Finish();
+	
 	return Plugin_Changed;
+}
+
+bool:CheckForward(author, const String:message[], CCC_ColorType:type) {
+	new Action:result = Plugin_Continue;
+	Call_StartForward(applicationForward);
+	Call_PushCell(author);
+	Call_PushString(message);
+	Call_PushCell(type);
+	Call_Finish(result);
+	if(result >= Plugin_Handled) {
+		return false;
+	}
+	
+	// Compatibility
+	switch(type) {
+		case CCC_TagColor: return TagForward(author);
+		case CCC_NameColor: return NameForward(author);
+		case CCC_ChatColor: return ColorForward(author);
+	}
+	
+	return true;
 }
 
 bool:ColorForward(author) {
@@ -261,9 +287,10 @@ bool:ColorForward(author) {
 	Call_StartForward(colorForward);
 	Call_PushCell(author);
 	Call_Finish(result);
-	if(result == Plugin_Handled || result == Plugin_Stop) {
+	if(result >= Plugin_Handled) {
 		return false;
 	}
+	
 	return true;
 }
 
@@ -272,9 +299,10 @@ bool:NameForward(author) {
 	Call_StartForward(nameForward);
 	Call_PushCell(author);
 	Call_Finish(result);
-	if(result == Plugin_Handled || result == Plugin_Stop) {
+	if(result >= Plugin_Handled) {
 		return false;
 	}
+	
 	return true;
 }
 
@@ -283,9 +311,10 @@ bool:TagForward(author) {
 	Call_StartForward(tagForward);
 	Call_PushCell(author);
 	Call_Finish(result);
-	if(result == Plugin_Handled || result == Plugin_Stop) {
+	if(result >= Plugin_Handled) {
 		return false;
 	}
+	
 	return true;
 }
 
@@ -294,16 +323,17 @@ bool:ConfigForward(client) {
 	Call_StartForward(preLoadedForward);
 	Call_PushCell(client);
 	Call_Finish(result);
-	if(result == Plugin_Handled || result == Plugin_Stop) {
+	if(result >= Plugin_Handled) {
 		return false;
 	}
+	
 	return true;
 }
 
 public Native_GetColor(Handle:plugin, numParams) {
 	new client = GetNativeCell(1);
 	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid client or client is not in game");
 		return COLOR_NONE;
 	}
 	switch(GetNativeCell(2)) {
@@ -365,7 +395,7 @@ public Native_GetColor(Handle:plugin, numParams) {
 public Native_SetColor(Handle:plugin, numParams) {
 	new client = GetNativeCell(1);
 	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid client or client is not in game");
 		return false;
 	}
 	decl String:color[32];
@@ -413,7 +443,7 @@ public Native_SetColor(Handle:plugin, numParams) {
 public Native_GetTag(Handle:plugin, numParams) {
 	new client = GetNativeCell(1);
 	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid client or client is not in game");
 		return;
 	}
 	SetNativeString(2, tag[client], GetNativeCell(3));
@@ -422,7 +452,7 @@ public Native_GetTag(Handle:plugin, numParams) {
 public Native_SetTag(Handle:plugin, numParams) {
 	new client = GetNativeCell(1);
 	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid client or client is not in game");
 		return;
 	}
 	GetNativeString(2, tag[client], sizeof(tag[]));
@@ -431,7 +461,7 @@ public Native_SetTag(Handle:plugin, numParams) {
 public Native_ResetColor(Handle:plugin, numParams) {
 	new client = GetNativeCell(1);
 	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid client or client is not in game");
 		return;
 	}
 	switch(GetNativeCell(2)) {
@@ -450,181 +480,8 @@ public Native_ResetColor(Handle:plugin, numParams) {
 public Native_ResetTag(Handle:plugin, numParams) {
 	new client = GetNativeCell(1);
 	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
+		ThrowNativeError(SP_ERROR_PARAM, "Invalid client or client is not in game");
 		return;
 	}
 	strcopy(tag[client], sizeof(tag[]), defaultTag[client]);
-}
-
-public Native_GetNameColor(Handle:plugin, numParams) {
-	new client = GetNativeCell(1);
-	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
-		return;
-	}
-	decl String:buffer[16];
-	if(StrEqual(usernameColor[client], "G", false)) {
-		Format(buffer, sizeof(buffer), "\x04");
-	} else if(StrEqual(usernameColor[client], "O", false)) {
-		Format(buffer, sizeof(buffer), "\x05");
-	} else if(strlen(usernameColor[client]) == 6) {
-		Format(buffer, sizeof(buffer), "\x07%s", usernameColor[client]);
-	} else if(strlen(usernameColor[client]) == 8) {
-		Format(buffer, sizeof(buffer), "\x08%s", usernameColor[client]);
-	} else {
-		Format(buffer, sizeof(buffer), "\x07%06X", GetTeamColor(client)); // team color by default!
-	}
-	SetNativeString(2, buffer, GetNativeCell(3));
-}
-
-public Native_SetNameColor(Handle:plugin, numParams) {
-	new client = GetNativeCell(1);
-	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
-		return false;
-	}
-	decl String:color[32];
-	GetNativeString(2, color, sizeof(color));
-	new len = strlen(color);
-	if(len != 6 && len != 8 && !StrEqual(color, "G", false) && !StrEqual(color, "O", false)) {
-		return false;
-	}
-	strcopy(usernameColor[client], sizeof(usernameColor[]), color);
-	return true;
-}
-
-public Native_GetChatColor(Handle:plugin, numParams) {
-	new client = GetNativeCell(1);
-	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
-		return;
-	}
-	decl String:buffer[16];
-	if(StrEqual(chatColor[client], "T", false)) {
-		Format(buffer, sizeof(buffer), "\x07%06X", GetTeamColor(client));
-	} else if(StrEqual(chatColor[client], "G", false)) {
-		Format(buffer, sizeof(buffer), "\x04");
-	} else if(StrEqual(chatColor[client], "O", false)) {
-		Format(buffer, sizeof(buffer), "\x05");
-	} else if(strlen(chatColor[client]) == 6) {
-		Format(buffer, sizeof(buffer), "\x07%s", chatColor[client]);
-	} else if(strlen(chatColor[client]) == 8) {
-		Format(buffer, sizeof(buffer), "\x08%s", chatColor[client]);
-	} else {
-		Format(buffer, sizeof(buffer), "\x01");
-	}
-	SetNativeString(2, buffer, GetNativeCell(3));
-}
-
-public Native_SetChatColor(Handle:plugin, numParams) {
-	new client = GetNativeCell(1);
-	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
-		return false;
-	}
-	decl String:color[32];
-	GetNativeString(2, color, sizeof(color));
-	new len = strlen(color);
-	if(len != 6 && len != 8 && !StrEqual(color, "G", false) && !StrEqual(color, "O", false) && !StrEqual(color, "T", false)) {
-		return false;
-	}
-	strcopy(chatColor[client], sizeof(chatColor[]), color);
-	return true;
-}
-
-public Native_GetTagColor(Handle:plugin, numParams) {
-	new client = GetNativeCell(1);
-	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
-		return;
-	}
-	decl String:buffer[16];
-	if(StrEqual(tagColor[client], "T", false)) {
-		Format(buffer, sizeof(buffer), "\x07%06X", GetTeamColor(client));
-	} else if(StrEqual(tagColor[client], "G", false)) {
-		Format(buffer, sizeof(buffer), "\x04");
-	} else if(StrEqual(tagColor[client], "O", false)) {
-		Format(buffer, sizeof(buffer), "\x05");
-	} else if(strlen(tagColor[client]) == 6) {
-		Format(buffer, sizeof(buffer), "\x07%s", tagColor[client]);
-	} else if(strlen(tagColor[client]) == 8) {
-		Format(buffer, sizeof(buffer), "\x08%s", tagColor[client]);
-	} else {
-		Format(buffer, sizeof(buffer), "\x01");
-	}
-	SetNativeString(2, buffer, GetNativeCell(3));
-}
-
-public Native_SetTagColor(Handle:plugin, numParams) {
-	new client = GetNativeCell(1);
-	if(client < 1 || client > MaxClients || !IsClientInGame(client)) {
-		ThrowNativeError(1, "Invalid client or client is not in game");
-		return false;
-	}
-	decl String:color[32];
-	GetNativeString(2, color, sizeof(color));
-	new len = strlen(color);
-	if(len != 6 && len != 8 && !StrEqual(color, "G", false) && !StrEqual(color, "O", false) && !StrEqual(color, "T", false)) {
-		return false;
-	}
-	strcopy(tagColor[client], sizeof(tagColor[]), color);
-	return true;
-}
-
-GetTeamColor(client) {
-	new value;
-	switch(GetClientTeam(client)) {
-		case 1: {
-			value = 0xCCCCCC;
-		}
-		case 2: {
-			value = 0xFF4040;
-		}
-		case 3: {
-			value = 0x99CCFF;
-		}
-		default: {
-			value = 0x3EFF3E;
-		}
-	}
-	return value;
-}
-
-/////////////////////////////////
-
-public OnAllPluginsLoaded() {
-	if(!LibraryExists("scp")) {
-		SetFailState("Simple Chat Processor is not installed. Please visit https://forums.alliedmods.net/showthread.php?t=198501 and install it.");
-	}
-	new Handle:convar;
-	if(LibraryExists("updater")) {
-		Updater_AddPlugin(UPDATE_URL);
-		new String:newVersion[10];
-		Format(newVersion, sizeof(newVersion), "%sA", PLUGIN_VERSION);
-		convar = CreateConVar("custom_chat_colors_version", newVersion, "Custom Chat Colors Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);
-	} else {
-		convar = CreateConVar("custom_chat_colors_version", PLUGIN_VERSION, "Custom Chat Colors Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);	
-	}
-	HookConVarChange(convar, Callback_VersionConVarChanged);
-}
-
-public Callback_VersionConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
-	ResetConVar(convar);
-}
-
-public Action:Updater_OnPluginDownloading() {
-	if(!GetConVarBool(updaterCvar)) {
-		return Plugin_Handled;
-	}
-	return Plugin_Continue;
-}
-
-public OnLibraryAdded(const String:name[]) {
-	if(StrEqual(name, "updater")) {
-		Updater_AddPlugin(UPDATE_URL);
-	}
-}
-
-public Updater_OnPluginUpdated() {
-	ReloadPlugin();
 }
