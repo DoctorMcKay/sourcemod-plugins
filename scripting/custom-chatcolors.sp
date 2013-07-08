@@ -3,7 +3,7 @@
 #include <sourcemod>
 #include <scp>
 
-#define PLUGIN_VERSION		"3.0.0"
+#define PLUGIN_VERSION		"3.0.1"
 
 public Plugin:myinfo = {
 	name        = "[Source 2009] Custom Chat Colors",
@@ -145,7 +145,7 @@ public OnClientPostAdminCheck(client) {
 			KvGetSectionName(configFile, section, sizeof(section));
 			KvGetString(configFile, "flag", configFlag, sizeof(configFlag));
 			if(strlen(configFlag) > 1) {
-				LogError("Multiple flags given in section \"%s\", which is not allowed. Using first character.");
+				LogError("Multiple flags given in section \"%s\", which is not allowed. Using first character.", section);
 			}
 			if(strlen(configFlag) == 0 && StrContains(section, "STEAM_", false) == -1) {
 				found = true;
