@@ -6,7 +6,7 @@
 #undef REQUIRE_EXTENSIONS
 #include <steamtools>
 
-#define PLUGIN_VERSION			"1.0.1"
+#define PLUGIN_VERSION			"1.1.0"
 
 #define IsClientF2P(%1)			(Steam_CheckClientSubscription(%1, 0) && !Steam_CheckClientDLC(%1, 459))
 
@@ -93,7 +93,9 @@ public OnClientPostAdminCheck(client) {
 		return;
 	}
 	decl String:ip[32], String:city[45], String:region[45], String:country_name[45], String:country_code[3], String:country_code3[4];
-	GetClientIP(client, ip, sizeof(ip));
+	if(!GetClientIP(client, ip, sizeof(ip))) {
+		return;
+	}
 	if(!GeoipGetRecord(ip, city, region, country_name, country_code, country_code3)) {
 		LogError("Unable to get GeoIP record for %L (IP %s)", client, ip);
 		return;
@@ -125,20 +127,25 @@ public OnUserChecked(Handle:owner, Handle:hndl, const String:error[], any:userid
 }
 
 public Action:Command_BanCity(client, args) {
-	if(args != 1) {
+	if(args < 1) {
 		ReplyToCommand(client, "\x04[SM] \x01Usage: sm_bancity <target>");
 		return Plugin_Handled;
 	}
 	
-	decl String:arg1[MAX_NAME_LENGTH];
-	GetCmdArg(1, arg1, sizeof(arg1));
-	new target = FindTarget(client, arg1, true);
+	decl String:arg[MAX_NAME_LENGTH];
+	GetCmdArgString(arg, sizeof(arg));
+	StripQuotes(arg);
+	TrimString(arg);
+	new target = FindTarget(client, arg, true);
 	if(target == -1) {
 		return Plugin_Handled;
 	}
 	
 	decl String:ip[64], String:city[45], String:region[45], String:country_name[45], String:country_code[3], String:country_code3[4];
-	GetClientIP(target, ip, sizeof(ip));
+	if(!GetClientIP(target, ip, sizeof(ip))) {
+		ReplyToCommand(client, "\x04[SM] \x01Unable to get IP address for %N.", target);
+		return Plugin_Handled;
+	}
 	if(!GeoipGetRecord(ip, city, region, country_name, country_code, country_code3)) {
 		ReplyToCommand(client, "\x04[SM] \x01Unable to get city information for %N.", target);
 		return Plugin_Handled;
@@ -176,7 +183,7 @@ public OnBanChecked(Handle:owner, Handle:hndl, const String:error[], any:pack) {
 	if(hndl == INVALID_HANDLE) {
 		LogError("Unable to check ban for '%s, %s'. %s", city, country, error);
 		new client = GetClientOfUserId(userid);
-		if(userid != 0 && client == 0) {
+		if(client != 0) {
 			SetCmdReplySource(reply);
 			ReplyToCommand(client, "\x04[SM] \x01Unable to ban %N.", target);
 		}
