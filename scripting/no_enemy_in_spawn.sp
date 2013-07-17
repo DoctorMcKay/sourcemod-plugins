@@ -4,7 +4,7 @@
 #include <sdkhooks>
 #include <sdktools>
 
-#define PLUGIN_VERSION		"1.1.0"
+#define PLUGIN_VERSION		"1.2.0"
 
 public Plugin:myinfo = {
 	name = "[TF2] No Enemies In Spawn",
@@ -34,6 +34,7 @@ public OnMapStart() {
 	new i = -1;
 	while((i = FindEntityByClassname(i, "func_respawnroom")) != -1) {
 		SDKHook(i, SDKHook_TouchPost, OnTouchRespawnRoom);
+		SDKHook(i, SDKHook_StartTouchPost, OnTouchRespawnRoom);
 	}
 }
 
