@@ -4,7 +4,7 @@
 #include <sdktools>
 #include <steamtools>
 
-#define PLUGIN_VERSION		"2.2.0"
+#define PLUGIN_VERSION		"2.3.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -249,14 +249,26 @@ public Action:Timer_Update(Handle:timer) {
 
 public OnBackpackTFComplete(HTTPRequestHandle:request, bool:successful, HTTPStatusCode:status) {
 	if(status != HTTPStatusCode_OK || !successful) {
-		if(status == HTTPStatusCode_Forbidden) {
-			LogError("backpack.tf API failed: We are being rate-limited by backpack.tf");
+		if(status == HTTPStatusCode_BadRequest) {
+			LogError("backpack.tf API failed: You have not set an API key");
+			Steam_ReleaseHTTPRequest(request);
+			CreateTimer(600.0, Timer_Update); // Set this for 10 minutes instead of 1 minute
+			return;
+		} else if(status == HTTPStatusCode_Forbidden) {
+			LogError("backpack.tf API failed: Your API key is invalid");
+			Steam_ReleaseHTTPRequest(request);
+			CreateTimer(600.0, Timer_Update); // Set this for 10 minutes instead of 1 minute
+			return;
+		} else if(status == HTTPStatusCode_PreconditionFailed) {
+			decl String:retry[16];
+			Steam_GetHTTPResponseHeaderValue(request, "Retry-After", retry, sizeof(retry));
+			LogError("backpack.tf API failed: We are being rate-limited by backpack.tf, next request allowed in %s seconds", retry);
 		} else if(status >= HTTPStatusCode_InternalServerError) {
 			LogError("backpack.tf API failed: An internal server error occurred");
 		} else if(status == HTTPStatusCode_OK && !successful) {
 			LogError("backpack.tf API failed: backpack.tf returned an OK response but no data");
 		} else if(status != HTTPStatusCode_Invalid) {
-			LogError("backpack.tf API failed: Unknown error (status code %i)", _:status);
+			LogError("backpack.tf API failed: Unknown error (status code %d)", _:status);
 		} else {
 			LogError("backpack.tf API failed: Unable to connect to server or server returned no data");
 		}

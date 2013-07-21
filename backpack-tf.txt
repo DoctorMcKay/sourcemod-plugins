@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.2.0"
-			"Previous"	"2.1.0"
+			"Latest"	"2.3.0"
+			"Previous"	"2.2.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added new Unusual effects"
+		"Notes" " - Added more verbose error logging"
 	}
 	
 	"Files"
