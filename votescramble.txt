@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.1.0"
+			"Latest"	"1.2.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added ability to restrict access to !votescramble by overriding 'votescramble'"
+		"Notes" " - Moved scramble time to end of the round instead of the start of the next one, to prevent the round from starting twice"
 	}
 	
 	"Files"
