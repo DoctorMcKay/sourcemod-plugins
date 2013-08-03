@@ -3,11 +3,7 @@
 #include <sourcemod>
 #include <morecolors>
 
-#undef REQUIRE_PLUGIN
-#include <updater>
-
-#define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/votescramble.txt"
-#define PLUGIN_VERSION		"1.1.0"
+#define PLUGIN_VERSION		"1.2.0"
 
 public Plugin:myinfo = {
     name		= "[TF2] Better Vote Scramble",
@@ -19,18 +15,30 @@ public Plugin:myinfo = {
 
 new Handle:cvarPercentage;
 new Handle:cvarVotesRequired;
-new Handle:cvarUpdater;
 
 new bool:votedToScramble[MAXPLAYERS + 1];
 new bool:scrambleTeams = false;
 
+new Handle:mp_bonusroundtime;
+
+#define UPDATE_FILE		"votescramble.txt"
+#define CONVAR_PREFIX	"better_votescramble"
+
+#include "mckayupdater.sp"
+
 public OnPluginStart() {
-	cvarUpdater = CreateConVar("better_votescramble_auto_update", "1", "Enables automatic updating (has no effect if Updater is not installed)");
 	cvarPercentage = CreateConVar("better_votescramble_percentage", "0.6", "Percentage required to initiate a team scramble");
 	cvarVotesRequired = CreateConVar("better_votescramble_votes_required", "3", "Votes required to initiate a vote");
+	
 	AddCommandListener(Command_Say, "say");
 	AddCommandListener(Command_Say, "say_team");
-	HookEvent("teamplay_round_start", Event_RoundStart);
+	
+	HookEvent("teamplay_round_win", Event_RoundEnd);
+	HookEvent("teamplay_round_stalemate", Event_RoundEnd);
+	HookEvent("teamplay_win_panel", Event_RoundEnd);
+	
+	mp_bonusroundtime = FindConVar("mp_bonusroundtime");
+	
 	LoadTranslations("core.phrases");
 }
 
@@ -160,42 +168,19 @@ public Handler_CastVote(Handle:menu, MenuAction:action, param1, param2) {
 	}
 }
 
-public Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast) {
+public Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadcast) {
 	if(scrambleTeams) {
-		ServerCommand("mp_scrambleteams 2");
-		PrintToChatAll("\x04[SM] \x01Scrambling the teams due to vote.");
+		new Float:delay = GetConVarFloat(mp_bonusroundtime) - 7.0;
+		if(delay < 0.0) {
+			delay = 0.0;
+		}
+		
 		scrambleTeams = false;
+		CreateTimer(delay, Timer_Scramble);
 	}
 }
 
-/////////////////////////////////
-
-public OnAllPluginsLoaded() {
-	new Handle:convar;
-	if(LibraryExists("updater")) {
-		Updater_AddPlugin(UPDATE_URL);
-		new String:newVersion[10];
-		Format(newVersion, sizeof(newVersion), "%sA", PLUGIN_VERSION);
-		convar = CreateConVar("better_votescramble_version", newVersion, "Better Vote Scramble Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);
-	} else {
-		convar = CreateConVar("better_votescramble_version", PLUGIN_VERSION, "Better Vote Scramble Version", FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_CHEAT);	
-	}
-	HookConVarChange(convar, Callback_VersionConVarChanged);
-}
-
-public OnLibraryAdded(const String:name[]) {
-	if(StrEqual(name, "updater")) {
-		Updater_AddPlugin(UPDATE_URL);
-	}
-}
-
-public Callback_VersionConVarChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
-	ResetConVar(convar);
-}
-
-public Action:Updater_OnPluginDownloading() {
-	if(!GetConVarBool(cvarUpdater)) {
-		return Plugin_Handled;
-	}
-	return Plugin_Continue;
+public Action:Timer_Scramble(Handle:timer) {
+	ServerCommand("mp_scrambleteams 2");
+	PrintToChatAll("\x04[SM] \x01Scrambling the teams due to vote.");
 }
