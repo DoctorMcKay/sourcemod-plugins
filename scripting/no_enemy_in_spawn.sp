@@ -4,7 +4,7 @@
 #include <sdkhooks>
 #include <sdktools>
 
-#define PLUGIN_VERSION		"1.2.0"
+#define PLUGIN_VERSION		"1.2.1"
 
 public Plugin:myinfo = {
 	name = "[TF2] No Enemies In Spawn",
@@ -30,16 +30,14 @@ public OnPluginStart() {
 	HookEvent("teamplay_round_stalemate", Event_RoundEnd);
 }
 
-public OnMapStart() {
+public Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast) {
+	roundRunning = true;
+	
 	new i = -1;
 	while((i = FindEntityByClassname(i, "func_respawnroom")) != -1) {
 		SDKHook(i, SDKHook_TouchPost, OnTouchRespawnRoom);
 		SDKHook(i, SDKHook_StartTouchPost, OnTouchRespawnRoom);
 	}
-}
-
-public Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast) {
-	roundRunning = true;
 }
 
 public Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadcast) {
