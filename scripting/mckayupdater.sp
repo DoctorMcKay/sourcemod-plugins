@@ -33,7 +33,9 @@
 #endif
 #define _mckay_updater_included
 
-#undef REQUIRE_PLUGIN
+#if defined REQUIRE_PLUGIN
+ #undef REQUIRE_PLUGIN
+#endif
 #include <updater>
 #define REQUIRE_PLUGIN
 
