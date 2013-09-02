@@ -27,5 +27,6 @@
 		"Plugin"	"Path_SM/translations/nl/backpack-tf.phrases.txt"
 		
 		"Source"	"Path_SM/scripting/backpack-tf.sp"
+		"Source"	"Path_SM/scripting/mckayupdater.sp"
 	}
 }
