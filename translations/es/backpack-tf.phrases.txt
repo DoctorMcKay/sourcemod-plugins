@@ -1,0 +1,66 @@
+// Exported from SourceMod Translator
+// Date: 2013-09-24 02:48:15 UTC
+// Language: Spanish (es)
+// 
+// To view other translations for this plugin, please visit:
+// http://translator.mitchdempsey.com/sourcemod_plugins/122
+//
+"Phrases"
+{
+
+	"Up"
+	{
+		"es"		"Arriba"
+	}
+
+	"Down"
+	{
+		"es"		"Abajo"
+	}
+
+	"The price list has not loaded yet"
+	{
+		"es"		"La lista de precios no se ha cargado aun"
+	}
+
+	"Price check"
+	{
+		"es"		"Precio: {1}"
+	}
+
+	"Price list updated"
+	{
+		"es"		"Lista de precios actualizada."
+	}
+
+	"Type !pc for a price check"
+	{
+		"es"		"Escribe !pc para comprobar un precio."
+	}
+
+	"Prices courtesy of backpack.tf"
+	{
+		"es"		"Precios por cortesia de backpack.tf"
+	}
+
+	"Please allow backpack.tf time to load"
+	{
+		"es"		"Por favor, dale tiempo a backpack.tf para que cargue"
+	}
+
+	"From"
+	{
+		"es"		"desde"
+	}
+
+	"To"
+	{
+		"es"		"hasta"
+	}
+
+	"Prices are estimates only"
+	{
+		"es"		"Los precios son solo estimaciones"
+	}
+
+}

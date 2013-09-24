@@ -1,0 +1,66 @@
+// Exported from SourceMod Translator
+// Date: 2013-09-24 02:48:15 UTC
+// Language: German (de)
+// 
+// To view other translations for this plugin, please visit:
+// http://translator.mitchdempsey.com/sourcemod_plugins/122
+//
+"Phrases"
+{
+
+	"To"
+	{
+		"de"		"zu"
+	}
+
+	"Down"
+	{
+		"de"		"Unten"
+	}
+
+	"Type !pc for a price check"
+	{
+		"de"		"Benutze !pc für einen Preischeck."
+	}
+
+	"Price check"
+	{
+		"de"		"Preischeck: {1}"
+	}
+
+	"Up"
+	{
+		"de"		"Gestiegen"
+	}
+
+	"Please allow backpack.tf time to load"
+	{
+		"de"		"Lass bitte backpack.tf Zeit zum Laden."
+	}
+
+	"From"
+	{
+		"de"		"von"
+	}
+
+	"Price list updated"
+	{
+		"de"		"Preisliste erneuert."
+	}
+
+	"The price list has not loaded yet"
+	{
+		"de"		"Die Preisliste wurde noch nicht geladen."
+	}
+
+	"Prices courtesy of backpack.tf"
+	{
+		"de"		"Preise in Verbindung von backpack.tf"
+	}
+
+	"Prices are estimates only"
+	{
+		"de"		"Preise wurden nur geschätzt."
+	}
+
+}

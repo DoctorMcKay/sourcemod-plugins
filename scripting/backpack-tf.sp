@@ -4,7 +4,7 @@
 #include <sdktools>
 #include <steamtools>
 
-#define PLUGIN_VERSION		"2.3.0"
+#define PLUGIN_VERSION		"2.4.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -100,6 +100,7 @@ public OnPluginStart() {
 	SetTrieString(qualityNameTrie, "12", "Completed");
 	SetTrieString(qualityNameTrie, "13", "Haunted");
 	SetTrieString(qualityNameTrie, "600", "Uncraftable"); // custom for backpack.tf
+	SetTrieString(qualityNameTrie, "1100", "Uncraftable Strange"); // custom for backpack.tf
 	
 	unusualNameTrie = CreateTrie();
 	// Original effects
@@ -402,7 +403,12 @@ public OnBackpackTFComplete(HTTPRequestHandle:request, bool:successful, HTTPStat
 						decl String:effect[16];
 						KvGetSectionName(backpackTFPricelist, effect, sizeof(effect));
 						if(!GetTrieString(unusualNameTrie, effect, quality, sizeof(quality))) {
-							LogError("Unknown unusual effect: %s. Please report this!", effect);
+							LogError("Unknown unusual effect: %s in OnBackpackTFComplete. Please report this!", effect);
+							decl String:kvPath[PLATFORM_MAX_PATH];
+							BuildPath(Path_SM, kvPath, sizeof(kvPath), "data/backpack-tf.%d.txt", GetTime());
+							if(!FileExists(kvPath)) {
+								KeyValuesToFile(backpackTFPricelist, kvPath);
+							}
 							continue;
 						}
 					} else {
@@ -746,17 +752,26 @@ public Handler_PriceListMenu(Handle:menu, MenuAction:action, client, param) {
 	}
 	KvGoBack(backpackTFPricelist);
 	
+	if(!KvJumpToKey(backpackTFPricelist, QUALITY_UNUSUAL)) {
+		return;
+	}
+	
+	KvGotoFirstSubKey(backpackTFPricelist);
+	
 	SetGlobalTransTarget(client);
 	new Handle:menu2 = CreateMenu(Handler_PriceListMenu);
 	SetMenuTitle(menu2, "%t\n%t\n%t\n ", "Price check", name, "Prices are estimates only", "Prices courtesy of backpack.tf");
-	KvJumpToKey(backpackTFPricelist, QUALITY_UNUSUAL);
-	KvGotoFirstSubKey(backpackTFPricelist);
 	decl String:effect[8], String:effectName[64], String:message[128], String:price[64], String:currency[32];
 	new Float:value, Float:valueHigh;
 	do {
 		KvGetSectionName(backpackTFPricelist, effect, sizeof(effect));
 		if(!GetTrieString(unusualNameTrie, effect, effectName, sizeof(effectName))) {
-			LogError("Unknown unusual effect: %s. Please report this!", effect);
+			LogError("Unknown unusual effect: %s in Handler_PriceListMenu. Please report this!", effect);
+			decl String:path[PLATFORM_MAX_PATH];
+			BuildPath(Path_SM, path, sizeof(path), "data/backpack-tf.%d.txt", GetTime());
+			if(!FileExists(path)) {
+				KeyValuesToFile(backpackTFPricelist, path);
+			}
 			continue;
 		}
 		value = KvGetFloat(backpackTFPricelist, "value");
