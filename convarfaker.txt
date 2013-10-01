@@ -1,0 +1,20 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.0.0"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Initial release"
+	}
+	
+	"Files"
+	{	
+		"Plugin"	"Path_SM/plugins/convarfaker.smx"
+		"Source"	"Path_SM/scripting/convarfaker.sp"
+		"Source"	"Path_SM/scripting/mckayupdater.sp"
+	}
+}
