@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.0.1"
+			"Latest"	"1.1.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed a handle leak"
+		"Notes" " - Added ability to restrict bomb count by admin flag"
 	}
 	
 	"Files"
