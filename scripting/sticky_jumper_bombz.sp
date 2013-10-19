@@ -3,7 +3,7 @@
 #include <sourcemod>
 #include <tf2items>
 
-#define PLUGIN_VERSION			"1.0.1"
+#define PLUGIN_VERSION			"1.1.0"
 #define WEAPON_JUMPER			265
 #define ATTRIBUTE_ADD_BOMBS		88
 #define ATTRIBUTE_MINUS_BOMBS	89
@@ -52,7 +52,7 @@ public OnConfigsExecuted() {
 }
 
 public Action:TF2Items_OnGiveNamedItem(client, String:classname[], defindex, &Handle:item) {
-	if(defindex == WEAPON_JUMPER) {
+	if(defindex == WEAPON_JUMPER && CheckCommandAccess(client, "sticky_jumper_bombz", 0, true)) {
 		item = newItem;
 		return Plugin_Changed;
 	}
