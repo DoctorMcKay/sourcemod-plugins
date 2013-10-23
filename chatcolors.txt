@@ -13,6 +13,7 @@
 	"Files"
 	{
 		"Plugin"	"Path_SM/plugins/custom-chatcolors.smx"
+		"Package"	"Path_SM/configs/custom-chatcolors.cfg"
 		"Source"	"Path_SM/scripting/custom-chatcolors.sp"
 		"Source"	"Path_SM/scripting/mckayupdater.sp"
 		"Source"	"Path_SM/scripting/include/ccc.inc"
