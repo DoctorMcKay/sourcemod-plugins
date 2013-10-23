@@ -15,5 +15,6 @@
 	{	
 		"Plugin"	"Path_SM/plugins/citybans.smx"
 		"Source"	"Path_SM/scripting/citybans.sp"
+		"Source"	"Path_SM/scripting/mckayupdater.sp"
 	}
 }
