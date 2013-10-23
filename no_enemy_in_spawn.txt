@@ -15,5 +15,6 @@
 	{
 		"Plugin"	"Path_SM/plugins/no_enemy_in_spawn.smx"
 		"Source"	"Path_SM/scripting/no_enemy_in_spawn.sp"
+		"Source"	"Path_SM/scripting/mckayupdater.sp"
 	}
 }
