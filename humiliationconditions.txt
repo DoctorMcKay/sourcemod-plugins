@@ -14,5 +14,6 @@
 	{
 		"Plugin"	"Path_SM/plugins/humiliationconditions.smx"
 		"Source"	"Path_SM/scripting/humiliationconditions.sp"
+		"Source"	"Path_SM/scripting/mckayupdater.sp"
 	}
 }
