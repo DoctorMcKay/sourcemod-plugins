@@ -1,0 +1,66 @@
+// Exported from SourceMod Translator
+// Date: 2013-10-23 20:49:22 UTC
+// Language: Russian (ru)
+// 
+// To view other translations for this plugin, please visit:
+// http://translator.mitchdempsey.com/sourcemod_plugins/122
+//
+"Phrases"
+{
+
+	"Up"
+	{
+		"ru"		"Вверх"
+	}
+
+	"Price list updated"
+	{
+		"ru"		"Список цен обновлен."
+	}
+
+	"Type !pc for a price check"
+	{
+		"ru"		"Введите !pc для просмотра цен."
+	}
+
+	"Price check"
+	{
+		"ru"		"Предмет: {1}"
+	}
+
+	"Prices courtesy of backpack.tf"
+	{
+		"ru"		"Цены предоставлены сайтом backpack.tf"
+	}
+
+	"Down"
+	{
+		"ru"		"Вниз"
+	}
+
+	"The price list has not loaded yet"
+	{
+		"ru"		"Список цен не загружен"
+	}
+
+	"Please allow backpack.tf time to load"
+	{
+		"ru"		"Пожалуйста, дождитесь загрузки backpack.tf"
+	}
+
+	"From"
+	{
+		"ru"		"из"
+	}
+
+	"Prices are estimates only"
+	{
+		"ru"		"Цены являются ориентировочными"
+	}
+
+	"To"
+	{
+		"ru"		"для"
+	}
+
+}

@@ -4,13 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.4.0"
-			"Previous"	"2.3.0"
+			"Latest"	"2.5.0"
+			"Previous"	"2.4.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added support for Strange Uncraftable"
-		"Notes" " - Added Spanish and German translations"
+		"Notes" " - Added Russian translation"
 	}
 	
 	"Files"
@@ -18,8 +17,7 @@
 		"Patch"
 		{
 			"Plugin"	"Path_SM/plugins/backpack-tf.smx"
-			"Plugin"	"Path_SM/translations/es/backpack-tf.phrases.txt"
-			"Plugin"	"Path_SM/translations/de/backpack-tf.phrases.txt"
+			"Plugin"	"Path_SM/translations/ru/backpack-tf.phrases.txt"
 			"Source"	"Path_SM/scripting/backpack-tf.sp"
 		}
 		
@@ -30,6 +28,7 @@
 		"Plugin"	"Path_SM/translations/nl/backpack-tf.phrases.txt"
 		"Plugin"	"Path_SM/translations/es/backpack-tf.phrases.txt"
 		"Plugin"	"Path_SM/translations/de/backpack-tf.phrases.txt"
+		"Plugin"	"Path_SM/translations/ru/backpack-tf.phrases.txt"
 		
 		"Source"	"Path_SM/scripting/backpack-tf.sp"
 		"Source"	"Path_SM/scripting/mckayupdater.sp"
