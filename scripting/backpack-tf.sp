@@ -4,7 +4,7 @@
 #include <sdktools>
 #include <steamtools>
 
-#define PLUGIN_VERSION		"2.5.0"
+#define PLUGIN_VERSION		"2.6.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -99,6 +99,7 @@ public OnPluginStart() {
 	SetTrieString(qualityNameTrie, "11", "Strange");
 	SetTrieString(qualityNameTrie, "12", "Completed");
 	SetTrieString(qualityNameTrie, "13", "Haunted");
+	SetTrieString(qualityNameTrie, "300", "Uncraftable Vintage"); // custom for backpack.tf
 	SetTrieString(qualityNameTrie, "600", "Uncraftable"); // custom for backpack.tf
 	SetTrieString(qualityNameTrie, "1100", "Uncraftable Strange"); // custom for backpack.tf
 	
@@ -156,6 +157,15 @@ public OnPluginStart() {
 	SetTrieString(unusualNameTrie, "70", "Time Warp");
 	SetTrieString(unusualNameTrie, "71", "Green Black Hole");
 	SetTrieString(unusualNameTrie, "72", "Roboactive");
+	// Halloween 2013
+	SetTrieString(unusualNameTrie, "73", "Arcana");
+	SetTrieString(unusualNameTrie, "74", "Spellbound");
+	SetTrieString(unusualNameTrie, "75", "Chiroptera Venenata");
+	SetTrieString(unusualNameTrie, "76", "Poisoned Shadows");
+	SetTrieString(unusualNameTrie, "77", "Something Burning This Way Comes");
+	SetTrieString(unusualNameTrie, "78", "Hellfire");
+	SetTrieString(unusualNameTrie, "79", "Darkblaze");
+	SetTrieString(unusualNameTrie, "80", "Demonflame");
 	
 	hudText = CreateHudSynchronizer();
 }
