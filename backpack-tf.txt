@@ -4,12 +4,13 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.5.0"
-			"Previous"	"2.4.0"
+			"Latest"	"2.6.0"
+			"Previous"	"2.5.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added Russian translation"
+		"Notes" " - Added support for Uncraftable Vintage"
+		"Notes" " - Added new Halloween Unusual effects"
 	}
 	
 	"Files"
@@ -17,7 +18,6 @@
 		"Patch"
 		{
 			"Plugin"	"Path_SM/plugins/backpack-tf.smx"
-			"Plugin"	"Path_SM/translations/ru/backpack-tf.phrases.txt"
 			"Source"	"Path_SM/scripting/backpack-tf.sp"
 		}
 		
