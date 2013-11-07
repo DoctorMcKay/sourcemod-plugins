@@ -4,7 +4,7 @@
 #include <sdktools>
 #include <socket>
 
-#define PLUGIN_VERSION		"1.0.0"
+#define PLUGIN_VERSION		"1.0.1"
 
 public Plugin:myinfo = {
 	name		= "[ANY] HTTP Text MOTD",
@@ -119,6 +119,8 @@ public OnSocketDisconnect(Handle:socket, any:arg) {
 		SetStringTableData(table, index, data, sizeof(data));
 	}
 	LockStringTables(locked);
+	
+	CloseHandle(socket);
 }
 
 public OnSocketError(Handle:socket, const errorType, const errorNum, any:arg) {
