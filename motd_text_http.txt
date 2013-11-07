@@ -1,0 +1,19 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.0.0"
+		}
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Initial release"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/motd_text_http.smx"
+		"Source"	"Path_SM/scripting/motd_text_http.sp"
+		"Source"	"Path_SM/scripting/mckayupdater.sp"
+	}
+}
