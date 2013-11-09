@@ -6,7 +6,7 @@
 #include <socket> // Compiled with this version of colors.inc: https://forums.alliedmods.net/showpost.php?p=1883578&postcount=311
 #include <clientprefs>
 
-#define PLUGIN_VERSION "2.6.0"
+#define PLUGIN_VERSION "2.6.1"
 
 new Handle:advertCvar;
 new Handle:joinAdvertCvar;
@@ -896,7 +896,7 @@ OpenURL(client, songId, repeat = 1, bool:playlist = false, volume = 100) {
 	KvSetNum(panel, "type", MOTDPANEL_TYPE_URL);
 
 	if(songId == -1) {
-		KvSetString(panel, "msg", "about:blank");
+		KvSetString(panel, "msg", "http://www.google.com");
 	} else {
 		decl String:url[256];
 		GetConVarString(djUrlCvar, url, sizeof(url));
