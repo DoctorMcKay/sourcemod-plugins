@@ -2,7 +2,7 @@
 
 #include <sourcemod>
 
-#define PLUGIN_VERSION		"1.1.0"
+#define PLUGIN_VERSION		"1.2.0"
 
 public Plugin:myinfo = {
 	name		= "[ANY] Connection Method Viewer",
@@ -21,7 +21,7 @@ new String:g_ConnectMethod[MAXPLAYERS + 1][64];
 
 public OnPluginStart() {
 	for(new i = 1; i <= MaxClients; i++) {
-		if(IsClientInGame(i) && !IsFakeClient(i)) {
+		if(IsClientConnected(i)) {
 			OnClientConnected(i);
 		}
 	}
