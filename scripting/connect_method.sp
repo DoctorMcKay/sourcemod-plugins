@@ -2,7 +2,7 @@
 
 #include <sourcemod>
 
-#define PLUGIN_VERSION		"1.0.0"
+#define PLUGIN_VERSION		"1.1.0"
 
 public Plugin:myinfo = {
 	name		= "[ANY] Connection Method Viewer",
@@ -22,29 +22,21 @@ new String:g_ConnectMethod[MAXPLAYERS + 1][64];
 public OnPluginStart() {
 	for(new i = 1; i <= MaxClients; i++) {
 		if(IsClientInGame(i) && !IsFakeClient(i)) {
-			OnClientPutInServer(i);
+			OnClientConnected(i);
 		}
 	}
 	
 	RegAdminCmd("sm_connectmethod", Command_ConnectMethod, ADMFLAG_GENERIC, "Displays how all in-game players connected");
 }
 
-public OnClientPutInServer(client) {
+public OnClientConnected(client) {
 	if(IsFakeClient(client)) {
 		return;
 	}
 	
-	strcopy(g_ConnectMethod[client], sizeof(g_ConnectMethod[]), "Unknown");
-	
-	QueryClientConVar(client, "cl_connectmethod", OnQueryFinished);
-}
-
-public OnQueryFinished(QueryCookie:cookie, client, ConVarQueryResult:result, const String:cvarName[], const String:cvarValue[]) {
-	if(result != ConVarQuery_Okay) {
-		return;
+	if(!GetClientInfo(client, "cl_connectmethod", g_ConnectMethod[client], sizeof(g_ConnectMethod[]))) {
+		strcopy(g_ConnectMethod[client], sizeof(g_ConnectMethod[]), "Unknown");
 	}
-	
-	strcopy(g_ConnectMethod[client], sizeof(g_ConnectMethod[]), cvarValue);
 }
 
 public Action:Command_ConnectMethod(client, args) {
@@ -60,7 +52,7 @@ public Action:Command_ConnectMethod(client, args) {
 			continue;
 		}
 		
-		ReplyToCommand(client, "    - %-32N  %s", i, g_ConnectMethod[i]);
+		ReplyToCommand(client, "  - %-32N  %s", i, g_ConnectMethod[i]);
 	}
 	
 	SetCmdReplySource(source);
