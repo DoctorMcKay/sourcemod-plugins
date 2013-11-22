@@ -5,7 +5,7 @@
 #include <tf2>
 #include <tf2_stocks>
 
-#define PLUGIN_VERSION			"1.1.0"
+#define PLUGIN_VERSION			"1.2.0"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Bot Manager",
@@ -263,17 +263,29 @@ GetClassCounts(TFTeam:team, &scout, &soldier, &pyro, &demoman, &heavy, &engineer
 }
 
 RemoveBot() {
-	new teamToKick = (GetTeamClientCount(2) >= GetTeamClientCount(3)) ? 2 : 3;
-	new bot = 0;
+	new teamToKick;
+	if(GetTeamClientCount(2) > GetTeamClientCount(3)) {
+		teamToKick = 2;
+	} else if(GetTeamClientCount(2) < GetTeamClientCount(3)) {
+		teamToKick = 3;
+	} else {
+		teamToKick = GetRandomInt(2, 3);
+	}
+	
+	new Handle:bots = CreateArray();
 	for(new i = 1; i <= MaxClients; i++) {
 		if(IsClientConnected(i) && !IsClientSourceTV(i) && !IsClientReplay(i) && IsFakeClient(i) && GetClientTeam(i) == teamToKick) {
-			bot = i;
-			break;
+			PushArrayCell(bots, i);
 		}
 	}
-	if(bot == 0) {
+	
+	if(GetArraySize(bots) == 0) {
+		CloseHandle(bots);
 		return;
 	}
+	
+	new bot = GetArrayCell(bots, GetRandomInt(0, GetArraySize(bots) - 1));
+	CloseHandle(bots);
 	
 	Call_StartForward(fwdBotKick);
 	Call_PushCellRef(bot);
