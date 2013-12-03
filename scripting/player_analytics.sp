@@ -45,6 +45,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) 
 	MarkNativeAsOptional("Steam_GetNumClientDLCs");
 	MarkNativeAsOptional("Steam_GetClientDLC");
 	MarkNativeAsOptional("Steam_GetPublicIP");
+	MarkNativeAsOptional("Steam_IsConnected");
 	
 	if(SQL_CheckConfig("player_analytics")) {
 		g_DB = SQL_Connect("player_analytics", true, error, err_max);
