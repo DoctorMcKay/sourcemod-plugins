@@ -6,7 +6,7 @@
 #include <steamtools>
 #include <geoipcity>
 
-#define PLUGIN_VERSION		"1.0.1"
+#define PLUGIN_VERSION		"1.0.2"
 #define CVAR_WINDOWS		"windows_speaker_config"
 #define CVAR_LINUX			"joy_active"
 #define CVAR_MACOS			"mac_fsbackground"
@@ -235,8 +235,6 @@ public Action:Timer_HandleConnect(Handle:timer, any:userid) {
 		} else {
 			strcopy(buffers[7], sizeof(buffers[]), "1");
 		}
-	} else {
-		PrintToServer("SteamTools %s, Folder %s", g_SteamTools ? "true" : "false", g_GameFolder);
 	}
 	
 	if(g_MOTDDisabled[client] != -1) {
@@ -258,7 +256,6 @@ public Action:Timer_HandleConnect(Handle:timer, any:userid) {
 	Format(query, sizeof(query), "INSERT INTO `player_analytics` SET server_ip = '%s', name = %s, auth = %s, connect_time = %d, connect_date = '%s', connect_method = %s, numplayers = %d, map = '%s', flags = '%s', ip = '%s', city = %s, region = %s, country = %s, country_code = %s, country_code3 = %s, premium = %s, html_motd_disabled = %s, os = %s",
 		g_IP, buffers[0], buffers[1], g_ConnectTime[client], date, g_ConnectMethod[client], g_NumPlayers[client], map, flagstring, ip, buffers[2], buffers[3], buffers[4], buffers[5], buffers[6], buffers[7], buffers[8], buffers[9]);
 	
-	PrintToServer(query);
 	SQL_TQuery(g_DB, OnRowInserted, query, GetClientUserId(client));
 	return Plugin_Stop;
 }
