@@ -1,0 +1,20 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.0.0"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Initial public release"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/player_analytics.smx"
+		"Source"	"Path_SM/scripting/player_analytics.sp"
+		"Source"	"Path_SM/scripting/mckayupdater.sp"
+	}
+}
