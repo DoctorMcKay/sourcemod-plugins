@@ -1,0 +1,29 @@
+"Games"
+{
+	"#default"
+	{
+		"#supported"
+		{
+			"game"		"cstrike"
+			"game"		"tf"
+			"game"		"dod"
+			"game"		"hl2mp"
+		}
+		
+		"Keys"
+		{
+			"Convar_Windows"	"windows_speaker_config"
+			"Convar_Linux"		"sdl_double_click_size"
+			"Convar_Mac"		"gl_can_mix_shader_gammas"
+		}
+	}
+	
+	"csgo"
+	{
+		"Keys"
+		{
+			"Convar_Windows"	"windows_speaker_config"
+			"Convar_Mac"		"mac_fsbackground"
+		}
+	}
+}

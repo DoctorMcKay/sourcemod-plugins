@@ -6,11 +6,15 @@
 #include <steamtools>
 #include <geoipcity>
 
-#define PLUGIN_VERSION		"1.0.2"
-#define CVAR_WINDOWS		"windows_speaker_config"
-#define CVAR_LINUX			"joy_active"
-#define CVAR_MACOS			"mac_fsbackground"
-#define NUM_OS				3
+#define PLUGIN_VERSION		"1.1.0"
+
+enum OS {
+	OS_Unknown = -1,
+	OS_Windows = 0,
+	OS_Mac = 1,
+	OS_Linux = 2,
+	OS_Total = 3
+};	
 
 public Plugin:myinfo = {
 	name		= "[ANY] Player Analytics",
@@ -20,24 +24,33 @@ public Plugin:myinfo = {
 	url			= "http://www.doctormckay.com"
 };
 
+//#define DEBUG
+
+#if !defined DEBUG
 new Handle:g_DB;
+#endif
 new bool:g_SteamTools;
 new String:g_IP[64];
 new String:g_GameFolder[64];
+new Handle:g_OSGamedata;
+new String:g_OSConVar[OS_Total][64];
+
 new g_ConnectTime[MAXPLAYERS + 1];
 new g_NumPlayers[MAXPLAYERS + 1];
 new g_RowID[MAXPLAYERS + 1] = {-1, ...};
 new String:g_ConnectMethod[MAXPLAYERS + 1][64];
 new g_MOTDDisabled[MAXPLAYERS + 1] = {-1, ...};
 new Handle:g_MOTDTimer[MAXPLAYERS + 1];
-new String:g_OS[MAXPLAYERS + 1][64];
+new OS:g_OS[MAXPLAYERS + 1];
 new Handle:g_OSTimer[MAXPLAYERS + 1];
 new g_OSQueries[MAXPLAYERS + 1];
 
+#if !defined DEBUG
 #define UPDATE_FILE		"player_analytics.txt"
 #define CONVAR_PREFIX	"player_analytics"
 
 #include "mckayupdater.sp"
+#endif
 
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) {
 	MarkNativeAsOptional("Steam_GetNumClientSubscriptions");
@@ -47,6 +60,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) 
 	MarkNativeAsOptional("Steam_GetPublicIP");
 	MarkNativeAsOptional("Steam_IsConnected");
 	
+#if !defined DEBUG
 	if(SQL_CheckConfig("player_analytics")) {
 		g_DB = SQL_Connect("player_analytics", true, error, err_max);
 	} else {
@@ -58,15 +72,18 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) 
 	}
 	
 	SQL_TQuery(g_DB, OnTableCreated, "CREATE TABLE IF NOT EXISTS `player_analytics` (id int(11) NOT NULL AUTO_INCREMENT, server_ip varchar(32) NOT NULL, name varchar(32), auth varchar(32), connect_time int(11) NOT NULL, connect_date date NOT NULL, connect_method varchar(64) DEFAULT NULL, numplayers tinyint(4) NOT NULL, map varchar(64) NOT NULL, duration int(11) DEFAULT NULL, flags varchar(32) NOT NULL, ip varchar(32) NOT NULL, city varchar(45), region varchar(45), country varchar(45), country_code varchar(2), country_code3 varchar(3), premium tinyint(1), html_motd_disabled tinyint(1), os varchar(32), PRIMARY KEY (id)) ENGINE=InnoDB  DEFAULT CHARSET=utf8");
+#endif
 	
 	return APLRes_Success;
 }
 
+#if !defined DEBUG
 public OnTableCreated(Handle:owner, Handle:hndl, const String:error[], any:data) {
 	if(hndl == INVALID_HANDLE) {
 		SetFailState("Unable to create table. %s", error);
 	}
 }
+#endif
 
 public OnPluginStart() {
 	if(!g_SteamTools || !Steam_IsConnected()) {
@@ -75,6 +92,14 @@ public OnPluginStart() {
 	}
 	
 	GetGameFolderName(g_GameFolder, sizeof(g_GameFolder));
+	g_OSGamedata = LoadGameConfigFile("detect_os.games");
+	if(g_OSGamedata == INVALID_HANDLE) {
+		LogError("Failed to load gamedata file detect_os.games.txt: client operating system data will be unavailable.");
+	} else {
+		GameConfGetKeyValue(g_OSGamedata, "Convar_Windows", g_OSConVar[OS_Windows], sizeof(g_OSConVar[]));
+		GameConfGetKeyValue(g_OSGamedata, "Convar_Mac", g_OSConVar[OS_Mac], sizeof(g_OSConVar[]));
+		GameConfGetKeyValue(g_OSGamedata, "Convar_Linux", g_OSConVar[OS_Linux], sizeof(g_OSConVar[]));
+	}
 }
 
 public Steam_SteamServersConnected() {
@@ -100,11 +125,15 @@ public OnClientConnected(client) {
 	g_ConnectTime[client] = GetTime();
 	g_NumPlayers[client] = GetRealClientCount();
 	g_RowID[client] = -1;
-	g_OS[client][0] = '\0';
+	g_OS[client] = OS_Unknown;
 	
 	decl String:buffer[30];
 	if(GetClientInfo(client, "cl_connectmethod", buffer, sizeof(buffer))) {
+#if !defined DEBUG
 		SQL_EscapeString(g_DB, buffer, g_ConnectMethod[client], sizeof(g_ConnectMethod[]));
+#else
+		strcopy(g_ConnectMethod[client], sizeof(g_ConnectMethod[]), buffer);
+#endif
 		Format(g_ConnectMethod[client], sizeof(g_ConnectMethod[]), "'%s'", g_ConnectMethod[client]);
 	} else {
 		strcopy(g_ConnectMethod[client], sizeof(g_ConnectMethod[]), "NULL");
@@ -118,10 +147,10 @@ public OnClientPutInServer(client) {
 	
 	QueryClientConVar(client, "cl_disablehtmlmotd", OnMOTDQueried);
 	g_MOTDTimer[client] = CreateTimer(30.0, Timer_MOTDTimeout, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
-	g_OSQueries[client] = 0;
-	QueryClientConVar(client, CVAR_WINDOWS, OnOSQueried);
-	QueryClientConVar(client, CVAR_LINUX, OnOSQueried);
-	QueryClientConVar(client, CVAR_MACOS, OnOSQueried);
+	
+	for(new i = 0; i < _:OS_Total; i++) {
+		QueryClientConVar(client, g_OSConVar[i], OnOSQueried);
+	}
 	g_OSTimer[client] = CreateTimer(30.0, Timer_OSTimeout, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 }
 
@@ -157,18 +186,17 @@ public OnOSQueried(QueryCookie:cookie, client, ConVarQueryResult:result, const S
 	
 	if(result == ConVarQuery_NotFound) {
 		g_OSQueries[client]++;
-		if(g_OSQueries[client] >= NUM_OS) {
+		if(g_OSQueries[client] >= _:OS_Total) {
 			CloseHandle(g_OSTimer[client]);
 			g_OSTimer[client] = INVALID_HANDLE;
 		}
 		return;
 	} else {
-		if(StrEqual(cvarName, CVAR_WINDOWS, false)) {
-			strcopy(g_OS[client], sizeof(g_OS[]), "Windows");
-		} else if(StrEqual(cvarName, CVAR_LINUX, false)) {
-			strcopy(g_OS[client], sizeof(g_OS[]), "Linux");
-		} else if(StrEqual(cvarName, CVAR_MACOS, false)) {
-			strcopy(g_OS[client], sizeof(g_OS[]), "MacOS");
+		for(new i = 0; i < _:OS_Total; i++) {
+			if(StrEqual(cvarName, g_OSConVar[i])) {
+				g_OS[client] = OS:i;
+				break;
+			}
 		}
 		
 		CloseHandle(g_OSTimer[client]);
@@ -241,13 +269,21 @@ public Action:Timer_HandleConnect(Handle:timer, any:userid) {
 		IntToString(g_MOTDDisabled[client], buffers[8], sizeof(buffers[]));
 	}
 	
-	strcopy(buffers[9], sizeof(buffers[]), g_OS[client]);
+	if(g_OS[client] == OS_Windows) {
+		strcopy(buffers[9], sizeof(buffers[]), "Windows");
+	} else if(g_OS[client] == OS_Mac) {
+		strcopy(buffers[9], sizeof(buffers[]), "MacOS");
+	} else if(g_OS[client] == OS_Linux) {
+		strcopy(buffers[9], sizeof(buffers[]), "Linux");
+	}
 	
 	for(new i = 0; i < sizeof(buffers); i++) {
 		if(strlen(buffers[i]) == 0) {
 			strcopy(buffers[i], sizeof(buffers[]), "NULL");
 		} else {
+#if !defined DEBUG
 			SQL_EscapeString(g_DB, buffers[i], buffers[i], sizeof(buffers[]));
+#endif
 			Format(buffers[i], sizeof(buffers[]), "'%s'", buffers[i]);
 		}
 	}
@@ -256,7 +292,11 @@ public Action:Timer_HandleConnect(Handle:timer, any:userid) {
 	Format(query, sizeof(query), "INSERT INTO `player_analytics` SET server_ip = '%s', name = %s, auth = %s, connect_time = %d, connect_date = '%s', connect_method = %s, numplayers = %d, map = '%s', flags = '%s', ip = '%s', city = %s, region = %s, country = %s, country_code = %s, country_code3 = %s, premium = %s, html_motd_disabled = %s, os = %s",
 		g_IP, buffers[0], buffers[1], g_ConnectTime[client], date, g_ConnectMethod[client], g_NumPlayers[client], map, flagstring, ip, buffers[2], buffers[3], buffers[4], buffers[5], buffers[6], buffers[7], buffers[8], buffers[9]);
 	
+#if !defined DEBUG
 	SQL_TQuery(g_DB, OnRowInserted, query, GetClientUserId(client));
+#else
+	PrintToServer("%s", query);
+#endif
 	return Plugin_Stop;
 }
 
@@ -270,6 +310,7 @@ GetRealClientCount() {
 	return total; // Note that this value will include the client who's connecting. If you want to get the number of players in-game when they actually initiated their connection, decrement this by one.
 }
 
+#if !defined DEBUG
 public OnRowInserted(Handle:owner, Handle:hndl, const String:error[], any:userid) {
 	new client = GetClientOfUserId(userid);
 	if(client == 0) {
@@ -283,6 +324,7 @@ public OnRowInserted(Handle:owner, Handle:hndl, const String:error[], any:userid
 	
 	g_RowID[client] = SQL_GetInsertId(hndl);
 }
+#endif
 
 public OnClientDisconnect(client) {
 	if(g_RowID[client] == -1 || g_ConnectTime[client] == 0) {
@@ -292,13 +334,19 @@ public OnClientDisconnect(client) {
 	
 	decl String:query[256];
 	Format(query, sizeof(query), "UPDATE `player_analytics` SET duration = %d WHERE id = %d", GetTime() - g_ConnectTime[client], g_RowID[client]);
+#if !defined DEBUG
 	SQL_TQuery(g_DB, OnRowUpdated, query, g_RowID[client]);
+#else
+	PrintToServer("%s", query);
+#endif
 	
 	g_ConnectTime[client] = 0;
 }
 
+#if !defined DEBUG
 public OnRowUpdated(Handle:owner, Handle:hndl, const String:error[], any:id) {
 	if(hndl == INVALID_HANDLE) {
 		LogError("Unable to update row %d. %s", id, error);
 	}
 }
+#endif
