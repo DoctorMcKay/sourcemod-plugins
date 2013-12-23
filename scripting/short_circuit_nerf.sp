@@ -4,7 +4,7 @@
 #include <sdktools>
 #include <tf2>
 
-#define PLUGIN_VERSION			"1.0.1"
+#define PLUGIN_VERSION			"1.0.2"
 #define WEAPON_SHORT_CIRCUIT	528
 
 public Plugin:myinfo = {
@@ -38,6 +38,10 @@ public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:ang
 	}
 	
 	new wep = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+	if(wep == -1 || !IsValidEntity(wep)) {
+		return Plugin_Continue;
+	}
+	
 	if(GetEntProp(wep, Prop_Send, "m_iItemDefinitionIndex") != WEAPON_SHORT_CIRCUIT) {
 		return Plugin_Continue;
 	}
