@@ -3,8 +3,9 @@
 #include <sourcemod>
 #include <sdktools>
 #include <steamtools>
+#include <advanced_motd>
 
-#define PLUGIN_VERSION		"2.6.0"
+#define PLUGIN_VERSION		"2.7.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -99,6 +100,7 @@ public OnPluginStart() {
 	SetTrieString(qualityNameTrie, "11", "Strange");
 	SetTrieString(qualityNameTrie, "12", "Completed");
 	SetTrieString(qualityNameTrie, "13", "Haunted");
+	SetTrieString(qualityNameTrie, "14", "Collector's");
 	SetTrieString(qualityNameTrie, "300", "Uncraftable Vintage"); // custom for backpack.tf
 	SetTrieString(qualityNameTrie, "600", "Uncraftable"); // custom for backpack.tf
 	SetTrieString(qualityNameTrie, "1100", "Uncraftable Strange"); // custom for backpack.tf
@@ -822,14 +824,16 @@ public Action:Command_Backpack(client, args) {
 	Steam_GetCSteamIDForClient(target, steamID, sizeof(steamID)); // we could use the regular Steam ID, but we already have SteamTools, so we can just bypass backpack.tf's redirect directly
 	decl String:url[256];
 	Format(url, sizeof(url), "http://backpack.tf/id/%s", steamID);
-	new Handle:Kv = CreateKeyValues("data");
-	KvSetString(Kv, "title", "");
-	KvSetString(Kv, "type", "2");
-	KvSetString(Kv, "msg", url);
-	KvSetNum(Kv, "customsvr", 1);
-	ShowVGUIPanel(client, "info", Kv);
-	CloseHandle(Kv);
+	AdvMOTD_ShowMOTDPanel(client, "backpack.tf", url, MOTDPANEL_TYPE_URL, true, true, true, OnMOTDFailure);
 	return Plugin_Handled;
+}
+
+public OnMOTDFailure(client, MOTDFailureReason:reason) {
+	switch(reason) {
+		case MOTDFailure_Disabled: PrintToChat(client, "\x04[SM] \x01You cannot view backpacks with HTML MOTDs disabled.");
+		case MOTDFailure_Matchmaking: PrintToChat(client, "\x04[SM] \x01You cannot view backpacks after joining via Quickplay.");
+		case MOTDFailure_QueryFailed: PrintToChat(client, "\x04[SM] \x01Unable to open backpack.");
+	}
 }
 
 DisplayClientMenu(client) {

@@ -4,13 +4,13 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.6.0"
-			"Previous"	"2.5.0"
+			"Latest"	"2.7.0"
+			"Previous"	"2.6.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added support for Uncraftable Vintage"
-		"Notes" " - Added new Halloween Unusual effects"
+		"Notes" " - Added support for Collector's"
+		"Notes" " - Added graceful MOTD failure messages"
 	}
 	
 	"Files"
@@ -32,5 +32,6 @@
 		
 		"Source"	"Path_SM/scripting/backpack-tf.sp"
 		"Source"	"Path_SM/scripting/mckayupdater.sp"
+		"Source"	"Path_SM/scripting/include/advanced_motd.inc"
 	}
 }
