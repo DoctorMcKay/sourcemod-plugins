@@ -11,7 +11,7 @@
 #include <updater>
 
 #define UPDATE_URL			"http://hg.doctormckay.com/public-plugins/raw/default/steamrep.txt"
-#define PLUGIN_VERSION		"1.1.3"
+#define PLUGIN_VERSION		"1.2.0"
 #define STEAMREP_URL		"http://steamrep.com/id2rep.php"
 #define STEAM_API_URL		"http://api.steampowered.com/ISteamUser/GetPlayerBans/v1/"
 
@@ -197,7 +197,7 @@ HandleScammer(client, const String:auth[]) {
 		case 3: {
 			// Ban Steam ID
 			LogItem(Log_Info, "Banned %L by Steam ID as a scammer", client);
-			if(LibraryExists("sourcebans")) {
+			if(GetFeatureStatus(FeatureType_Native, "SBBanPlayer") == FeatureStatus_Available) {
 				SBBanPlayer(0, client, GetConVarInt(cvarSteamIDBanLength), "Player is a reported scammer via SteamRep.com");
 			} else {
 				BanClient(client, GetConVarInt(cvarSteamIDBanLength), BANFLAG_AUTHID, "Player is a reported scammer via SteamRep.com", "You are a reported scammer. Visit http://www.steamrep.com for more information", "steamrep_checker");
@@ -206,7 +206,7 @@ HandleScammer(client, const String:auth[]) {
 		case 4: {
 			// Ban IP
 			LogItem(Log_Info, "Banned %L by IP as a scammer", client);
-			if(LibraryExists("sourcebans")) {
+			if(GetFeatureStatus(FeatureType_Native, "SBBanPlayer") == FeatureStatus_Available) {
 				// SourceBans doesn't currently expose a native to ban an IP!
 				decl String:ip[64];
 				GetClientIP(client, ip, sizeof(ip));
@@ -220,7 +220,7 @@ HandleScammer(client, const String:auth[]) {
 		case 5: {
 			// Ban Steam ID + IP
 			LogItem(Log_Info, "Banned %L by Steam ID and IP as a scammer", client);
-			if(LibraryExists("sourcebans")) {
+			if(GetFeatureStatus(FeatureType_Native, "SBBanPlayer") == FeatureStatus_Available) {
 				decl String:ip[64];
 				GetClientIP(client, ip, sizeof(ip));
 				SBBanPlayer(0, client, GetConVarInt(cvarSteamIDBanLength), "Player is a reported scammer via SteamRep.com");
@@ -295,7 +295,7 @@ HandleValvePlayer(client, bool:banned) {
 		case 3: {
 			// Ban Steam ID
 			LogItem(Log_Info, "Banned %L by Steam ID as %s", client, banned ? "trade banned" : "trade probation");
-			if(LibraryExists("sourcebans")) {
+			if(GetFeatureStatus(FeatureType_Native, "SBBanPlayer") == FeatureStatus_Available) {
 				decl String:message[256];
 				Format(message, sizeof(message), "Player is %s", banned ? "trade banned" : "on trade probation");
 				SBBanPlayer(0, client, GetConVarInt(cvarSteamIDBanLength), message);
@@ -309,7 +309,7 @@ HandleValvePlayer(client, bool:banned) {
 		case 4: {
 			// Ban IP
 			LogItem(Log_Info, "Banned %L by IP as %s", client, banned ? "trade banned" : "trade probation");
-			if(LibraryExists("sourcebans")) {
+			if(GetFeatureStatus(FeatureType_Native, "SBBanPlayer") == FeatureStatus_Available) {
 				// SourceBans doesn't currently expose a native to ban an IP!
 				ServerCommand("sm_banip #%d %d A %s has connected from this IP. Steam ID: %s", banned ? "trade banned player" : "player on trade probation", GetClientUserId(client), GetConVarInt(cvarIPBanLength), clientAuth);
 			} else {
@@ -322,7 +322,7 @@ HandleValvePlayer(client, bool:banned) {
 		case 5: {
 			// Ban Steam ID + IP
 			LogItem(Log_Info, "Banned %L by Steam ID and IP as %s", client, banned ? "trade banned" : "trade probation");
-			if(LibraryExists("sourcebans")) {
+			if(GetFeatureStatus(FeatureType_Native, "SBBanPlayer") == FeatureStatus_Available) {
 				decl String:message[256];
 				Format(message, sizeof(message), "Player is %s", banned ? "trade banned" : "on trade probation");
 				SBBanPlayer(0, client, GetConVarInt(cvarSteamIDBanLength), message);
@@ -370,10 +370,11 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
 	return Plugin_Changed;
 }
 
-public Action:CCC_OnTagApplied(client) {
-	if(clientTag[client] != TagType_None) {
+public Action:CCC_OnColor(client, const String:message[], CCC_ColorType:type) {
+	if(type == CCC_TagColor && clientTag[client] != TagType_None) {
 		return Plugin_Handled;
 	}
+	
 	return Plugin_Continue;
 }
 
