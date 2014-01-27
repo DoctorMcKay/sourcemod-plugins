@@ -4,13 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.7.0"
-			"Previous"	"2.6.0"
+			"Latest"	"2.7.1"
+			"Previous"	"2.7.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added support for Collector's"
-		"Notes" " - Added graceful MOTD failure messages"
+		"Notes" " - Fixed an error caused by an API change"
 	}
 	
 	"Files"
