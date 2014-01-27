@@ -5,7 +5,7 @@
 #include <steamtools>
 #include <advanced_motd>
 
-#define PLUGIN_VERSION		"2.7.0"
+#define PLUGIN_VERSION		"2.7.1"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -688,7 +688,7 @@ public Action:Command_PriceCheck(client, args) {
 	decl String:currency[32], String:qualityIndex[16], String:quality[16], String:series[8], String:price[32], String:buffer[64];
 	do {
 		KvGetSectionName(backpackTFPricelist, qualityIndex, sizeof(qualityIndex));
-		if(StrEqual(qualityIndex, "item_info")) {
+		if(StrEqual(qualityIndex, "item_info") || StrEqual(qualityIndex, "alt_defindex")) {
 			continue;
 		}
 		KvGotoFirstSubKey(backpackTFPricelist);
