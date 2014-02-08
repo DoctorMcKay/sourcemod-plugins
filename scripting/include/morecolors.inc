@@ -9,7 +9,7 @@
 
 #include <regex>
 
-#define MORE_COLORS_VERSION		"1.9.0"
+#define MORE_COLORS_VERSION		"1.9.1"
 #define MAX_MESSAGE_LENGTH		256
 #define MAX_BUFFER_LENGTH		(MAX_MESSAGE_LENGTH * 4)
 
@@ -459,7 +459,8 @@ stock CShowActivity2(client, const String:tag[], const String:message[], any:...
  */
 stock bool:CColorExists(const String:color[]) {
 	CCheckTrie();
-	return GetTrieValue(CTrie, color, 0);
+	new temp;
+	return GetTrieValue(CTrie, color, temp);
 }
 
 /**
