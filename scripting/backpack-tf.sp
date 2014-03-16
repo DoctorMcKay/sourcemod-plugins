@@ -5,7 +5,7 @@
 #include <steamtools>
 #include <advanced_motd>
 
-#define PLUGIN_VERSION		"2.7.1"
+#define PLUGIN_VERSION		"2.7.2"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -823,7 +823,7 @@ public Action:Command_Backpack(client, args) {
 	decl String:steamID[64];
 	Steam_GetCSteamIDForClient(target, steamID, sizeof(steamID)); // we could use the regular Steam ID, but we already have SteamTools, so we can just bypass backpack.tf's redirect directly
 	decl String:url[256];
-	Format(url, sizeof(url), "http://backpack.tf/id/%s", steamID);
+	Format(url, sizeof(url), "http://backpack.tf/profiles/%s", steamID);
 	AdvMOTD_ShowMOTDPanel(client, "backpack.tf", url, MOTDPANEL_TYPE_URL, true, true, true, OnMOTDFailure);
 	return Plugin_Handled;
 }

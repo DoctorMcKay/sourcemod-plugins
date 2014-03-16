@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.7.1"
-			"Previous"	"2.7.0"
+			"Latest"	"2.7.2"
+			"Previous"	"2.7.1"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed an error caused by an API change"
+		"Notes" " - Fixed !bp command"
 	}
 	
 	"Files"
