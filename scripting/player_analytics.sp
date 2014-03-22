@@ -6,7 +6,7 @@
 #include <steamtools>
 #include <geoipcity>
 
-#define PLUGIN_VERSION		"1.1.0"
+#define PLUGIN_VERSION		"1.1.1"
 
 enum OS {
 	OS_Unknown = -1,
@@ -146,12 +146,12 @@ public OnClientPutInServer(client) {
 	}
 	
 	QueryClientConVar(client, "cl_disablehtmlmotd", OnMOTDQueried);
-	g_MOTDTimer[client] = CreateTimer(30.0, Timer_MOTDTimeout, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+	g_MOTDTimer[client] = CreateTimer(30.0, Timer_MOTDTimeout, GetClientUserId(client));
 	
 	for(new i = 0; i < _:OS_Total; i++) {
 		QueryClientConVar(client, g_OSConVar[i], OnOSQueried);
 	}
-	g_OSTimer[client] = CreateTimer(30.0, Timer_OSTimeout, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+	g_OSTimer[client] = CreateTimer(30.0, Timer_OSTimeout, GetClientUserId(client));
 }
 
 public OnMOTDQueried(QueryCookie:cookie, client, ConVarQueryResult:result, const String:cvarName[], const String:cvarValue[]) {
