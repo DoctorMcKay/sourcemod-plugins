@@ -6,7 +6,7 @@
 #include <steamtools>
 #include <geoipcity>
 
-#define PLUGIN_VERSION		"1.1.1"
+#define PLUGIN_VERSION		"1.1.2"
 
 enum OS {
 	OS_Unknown = -1,
@@ -277,20 +277,21 @@ public Action:Timer_HandleConnect(Handle:timer, any:userid) {
 		strcopy(buffers[9], sizeof(buffers[]), "Linux");
 	}
 	
+	decl String:escapedBuffers[10][513];
 	for(new i = 0; i < sizeof(buffers); i++) {
 		if(strlen(buffers[i]) == 0) {
-			strcopy(buffers[i], sizeof(buffers[]), "NULL");
+			strcopy(escapedBuffers[i], sizeof(escapedBuffers[]), "NULL");
 		} else {
 #if !defined DEBUG
-			SQL_EscapeString(g_DB, buffers[i], buffers[i], sizeof(buffers[]));
+			SQL_EscapeString(g_DB, buffers[i], escapedBuffers[i], sizeof(escapedBuffers[]));
 #endif
-			Format(buffers[i], sizeof(buffers[]), "'%s'", buffers[i]);
+			Format(escapedBuffers[i], sizeof(escapedBuffers[]), "'%s'", escapedBuffers[i]);
 		}
 	}
 	
 	decl String:query[512];
 	Format(query, sizeof(query), "INSERT INTO `player_analytics` SET server_ip = '%s', name = %s, auth = %s, connect_time = %d, connect_date = '%s', connect_method = %s, numplayers = %d, map = '%s', flags = '%s', ip = '%s', city = %s, region = %s, country = %s, country_code = %s, country_code3 = %s, premium = %s, html_motd_disabled = %s, os = %s",
-		g_IP, buffers[0], buffers[1], g_ConnectTime[client], date, g_ConnectMethod[client], g_NumPlayers[client], map, flagstring, ip, buffers[2], buffers[3], buffers[4], buffers[5], buffers[6], buffers[7], buffers[8], buffers[9]);
+		g_IP, escapedBuffers[0], escapedBuffers[1], g_ConnectTime[client], date, g_ConnectMethod[client], g_NumPlayers[client], map, flagstring, ip, escapedBuffers[2], escapedBuffers[3], escapedBuffers[4], escapedBuffers[5], escapedBuffers[6], escapedBuffers[7], escapedBuffers[8], escapedBuffers[9]);
 	
 #if !defined DEBUG
 	SQL_TQuery(g_DB, OnRowInserted, query, GetClientUserId(client));
