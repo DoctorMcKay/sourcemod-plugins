@@ -3,7 +3,7 @@
 #include <sourcemod>
 #include <tf2items>
 
-#define PLUGIN_VERSION			"1.1.0"
+#define PLUGIN_VERSION			"1.1.1"
 #define WEAPON_JUMPER			265
 #define ATTRIBUTE_ADD_BOMBS		88
 #define ATTRIBUTE_MINUS_BOMBS	89
@@ -25,7 +25,7 @@ new Handle:newItem;
 #include "mckayupdater.sp"
 
 public OnPluginStart() {
-	cvarMaxBombz = CreateConVar("sticky_jumper_max_bombs", "2", "Maximum number of bombs that a player can lay out at once", _, true, 1.0, true, 10.0);
+	cvarMaxBombz = CreateConVar("sticky_jumper_max_bombs", "2", "Maximum number of bombs that a player can lay out at once", _, true, 1.0);
 	HookConVarChange(cvarMaxBombz, OnConVarChanged);
 }
 
@@ -38,7 +38,7 @@ public OnConfigsExecuted() {
 		CloseHandle(newItem);
 	}
 	
-	newItem = TF2Items_CreateItem(OVERRIDE_ATTRIBUTES);
+	newItem = TF2Items_CreateItem(OVERRIDE_ATTRIBUTES|PRESERVE_ATTRIBUTES);
 	
 	new Float:diff = GetConVarFloat(cvarMaxBombz) - 8.0;
 	if(diff <= 0.0) {
