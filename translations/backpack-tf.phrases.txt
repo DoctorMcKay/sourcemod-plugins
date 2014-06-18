@@ -4,45 +4,103 @@
 	{
 		"en"			"Price list updated."
 	}
+	
 	"Type !pc for a price check"
 	{
 		"en"			"Type !pc for a price check."
 	}
-	"Up"
+	
+	"Price change up"
 	{
-		"en"			"Up"
+		"#format"		"{1:s},{2:s},{3:s}"
+		"en"			"{1}: Up from {2} to {3}"
 	}
-	"Down"
+	
+	"Price change down"
 	{
-		"en"			"Down"
+		"#format"		"{1:s},{2:s},{3:s}"
+		"en"			"{1}: Down from {2} to {3}"
 	}
-	"From"
+	
+	"Price check title"
 	{
-		"en"			"from"
+		"en"			"Backpack.tf Price Check"
 	}
-	"To"
+	
+	"Search Results"
 	{
-		"en"			"to"
+		"en"			"Search Results"
 	}
-	"Price check"
+	
+	"Price list title"
 	{
 		"#format"		"{1:s}"
-		"en"			"Price check: {1}"
+		"en"			"Backpack.tf price check: {1}"
 	}
-	"Prices are estimates only"
+	
+	"Prices are estimates"
 	{
-		"en"			"Prices are estimates only"
+		"en"			"Prices are estimates only."
 	}
-	"Prices courtesy of backpack.tf"
+	
+	"Unusual prices are estimates"
 	{
-		"en"			"Prices courtesy of backpack.tf"
+		"en"			"Prices, especially Unusual prices, are estimates only."
 	}
-	"Please allow backpack.tf time to load"
+	
+	"View effects"
 	{
-		"en"			"Please allow backpack.tf time to load"
+		"en"			"Unusual: View Effects"
 	}
+	
+	"Series"
+	{
+		"#format"		"{1:d},{2:s}"
+		"en"			"Series #{1}: {2}"
+	}
+	
+	"refined"
+	{
+		"en"			"refined"
+	}
+	
+	"key"
+	{
+		"en"			"key"
+	}
+	
+	"keys"
+	{
+		"en"			"keys"
+	}
+	
+	"bud"
+	{
+		"en"			"bud"
+	}
+	
+	"buds"
+	{
+		"en"			"buds"
+	}
+	
+	"View online"
+	{
+		"en"			"View Online"
+	}
+	
 	"The price list has not loaded yet"
 	{
 		"en"			"The price list has not loaded yet"
+	}
+	
+	"No matching item"
+	{
+		"en"			"No matching item was found"
+	}
+	
+	"Select Player"
+	{
+		"en"			"Select Player"
 	}
 }
