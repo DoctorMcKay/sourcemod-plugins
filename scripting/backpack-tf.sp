@@ -9,6 +9,7 @@
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v4/"
 #define NOTIFICATION_SOUND	"replay/downloadcomplete.wav"
 #define QUALITY_UNUSUAL		"5"
+#define QUALITY_UNIQUE		"6"
 
 public Plugin:myinfo = {
 	name        = "[TF2] backpack.tf Price Check",
@@ -41,6 +42,10 @@ new Handle:g_cvarTag;
 
 new Handle:g_HudSync;
 new Handle:sv_tags;
+
+new Float:g_MetalUSD;
+new Float:g_KeysRaw;
+new Float:g_BudsRaw;
 
 #define UPDATE_FILE		"backpack-tf.txt"
 #define CONVAR_PREFIX	"backpack_tf"
@@ -282,7 +287,6 @@ public OnBackpackTFComplete(HTTPRequestHandle:request, bool:successful, HTTPStat
 		return;
 	}
 	
-	LogMessage("backpack.tf price list successfully downloaded!");
 	CreateTimer(3600.0, Timer_Update);
 	
 	if(g_PriceList != INVALID_HANDLE) {
@@ -296,6 +300,30 @@ public OnBackpackTFComplete(HTTPRequestHandle:request, bool:successful, HTTPStat
 	new offset = GetTime() - g_CacheTime;
 	KvSetNum(kv, "time_offset", offset);
 	KeyValuesToFile(kv, path);
+	
+	// Get the raw prices of keys and buds so we can convert USD prices
+	KvRewind(g_PriceList);
+	g_MetalUSD = KvGetFloat(g_PriceList, "raw_usd_value");
+	
+	PrepPriceKv();
+	KvJumpToKey(g_PriceList, "Mann Co. Supply Crate Key");
+	KvJumpToKey(g_PriceList, "prices");
+	KvJumpToKey(g_PriceList, QUALITY_UNIQUE);
+	KvJumpToKey(g_PriceList, "Tradable");
+	KvJumpToKey(g_PriceList, "Craftable");
+	KvJumpToKey(g_PriceList, "0");
+	g_KeysRaw = KvGetFloat(g_PriceList, "value_raw");
+	
+	PrepPriceKv();
+	KvJumpToKey(g_PriceList, "Earbuds");
+	KvJumpToKey(g_PriceList, "prices");
+	KvJumpToKey(g_PriceList, QUALITY_UNIQUE);
+	KvJumpToKey(g_PriceList, "Tradable");
+	KvJumpToKey(g_PriceList, "Craftable");
+	KvJumpToKey(g_PriceList, "0");
+	g_BudsRaw = KvGetFloat(g_PriceList, "value_raw");
+	
+	LogMessage("backpack.tf price list successfully downloaded! USD/Metal: %.2f, Metal/Key: %.2f, Metal/Bud: %.2f", g_MetalUSD, g_KeysRaw, g_BudsRaw);
 	
 	if(!GetConVarBool(g_cvarDisplayUpdateNotification)) {
 		return;
