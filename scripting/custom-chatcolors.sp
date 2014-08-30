@@ -3,12 +3,12 @@
 #include <sourcemod>
 #include <scp>
 
-#define PLUGIN_VERSION		"3.0.1"
+#define PLUGIN_VERSION		"3.1.0"
 
 public Plugin:myinfo = {
-	name        = "[Source 2009] Custom Chat Colors",
+	name        = "[Source 2013] Custom Chat Colors",
 	author      = "Dr. McKay",
-	description = "Processes chat and provides colors for Source 2009 games",
+	description = "Processes chat and provides colors for Source 2013 games",
 	version     = PLUGIN_VERSION,
 	url         = "http://www.doctormckay.com"
 };
@@ -147,7 +147,7 @@ public OnClientPostAdminCheck(client) {
 			if(strlen(configFlag) > 1) {
 				LogError("Multiple flags given in section \"%s\", which is not allowed. Using first character.", section);
 			}
-			if(strlen(configFlag) == 0 && StrContains(section, "STEAM_", false) == -1) {
+			if(strlen(configFlag) == 0 && StrContains(section, "STEAM_", false) == -1 && StrContains(section, "[U:1:", false) == -1) {
 				found = true;
 				break;
 			}
