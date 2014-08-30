@@ -4,10 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.4.4"
+			"Latest"	"2.0.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Now checks if Custom Chat Colors is installed"
+		"Notes" " - Updater improvements"
+		"Notes" " - No longer unnecessarily writes rows to the Clientprefs table for every unique player"
+		"Notes" " - Switched from deprecated forwards to preferred one"
 	}
 	
 	"Files"
