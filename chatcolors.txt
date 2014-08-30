@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"3.0.1"
+			"Latest"	"3.1.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed an issue related to error-logging"
+		"Notes" " - Added support for Steam3 IDs"
 	}
 	
 	"Files"
