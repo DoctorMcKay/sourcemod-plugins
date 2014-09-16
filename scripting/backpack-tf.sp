@@ -5,7 +5,7 @@
 #include <steamtools>
 #include <advanced_motd>
 
-#define PLUGIN_VERSION		"2.7.2"
+#define PLUGIN_VERSION		"2.8.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -168,6 +168,17 @@ public OnPluginStart() {
 	SetTrieString(unusualNameTrie, "78", "Hellfire");
 	SetTrieString(unusualNameTrie, "79", "Darkblaze");
 	SetTrieString(unusualNameTrie, "80", "Demonflame");
+	// Taunt effects
+	SetTrieString(unusualNameTrie, "3001", "Showstopper");
+	SetTrieString(unusualNameTrie, "3002", "Showstopper");
+	SetTrieString(unusualNameTrie, "3003", "Holy Grail");
+	SetTrieString(unusualNameTrie, "3004", "'72");
+	SetTrieString(unusualNameTrie, "3005", "Fountain of Delight");
+	SetTrieString(unusualNameTrie, "3006", "Screaming Tiger");
+	SetTrieString(unusualNameTrie, "3007", "Skill Gotten Gains");
+	SetTrieString(unusualNameTrie, "3008", "Midnight Whirlwind");
+	SetTrieString(unusualNameTrie, "3009", "Silver Cyclone");
+	SetTrieString(unusualNameTrie, "3010", "Mega Strike");
 	
 	hudText = CreateHudSynchronizer();
 }
