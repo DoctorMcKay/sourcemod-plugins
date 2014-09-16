@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.7.2"
-			"Previous"	"2.7.1"
+			"Latest"	"2.8.0"
+			"Previous"	"2.7.2"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed !bp command"
+		"Notes" " - Added new taunt effects"
 	}
 	
 	"Files"
