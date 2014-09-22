@@ -3,7 +3,7 @@
 #include <sourcemod>
 #include <scp>
 
-#define PLUGIN_VERSION		"1.0.0"
+#define PLUGIN_VERSION		"1.1.0"
 
 public Plugin:myinfo = {
 	name		= "[ANY] Anti Caps Lock",
@@ -27,6 +27,10 @@ public OnPluginStart() {
 }
 
 public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:message[]) {
+	if(CheckCommandAccess(author, "anti_caps_lock_immunity", ADMFLAG_ROOT, true)) {
+		return Plugin_Continue;
+	}
+	
 	new letters, uppercase, length = strlen(message);
 	for(new i = 0; i < length; i++) {
 		if(message[i] >= 'A' && message[i] <= 'Z') {
