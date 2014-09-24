@@ -12,12 +12,6 @@
 				"linux"		"157"
 			}
 			
-			"ChangeLevel"
-			{
-				"windows"	"147"
-				"linux"		"148"
-			}
-			
 			"GoToIntermission"
 			{
 				"windows"	"148"
