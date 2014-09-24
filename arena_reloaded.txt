@@ -1,0 +1,21 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.0.0"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Initial release"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/arena_reloaded.smx"
+		"Plugin"	"Path_SM/gamedata/arena-reloaded.games.txt"
+		"Source"	"Path_SM/scripting/arena_reloaded.sp"
+		"Source"	"Path_SM/scripting/mckayupdater.sp"
+	}
+}
