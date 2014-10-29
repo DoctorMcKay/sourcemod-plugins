@@ -1,0 +1,44 @@
+"Viewers"
+{
+	"backpacktf"
+	{
+		"name"			"Backpack.tf"
+		"url"			"http://backpack.tf/profiles/{ID}"
+		"idtype"		"3"
+	}
+	
+	"bazaar"
+	{
+		"name"			"Bazaar.tf"
+		"url"			"http://bazaar.tf/backpack/{ID}"
+		"idtype"		"3"
+	}
+	
+	"steam"
+	{
+		"name"			"Steam"
+		"url"			"https://steamcommunity.com/profiles/{ID}/inventory#440"
+		"idtype"		"3"
+	}
+	
+	"tf2b"
+	{
+		"name"			"TF2B"
+		"url"			"http://tf2b.com/tf2/{ID}"
+		"idtype"		"3"
+	}
+	
+	"tf2items"
+	{
+		"name"			"TF2Items"
+		"url"			"http://www.tf2items.com/profiles/{ID}"
+		"idtype"		"3"
+	}
+	
+	"traderep"
+	{
+		"name"			"TradeRep"
+		"url"			"http://www.traderep.org/load?title={NAME}'s+backpack&url=/backpack/{ID}%3Fsource%3Dplugin"
+		"idtype"		"3"
+	}
+}

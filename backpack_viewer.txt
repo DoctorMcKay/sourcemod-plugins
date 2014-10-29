@@ -1,0 +1,30 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.0.0"
+			"Previous"	"1.0.0"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Initial release"
+	}
+	
+	"Files"
+	{
+		"Patch"
+		{
+			"Plugin"	"Path_SM/plugins/backpack_viewer.smx"
+			"Source"	"Path_SM/scripting/backpack_viewer.sp"
+		}
+		
+		"Plugin"	"Path_SM/plugins/backpack_viewer.smx"
+		"Plugin"	"Path_SM/data/backpack_viewer.txt"
+		
+		"Source"	"Path_SM/scripting/backpack_viewer.sp"
+		"Source"	"Path_SM/scripting/mckayupdater.sp"
+		"Source"	"Path_SM/scripting/include/advanced_motd.inc"
+	}
+}
