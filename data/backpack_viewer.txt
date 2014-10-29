@@ -38,7 +38,7 @@
 	"traderep"
 	{
 		"name"			"TradeRep"
-		"url"			"http://www.traderep.org/load?title={NAME}'s+backpack&url=%2Fbackpack%2F{ID}%3Fpk_campaign%3Dplugin"
+		"url"			"http://www.traderep.org/load?title={NAME}'s+backpack&url=%2Fbackpack%2F{ID}%3Fpk_campaign%3DBackpack-Viewer-Plugin%3Fpk_keyword%3D{SERVER_IP}"
 		"idtype"		"3"
 	}
 }
