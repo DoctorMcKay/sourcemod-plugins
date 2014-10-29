@@ -4,7 +4,7 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.0.0"
+			"Latest"	"1.0.1"
 			"Previous"	"1.0.0"
 		}
 		
@@ -17,6 +17,7 @@
 		"Patch"
 		{
 			"Plugin"	"Path_SM/plugins/backpack_viewer.smx"
+			"Plugin"	"Path_SM/data/backpack_viewer.txt"
 			"Source"	"Path_SM/scripting/backpack_viewer.sp"
 		}
 		
