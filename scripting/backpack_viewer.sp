@@ -5,7 +5,7 @@
 #include <clientprefs>
 #include <advanced_motd>
 
-#define PLUGIN_VERSION		"1.0.1"
+#define PLUGIN_VERSION		"1.1.0"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Custom Backpack Viewer",
@@ -17,7 +17,10 @@ public Plugin:myinfo = {
 
 new Handle:g_cookieBackpackPreference;
 new Handle:g_cvarDefaultPreference;
+new Handle:g_cvarAllowTracking;
 new Handle:g_BackpackViewers;
+
+new String:g_ServerIP[32];
 
 #define UPDATE_FILE		"backpack_viewer.txt"
 #define CONVAR_PREFIX	"backpack_viewer"
@@ -27,6 +30,10 @@ new Handle:g_BackpackViewers;
 public OnPluginStart() {
 	g_cookieBackpackPreference = RegClientCookie("backpack_viewer_preference", "Backpack viewer preference", CookieAccess_Protected);
 	g_cvarDefaultPreference = CreateConVar("backpack_viewer_default", "traderep", "Default backpack viewer to use");
+	g_cvarAllowTracking = CreateConVar("backpack_viewer_allow_tracking", "1", "Allow the server IP to be sent to the backpack viewer (if configured as such) for analytics purposes", _, true, 0.0, true, 1.0);
+	
+	HookConVarChange(g_cvarAllowTracking, OnTrackingChanged);
+	OnTrackingChanged(g_cvarAllowTracking, "", "");
 	
 	decl String:path[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, path, sizeof(path), "configs/backpack_viewer.txt");
@@ -47,6 +54,23 @@ public OnPluginStart() {
 	RegConsoleCmd("sm_bp", Command_Backpack, "View a player's backpack");
 	
 	LoadTranslations("common.phrases");
+}
+
+public OnTrackingChanged(Handle:convar, const String:oldValue[], const String:newValue[]) {
+	if(GetConVarBool(convar)) {
+		// Tracking allowed
+		new ip = GetConVarInt(FindConVar("hostip"));
+		Format(g_ServerIP, sizeof(g_ServerIP), "%d.%d.%d.%d:%d",
+			((ip & 0xFF000000) >> 24) & 0xFF,
+			((ip & 0x00FF0000) >> 16) & 0xFF,
+			((ip & 0x0000FF00) >> 8) & 0xFF,
+			((ip & 0x000000FF) >> 0) & 0xFF,
+			GetConVarInt(FindConVar("hostport"))
+		);
+	} else {
+		// Tracking not allowed
+		strcopy(g_ServerIP, sizeof(g_ServerIP), "anonymous");
+	}
 }
 
 public Handler_CookieMenu(client, CookieMenuAction:action, any:info, String:buffer[], maxlen) {
@@ -178,6 +202,10 @@ ShowBackpack(client, target) {
 	GetClientAuthId(target, AuthIdType:KvGetNum(g_BackpackViewers, "idtype", 3), buffer, sizeof(buffer));
 	UrlEncodeString(buffer2, sizeof(buffer2), buffer);
 	ReplaceString(url, sizeof(url), "{ID}", buffer2);
+	
+	UrlEncodeString(buffer2, sizeof(buffer2), g_ServerIP);
+	ReplaceString(url, sizeof(url), "{SERVER_IP}", buffer2);
+	
 	AdvMOTD_ShowMOTDPanel(client, "Backpack", url, MOTDPANEL_TYPE_URL, true, true, true, OnMOTDFailure);
 }
 
