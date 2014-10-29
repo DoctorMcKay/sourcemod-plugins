@@ -5,7 +5,7 @@
 #include <clientprefs>
 #include <advanced_motd>
 
-#define PLUGIN_VERSION		"1.1.0"
+#define PLUGIN_VERSION		"1.1.1"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Custom Backpack Viewer",
