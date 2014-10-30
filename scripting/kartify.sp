@@ -3,7 +3,7 @@
 #include <sourcemod>
 #include <tf2>
 
-#define PLUGIN_VERSION		"1.0.1"
+#define PLUGIN_VERSION		"1.0.2"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Kartify",
@@ -88,10 +88,8 @@ public Action:Command_Unkartify(client, args) {
 
 Kartify(client) {
 	TF2_AddCondition(client, TFCond:82, 9999999.9);
-	SetEntProp(client, Prop_Send, "m_iKartState", 1);
 }
 
 Unkartify(client) {
 	TF2_RemoveCondition(client, TFCond:82);
-	SetEntProp(client, Prop_Send, "m_iKartState", 0);
 }
