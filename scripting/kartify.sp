@@ -13,6 +13,11 @@ public Plugin:myinfo = {
 	url			= "http://www.doctormckay.com"
 };
 
+#define UPDATE_FILE		"kartify.txt"
+#define CONVAR_PREFIX	"kartify"
+
+#include "mckayupdater.sp"
+
 public OnPluginStart() {
 	RegAdminCmd("sm_kartify", Command_Kartify, ADMFLAG_SLAY, "Put players into karts!");
 	RegAdminCmd("sm_kart", Command_Kartify, ADMFLAG_SLAY, "Put players into karts!");
