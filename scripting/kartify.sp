@@ -3,7 +3,7 @@
 #include <sourcemod>
 #include <tf2>
 
-#define PLUGIN_VERSION		"1.0.0"
+#define PLUGIN_VERSION		"1.0.1"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Kartify",
@@ -25,6 +25,11 @@ public OnPluginStart() {
 	RegAdminCmd("sm_unkart", Command_Unkartify, ADMFLAG_SLAY, "Remove players from karts");
 	
 	LoadTranslations("common.phrases");
+}
+
+public OnMapStart() {
+	PrecacheModel("models/player/items/taunts/bumpercar/parts/bumpercar.mdl");
+	PrecacheModel("models/player/items/taunts/bumpercar/parts/bumpercar_nolights.mdl");
 }
 
 public Action:Command_Kartify(client, args) {
