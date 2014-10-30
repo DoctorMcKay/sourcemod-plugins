@@ -35,6 +35,8 @@ public Action:Command_Kartify(client, args) {
 	
 	decl String:argString[MAX_NAME_LENGTH];
 	GetCmdArgString(argString, sizeof(argString));
+	StripQuotes(argString);
+	TrimString(argString);
 	
 	decl targets[MaxClients], String:target_name[MAX_NAME_LENGTH], bool:tn_is_ml;
 	new result = ProcessTargetString(argString, client, targets, MaxClients, COMMAND_FILTER_ALIVE, target_name, sizeof(target_name), tn_is_ml);
@@ -60,6 +62,8 @@ public Action:Command_Unkartify(client, args) {
 	
 	decl String:argString[MAX_NAME_LENGTH];
 	GetCmdArgString(argString, sizeof(argString));
+	StripQuotes(argString);
+	TrimString(argString);
 	
 	decl targets[MaxClients], String:target_name[MAX_NAME_LENGTH], bool:tn_is_ml;
 	new result = ProcessTargetString(argString, client, targets, MaxClients, COMMAND_FILTER_ALIVE, target_name, sizeof(target_name), tn_is_ml);
