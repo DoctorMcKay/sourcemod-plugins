@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.1.0"
+			"Latest"	"1.2.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added sm_kartifyme and sm_unkartifyme"
-		"Notes" " - Added kartify_spawn cvar"
+		"Notes" " - Fixed backwards cvar values"
+		"Notes" " - sm_kartifyme and sm_kartify are now toggles (only for sm_kartify if it matches a single target only)"
 	}
 	
 	"Files"
