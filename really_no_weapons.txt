@@ -1,0 +1,21 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"1.0.0"
+		}
+		
+		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Initial release"
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/really_no_weapons.smx"
+		
+		"Source"	"Path_SM/scripting/really_no_weapons.sp"
+		"Source"	"Path_SM/scripting/mckayupdater.sp"
+	}
+}
