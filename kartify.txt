@@ -4,12 +4,15 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.2.0"
+			"Latest"	"1.3.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed backwards cvar values"
-		"Notes" " - sm_kartifyme and sm_kartify are now toggles (only for sm_kartify if it matches a single target only)"
+		"Notes" " - Fixed sounds"
+		"Notes" " - Added kartify_boost_recharge_time cvar"
+		"Notes" " - Added kartify_start_percentage cvar"
+		"Notes" " - Added kartify_forced_percentage cvar"
+		"Notes" " - Added kartify_allow_suicide cvar"
 	}
 	
 	"Files"

@@ -3,8 +3,9 @@
 #include <sourcemod>
 #include <tf2>
 #include <tf2_stocks>
+#include <sdkhooks>
 
-#define PLUGIN_VERSION		"1.2.0"
+#define PLUGIN_VERSION		"1.3.0"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Kartify",
@@ -15,6 +16,10 @@ public Plugin:myinfo = {
 };
 
 new Handle:g_cvarSpawnKart;
+new Handle:g_cvarBoostRechargeTime;
+new Handle:g_cvarStartPercentage;
+new Handle:g_cvarForcedPercentage;
+new Handle:g_cvarAllowSuicide;
 
 new bool:g_KartSpawn[MAXPLAYERS + 1];
 
@@ -25,6 +30,10 @@ new bool:g_KartSpawn[MAXPLAYERS + 1];
 
 public OnPluginStart() {
 	g_cvarSpawnKart = CreateConVar("kartify_spawn", "0", "0 = do nothing, 1 = put all players into karts when they spawn, 2 = put players into karts when they spawn only if sm_kartify was used on them", _, true, 0.0, true, 2.0);
+	g_cvarBoostRechargeTime = CreateConVar("kartify_boost_recharge_time", "5.0", "Time in seconds it takes to recharge boost", _, true, 0.0);
+	g_cvarStartPercentage = CreateConVar("kartify_start_percentage", "0", "Starting percentage, as an integer, of damage for kartified players", _, true, 0.0);
+	g_cvarForcedPercentage = CreateConVar("kartify_forced_percentage", "-1", "If 0 or greater, karts will not take damage and will instead have this percent of damage all the time (as an integer)", _, true, -1.0);
+	g_cvarAllowSuicide = CreateConVar("kartify_allow_suicide", "1", "Allow players to suicide while in a kart", _, true, 0.0, true, 1.0);
 	
 	RegAdminCmd("sm_kartify", Command_Kartify, ADMFLAG_SLAY, "Put players into karts!");
 	RegAdminCmd("sm_kart", Command_Kartify, ADMFLAG_SLAY, "Put players into karts!");
@@ -38,11 +47,45 @@ public OnPluginStart() {
 	LoadTranslations("common.phrases");
 	
 	HookEvent("player_spawn", Event_PlayerSpawn);
+	
+	AddCommandListener(Command_Kill, "kill");
+	AddCommandListener(Command_Kill, "explode");
+}
+
+public Action:Command_Kill(client, const String:command[], argc) {
+	if(!GetConVarBool(g_cvarAllowSuicide)) {
+		return Plugin_Continue;
+	}
+	
+	SDKHooks_TakeDamage(client, 0, 0, 10000.0, StrEqual(command, "explode", false) ? DMG_BLAST : DMG_GENERIC);
+	return Plugin_Handled;
 }
 
 public OnMapStart() {
 	PrecacheModel("models/player/items/taunts/bumpercar/parts/bumpercar.mdl");
 	PrecacheModel("models/player/items/taunts/bumpercar/parts/bumpercar_nolights.mdl");
+	
+	PrecacheSound(")weapons/bumper_car_accelerate.wav");
+	PrecacheSound(")weapons/bumper_car_decelerate.wav");
+	PrecacheSound(")weapons/bumper_car_decelerate_quick.wav");
+	PrecacheSound(")weapons/bumper_car_go_loop.wav");
+	PrecacheSound(")weapons/bumper_car_hit_ball.wav");
+	PrecacheSound(")weapons/bumper_car_hit_ghost.wav");
+	PrecacheSound(")weapons/bumper_car_hit_hard.wav");
+	PrecacheSound(")weapons/bumper_car_hit_into_air.wav");
+	PrecacheSound(")weapons/bumper_car_jump.wav");
+	PrecacheSound(")weapons/bumper_car_jump_land.wav");
+	PrecacheSound(")weapons/bumper_car_screech.wav");
+	PrecacheSound(")weapons/bumper_car_spawn.wav");
+	PrecacheSound(")weapons/bumper_car_spawn_from_lava.wav");
+	PrecacheSound(")weapons/bumper_car_speed_boost_start.wav");
+	PrecacheSound(")weapons/bumper_car_speed_boost_stop.wav");
+	
+	decl String:name[64];
+	for(new i = 1; i <= 8; i++) {
+		FormatEx(name, sizeof(name), "weapons/bumper_car_hit%d.wav", i);
+		PrecacheSound(name);
+	}
 }
 
 public OnClientConnected(client) {
@@ -149,8 +192,26 @@ public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast) 
 
 Kartify(client) {
 	TF2_AddCondition(client, TFCond:82, TFCondDuration_Infinite);
+	SetEntProp(client, Prop_Send, "m_iKartHealth", GetConVarInt(g_cvarStartPercentage));
 }
 
 Unkartify(client) {
 	TF2_RemoveCondition(client, TFCond:82);
+}
+
+public TF2_OnConditionAdded(client, TFCond:condition) {
+	if(condition == TFCond:83) {
+		SetEntPropFloat(client, Prop_Send, "m_flKartNextAvailableBoost", GetGameTime() + GetConVarFloat(g_cvarBoostRechargeTime));
+	}
+}
+
+public OnGameFrame() {
+	new forcedPct = GetConVarInt(g_cvarForcedPercentage);
+	if(forcedPct >= 0) {
+		for(new i = 1; i <= MaxClients; i++) {
+			if(IsClientInGame(i)) {
+				SetEntProp(i, Prop_Send, "m_iKartHealth", forcedPct);
+			}
+		}
+	}
 }
