@@ -2,8 +2,9 @@
 
 #include <sourcemod>
 #include <tf2>
+#include <tf2_stocks>
 
-#define PLUGIN_VERSION		"1.1.0"
+#define PLUGIN_VERSION		"1.2.0"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Kartify",
@@ -66,10 +67,19 @@ public Action:Command_Kartify(client, args) {
 		return Plugin_Handled;
 	}
 	
+	if(result == 1 && TF2_IsPlayerInCondition(targets[0], TFCond:82)) {
+		// Only one player chosen and they're in a kart
+		ShowActivity2(client, "\x04[SM] \x03", "\x01Unkartified \x03%s\x01!", target_name);
+		LogAction(client, targets[0], "\"%L\" unkartified \"%L\"", client, targets[0]);
+		g_KartSpawn[targets[0]] = false;
+		Unkartify(targets[0]);
+		return Plugin_Handled;
+	}
+	
 	ShowActivity2(client, "\x04[SM] \x03", "\x01Kartified \x03%s\x01!", target_name);
 	for(new i = 0; i < result; i++) {
 		LogAction(client, targets[i], "\"%L\" kartified \"%L\"", client, targets[i]);
-		g_KartSpawn[client] = true;
+		g_KartSpawn[targets[i]] = true;
 		Kartify(targets[i]);
 	}
 	
@@ -97,7 +107,7 @@ public Action:Command_Unkartify(client, args) {
 	ShowActivity2(client, "\x04[SM] \x03", "\x01Unkartified \x03%s\x01!", target_name);
 	for(new i = 0; i < result; i++) {
 		LogAction(client, targets[i], "\"%L\" unkartified \"%L\"", client, targets[i]);
-		g_KartSpawn[client] = false;
+		g_KartSpawn[targets[i]] = false;
 		Unkartify(targets[i]);
 	}
 	
@@ -105,6 +115,11 @@ public Action:Command_Unkartify(client, args) {
 }
 
 public Action:Command_KartifyMe(client, args) {
+	if(TF2_IsPlayerInCondition(client, TFCond:82)) {
+		Command_UnkartifyMe(client, 0);
+		return Plugin_Handled;
+	}
+	
 	ShowActivity2(client, "\x04[SM] \x03", "\x01Put self into a kart");
 	LogAction(client, client, "\"%L\" put themself into a kart", client);
 	g_KartSpawn[client] = true;
@@ -127,7 +142,7 @@ public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast) 
 	}
 	
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
-	if(mode == 2 || (mode == 1 && g_KartSpawn[client])) {
+	if(mode == 1 || (mode == 2 && g_KartSpawn[client])) {
 		Kartify(client);
 	}
 }
