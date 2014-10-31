@@ -5,7 +5,7 @@
 #include <tf2_stocks>
 #include <sdkhooks>
 
-#define PLUGIN_VERSION		"1.3.0"
+#define PLUGIN_VERSION		"1.4.0"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Kartify",
@@ -47,6 +47,7 @@ public OnPluginStart() {
 	LoadTranslations("common.phrases");
 	
 	HookEvent("player_spawn", Event_PlayerSpawn);
+	HookEvent("player_team", Event_PlayerTeam);
 	
 	AddCommandListener(Command_Kill, "kill");
 	AddCommandListener(Command_Kill, "explode");
@@ -187,6 +188,14 @@ public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast) 
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if(mode == 1 || (mode == 2 && g_KartSpawn[client])) {
 		Kartify(client);
+	}
+}
+
+public Event_PlayerTeam(Handle:event, const String:name[], bool:dontBroadcast) {
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
+	if(TF2_IsPlayerInCondition(client, TFCond:82)) {
+		// Kill them otherwise they'll just spawn as the other team where they're standing
+		SDKHooks_TakeDamage(client, 0, 0, 10000.0, DMG_GENERIC);
 	}
 }
 
