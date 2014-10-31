@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.8.0"
-			"Previous"	"2.7.2"
+			"Latest"	"2.8.1"
+			"Previous"	"2.8.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added new taunt effects"
+		"Notes" " - Added proper handling for errors"
 	}
 	
 	"Files"
