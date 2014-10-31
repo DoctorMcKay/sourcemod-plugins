@@ -12,17 +12,17 @@
  * 		- Creates a version cvar CONVAR_PREFIX_version (CONVAR_PREFIX should be defined prior to including this file)
  * 		- Dynamically adds "A" to the version cvar based on whether Updater is installed and working
  * 
- * If you need to put code into OnAllPluginsLoaded, define ALL_PLUGINS_LOADED_FUNC with a function to be called inside of OnAllPluginsLoaded
+ * If you need to put code into OnAllPluginsLoaded, define ALL_PLUGINS_LOADED_FUNC with a function (doesn't need to be public) to be called inside of OnAllPluginsLoaded
  * 		For example, #define ALL_PLUGINS_LOADED_FUNC AllPluginsLoaded
- * 		public AllPluginsLoaded() { ... }
+ * 		AllPluginsLoaded() { ... }
  * 
- * If you need to put code into OnLibraryAdded, define LIBRARY_ADDED_FUNC with a function to be called inside of OnLibraryAdded
+ * If you need to put code into OnLibraryAdded, define LIBRARY_ADDED_FUNC with a function (doesn't need to be public) to be called inside of OnLibraryAdded
  * 		For example, #define LIBRARY_ADDED_FUNC LibraryAdded
- * 		public LibraryAdded(const String:name[]) { ... }
+ * 		LibraryAdded(const String:name[]) { ... }
  * 
- * If you need to put code into OnLibraryRemoved, define LIBRARY_REMOVED_FUNC with a function to be called inside of OnLibraryRemoved
+ * If you need to put code into OnLibraryRemoved, define LIBRARY_REMOVED_FUNC with a function (doesn't need to be public) to be called inside of OnLibraryRemoved
  * 		For example, #define LIBRARY_REMOVED_FUNC LibraryRemoved
- * 		public LibraryRemoved(const String:name[]) { ... }
+ * 		LibraryRemoved(const String:name[]) { ... }
  * 
  * Define RELOAD_ON_UPDATE and the plugin will reload itself upon being updated
  * 
@@ -57,8 +57,7 @@ public OnAllPluginsLoaded() {
 	CheckUpdaterStatus(INVALID_HANDLE, "", "");
 	
 #if defined ALL_PLUGINS_LOADED_FUNC
-	Call_StartFunction(INVALID_HANDLE, ALL_PLUGINS_LOADED_FUNC);
-	Call_Finish();
+	ALL_PLUGINS_LOADED_FUNC();
 #endif
 }
 
@@ -66,9 +65,7 @@ public OnLibraryAdded(const String:name[]) {
 	CheckUpdaterStatus(INVALID_HANDLE, "", "");
 	
 #if defined LIBRARY_ADDED_FUNC
-	Call_StartFunction(INVALID_HANDLE, LIBRARY_ADDED_FUNC);
-	Call_PushString(name);
-	Call_Finish();
+	LIBRARY_ADDED_FUNC(name);
 #endif
 }
 
@@ -76,9 +73,7 @@ public OnLibraryRemoved(const String:name[]) {
 	CheckUpdaterStatus(INVALID_HANDLE, "", "");
 	
 #if defined LIBRARY_REMOVED_FUNC
-	Call_StartFunction(INVALID_HANDLE, LIBRARY_REMOVED_FUNC);
-	Call_PushString(name);
-	Call_Finish();
+	LIBRARY_REMOVED_FUNC(name);
 #endif
 }
 
