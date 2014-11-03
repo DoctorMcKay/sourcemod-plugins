@@ -5,7 +5,7 @@
 #include <tf2_stocks>
 #include <sdkhooks>
 
-#define PLUGIN_VERSION		"1.4.0"
+#define PLUGIN_VERSION		"1.4.1"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Kartify",
@@ -57,9 +57,13 @@ public Action:Command_Kill(client, const String:command[], argc) {
 	if(!GetConVarBool(g_cvarAllowSuicide)) {
 		return Plugin_Continue;
 	}
-	
-	SDKHooks_TakeDamage(client, 0, 0, 10000.0, StrEqual(command, "explode", false) ? DMG_BLAST : DMG_GENERIC);
-	return Plugin_Handled;
+
+	if(!TF2_IsPlayerInCondition(client, TFCond:82)) {
+		return Plugin_Continue;
+	}
+	Unkartify(client);
+	//SDKHooks_TakeDamage(client, 0, 0, GetClientHealth(client) * 2.0 , StrEqual(command, "explode", false) ? DMG_BLAST : DMG_GENERIC);
+	return Plugin_Continue;
 }
 
 public OnMapStart() {
@@ -165,7 +169,7 @@ public Action:Command_KartifyMe(client, args) {
 	}
 	
 	ShowActivity2(client, "\x04[SM] \x03", "\x01Put self into a kart");
-	LogAction(client, client, "\"%L\" put themself into a kart", client);
+	LogAction(client, client, "\"%L\" put themselves into a kart", client);
 	g_KartSpawn[client] = true;
 	Kartify(client);
 	return Plugin_Handled;
@@ -173,7 +177,7 @@ public Action:Command_KartifyMe(client, args) {
 
 public Action:Command_UnkartifyMe(client, args) {
 	ShowActivity2(client, "\x04[SM] \x03", "\x01Removed self from a kart");
-	LogAction(client, client, "\"%L\" removed themself from a kart", client);
+	LogAction(client, client, "\"%L\" removed themselves from a kart", client);
 	g_KartSpawn[client] = false;
 	Unkartify(client);
 	return Plugin_Handled;
@@ -195,7 +199,8 @@ public Event_PlayerTeam(Handle:event, const String:name[], bool:dontBroadcast) {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if(TF2_IsPlayerInCondition(client, TFCond:82)) {
 		// Kill them otherwise they'll just spawn as the other team where they're standing
-		SDKHooks_TakeDamage(client, 0, 0, 10000.0, DMG_GENERIC);
+		Unkartify(client);
+		ForcePlayerSuicide(client);
 	}
 }
 
