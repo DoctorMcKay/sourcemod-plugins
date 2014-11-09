@@ -5,7 +5,7 @@
 #include <tf2_stocks>
 #include <sdkhooks>
 
-#define PLUGIN_VERSION		"1.4.1"
+#define PLUGIN_VERSION		"1.5.0"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Kartify",
@@ -16,7 +16,6 @@ public Plugin:myinfo = {
 };
 
 new Handle:g_cvarSpawnKart;
-new Handle:g_cvarBoostRechargeTime;
 new Handle:g_cvarStartPercentage;
 new Handle:g_cvarForcedPercentage;
 new Handle:g_cvarAllowSuicide;
@@ -30,7 +29,6 @@ new bool:g_KartSpawn[MAXPLAYERS + 1];
 
 public OnPluginStart() {
 	g_cvarSpawnKart = CreateConVar("kartify_spawn", "0", "0 = do nothing, 1 = put all players into karts when they spawn, 2 = put players into karts when they spawn only if sm_kartify was used on them", _, true, 0.0, true, 2.0);
-	g_cvarBoostRechargeTime = CreateConVar("kartify_boost_recharge_time", "5.0", "Time in seconds it takes to recharge boost", _, true, 0.0);
 	g_cvarStartPercentage = CreateConVar("kartify_start_percentage", "0", "Starting percentage, as an integer, of damage for kartified players", _, true, 0.0);
 	g_cvarForcedPercentage = CreateConVar("kartify_forced_percentage", "-1", "If 0 or greater, karts will not take damage and will instead have this percent of damage all the time (as an integer)", _, true, -1.0);
 	g_cvarAllowSuicide = CreateConVar("kartify_allow_suicide", "1", "Allow players to suicide while in a kart", _, true, 0.0, true, 1.0);
@@ -54,16 +52,9 @@ public OnPluginStart() {
 }
 
 public Action:Command_Kill(client, const String:command[], argc) {
-	if(!GetConVarBool(g_cvarAllowSuicide)) {
-		return Plugin_Continue;
+	if(GetConVarBool(g_cvarAllowSuicide)) {
+		Unkartify(client); // Won't do anything if they're not in a kart
 	}
-
-	if(!TF2_IsPlayerInCondition(client, TFCond:82)) {
-		return Plugin_Continue;
-	}
-	Unkartify(client);
-	//SDKHooks_TakeDamage(client, 0, 0, GetClientHealth(client) * 2.0 , StrEqual(command, "explode", false) ? DMG_BLAST : DMG_GENERIC);
-	return Plugin_Continue;
 }
 
 public OnMapStart() {
@@ -211,12 +202,6 @@ Kartify(client) {
 
 Unkartify(client) {
 	TF2_RemoveCondition(client, TFCond:82);
-}
-
-public TF2_OnConditionAdded(client, TFCond:condition) {
-	if(condition == TFCond:83) {
-		SetEntPropFloat(client, Prop_Send, "m_flKartNextAvailableBoost", GetGameTime() + GetConVarFloat(g_cvarBoostRechargeTime));
-	}
 }
 
 public OnGameFrame() {
