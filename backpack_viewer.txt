@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.1.1"
-			"Previous"	"1.1.0"
+			"Latest"	"1.1.2"
+			"Previous"	"1.1.1"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Initial release"
+		"Notes" " - Fixed issue where URL could be too long"
 	}
 	
 	"Files"
