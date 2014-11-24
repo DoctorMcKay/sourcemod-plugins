@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.8.1"
-			"Previous"	"2.8.0"
+			"Latest"	"2.9.0"
+			"Previous"	"2.8.1"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added proper handling for errors"
+		"Notes" " - Added Halloween 2014 unusual effects"
 	}
 	
 	"Files"

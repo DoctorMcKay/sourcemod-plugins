@@ -5,7 +5,7 @@
 #include <steamtools>
 #include <advanced_motd>
 
-#define PLUGIN_VERSION		"2.8.0"
+#define PLUGIN_VERSION		"2.9.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -168,6 +168,13 @@ public OnPluginStart() {
 	SetTrieString(unusualNameTrie, "78", "Hellfire");
 	SetTrieString(unusualNameTrie, "79", "Darkblaze");
 	SetTrieString(unusualNameTrie, "80", "Demonflame");
+	// Halloween 2014
+	SetTrieString(unusualNameTrie, "81", "Bonzo The All-Gnawing");
+	SetTrieString(unusualNameTrie, "82", "Amaranthine");
+	SetTrieString(unusualNameTrie, "83", "Stare From Beyond");
+	SetTrieString(unusualNameTrie, "84", "The Ooze");
+	SetTrieString(unusualNameTrie, "85", "Ghastly Ghosts Jr");
+	SetTrieString(unusualNameTrie, "86", "Haunted Phantasm Jr");
 	// Taunt effects
 	SetTrieString(unusualNameTrie, "3001", "Showstopper");
 	SetTrieString(unusualNameTrie, "3002", "Showstopper");
