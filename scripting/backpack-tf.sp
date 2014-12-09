@@ -5,7 +5,7 @@
 #include <steamtools>
 #include <advanced_motd>
 
-#define PLUGIN_VERSION		"2.9.0"
+#define PLUGIN_VERSION		"2.10.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -175,6 +175,11 @@ public OnPluginStart() {
 	SetTrieString(unusualNameTrie, "84", "The Ooze");
 	SetTrieString(unusualNameTrie, "85", "Ghastly Ghosts Jr");
 	SetTrieString(unusualNameTrie, "86", "Haunted Phantasm Jr");
+	// EOTL
+	SetTrieString(unusualNameTrie, "87", "Frostbite");
+	SetTrieString(unusualNameTrie, "88", "Molten Mallard");
+	SetTrieString(unusualNameTrie, "89", "Morning Glory");
+	SetTrieString(unusualNameTrie, "90", "Death at Dusk");
 	// Taunt effects
 	SetTrieString(unusualNameTrie, "3001", "Showstopper");
 	SetTrieString(unusualNameTrie, "3002", "Showstopper");
