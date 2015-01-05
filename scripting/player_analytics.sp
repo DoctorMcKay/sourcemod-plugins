@@ -6,7 +6,7 @@
 #include <steamtools>
 #include <geoipcity>
 
-#define PLUGIN_VERSION		"1.1.2"
+#define PLUGIN_VERSION		"1.1.3"
 
 enum OS {
 	OS_Unknown = -1,
@@ -44,6 +44,8 @@ new Handle:g_MOTDTimer[MAXPLAYERS + 1];
 new OS:g_OS[MAXPLAYERS + 1];
 new Handle:g_OSTimer[MAXPLAYERS + 1];
 new g_OSQueries[MAXPLAYERS + 1];
+
+#define STEAMTOOLS_AVAILABLE() (g_SteamTools && GetFeatureStatus(FeatureType_Native, "Steam_IsConnected") == FeatureStatus_Available)
 
 #if !defined DEBUG
 #define UPDATE_FILE		"player_analytics.txt"
@@ -257,7 +259,7 @@ public Action:Timer_HandleConnect(Handle:timer, any:userid) {
 	strcopy(buffers[5], sizeof(buffers[]), country_code);
 	strcopy(buffers[6], sizeof(buffers[]), country_code3);
 	
-	if(g_SteamTools && StrEqual(g_GameFolder, "tf")) {
+	if(STEAMTOOLS_AVAILABLE() && StrEqual(g_GameFolder, "tf")) {
 		if(Steam_CheckClientSubscription(client, 0) && !Steam_CheckClientDLC(client, 459)) {
 			strcopy(buffers[7], sizeof(buffers[]), "0");
 		} else {
