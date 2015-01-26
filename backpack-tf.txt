@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"2.10.0"
-			"Previous"	"2.9.0"
+			"Latest"	"2.11.0"
+			"Previous"	"2.10.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Added EOTL unusual effects"
+		"Notes" " - Added Halloween 2014 taunt unusual effects"
 	}
 	
 	"Files"

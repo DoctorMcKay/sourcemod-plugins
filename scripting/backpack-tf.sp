@@ -5,7 +5,7 @@
 #include <steamtools>
 #include <advanced_motd>
 
-#define PLUGIN_VERSION		"2.10.0"
+#define PLUGIN_VERSION		"2.11.0"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -191,6 +191,9 @@ public OnPluginStart() {
 	SetTrieString(unusualNameTrie, "3008", "Midnight Whirlwind");
 	SetTrieString(unusualNameTrie, "3009", "Silver Cyclone");
 	SetTrieString(unusualNameTrie, "3010", "Mega Strike");
+	// Halloween 2014 taunt effects
+	SetTrieString(unusualNameTrie, "3011", "Haunted Phantasm");
+	SetTrieString(unusualNameTrie, "3012", "Ghastly Ghosts");
 	
 	hudText = CreateHudSynchronizer();
 }
