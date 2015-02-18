@@ -5,7 +5,7 @@
 #include <tf2>
 #include <tf2_stocks>
 
-#define PLUGIN_VERSION			"1.2.0"
+#define PLUGIN_VERSION			"1.2.1"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Bot Manager",
@@ -54,7 +54,7 @@ public OnPluginStart() {
 	
 	tf_bot_quota = FindConVar("tf_bot_quota");
 	
-	HookEvent("player_connect", Event_PlayerConnect, EventHookMode_Pre);
+	HookEvent("player_connect_client", Event_PlayerConnect, EventHookMode_Pre);
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_team", Event_PlayerTeam, EventHookMode_Pre);
 	
@@ -295,9 +295,7 @@ RemoveBot() {
 }
 
 public Event_PlayerConnect(Handle:event, const String:name[], bool:dontBroadcast) {
-	decl String:address[64];
-	GetEventString(event, "address", address, sizeof(address));
-	if(StrEqual(address, "none")) {
+	if(GetEventBool(event, "bot")) {
 		PushArrayCell(joiningBots, GetEventInt(event, "userid"));
 		SetEventBroadcast(event, true);
 	}
