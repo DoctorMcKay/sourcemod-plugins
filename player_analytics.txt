@@ -4,11 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.1.3"
+			"Latest"	"1.2.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Check the status of SteamTools before attempting to use it"
+		"Notes" " - Added plugin API to get connection IDs"
 	}
 	
 	"Files"
