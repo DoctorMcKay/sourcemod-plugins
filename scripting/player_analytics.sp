@@ -6,7 +6,7 @@
 #include <steamtools>
 #include <geoipcity>
 
-#define PLUGIN_VERSION		"1.1.3"
+#define PLUGIN_VERSION		"1.2.0"
 
 enum OS {
 	OS_Unknown = -1,
@@ -75,6 +75,9 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) 
 	
 	SQL_TQuery(g_DB, OnTableCreated, "CREATE TABLE IF NOT EXISTS `player_analytics` (id int(11) NOT NULL AUTO_INCREMENT, server_ip varchar(32) NOT NULL, name varchar(32), auth varchar(32), connect_time int(11) NOT NULL, connect_date date NOT NULL, connect_method varchar(64) DEFAULT NULL, numplayers tinyint(4) NOT NULL, map varchar(64) NOT NULL, duration int(11) DEFAULT NULL, flags varchar(32) NOT NULL, ip varchar(32) NOT NULL, city varchar(45), region varchar(45), country varchar(45), country_code varchar(2), country_code3 varchar(3), premium tinyint(1), html_motd_disabled tinyint(1), os varchar(32), PRIMARY KEY (id)) ENGINE=InnoDB  DEFAULT CHARSET=utf8");
 #endif
+	
+	RegPluginLibrary("player_analytics");
+	CreateNative("PA_GetConnectionID", Native_GetConnectionID);
 	
 	return APLRes_Success;
 }
@@ -242,9 +245,9 @@ public Action:Timer_HandleConnect(Handle:timer, any:userid) {
 	GetClientAuthString(client, buffers[1], sizeof(buffers[]));
 	new num = FlagBitsToArray(GetUserFlagBits(client), flags, sizeof(flags));
 	for(new i = 0; i < num; i++) {
-		new char;
-		FindFlagChar(flags[i], char);
-		flagstring[i] = char;
+		new flagchar;
+		FindFlagChar(flags[i], flagchar);
+		flagstring[i] = flagchar;
 	}
 	flagstring[num] = '\0';
 	GetClientIP(client, ip, sizeof(ip));
@@ -326,6 +329,13 @@ public OnRowInserted(Handle:owner, Handle:hndl, const String:error[], any:userid
 	}
 	
 	g_RowID[client] = SQL_GetInsertId(hndl);
+	
+	new Handle:fwd = CreateGlobalForward("PA_OnConnectionLogged", ET_Ignore, Param_Cell, Param_Cell);
+	Call_StartForward(fwd);
+	Call_PushCell(client);
+	Call_PushCell(g_RowID[client]);
+	Call_Finish();
+	CloseHandle(fwd);
 }
 #endif
 
@@ -353,3 +363,13 @@ public OnRowUpdated(Handle:owner, Handle:hndl, const String:error[], any:id) {
 	}
 }
 #endif
+
+public Native_GetConnectionID(Handle:plugin, numParams) {
+	new client = GetNativeCell(1);
+	if(client < 1 || client > MaxClients || !IsClientConnected(client) || IsFakeClient(client)) {
+		ThrowNativeError(SP_ERROR_PARAM, "Client index %d is invalid, not connected, or fake", client);
+		return -1;
+	}
+	
+	return g_RowID[client];
+}
