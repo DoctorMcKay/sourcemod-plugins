@@ -5,7 +5,7 @@
 #include <steamtools>
 #include <advanced_motd>
 
-#define PLUGIN_VERSION		"2.11.0"
+#define PLUGIN_VERSION		"2.11.1"
 #define BACKPACK_TF_URL		"http://backpack.tf/api/IGetPrices/v3/"
 #define ITEM_EARBUDS		143
 #define ITEM_REFINED		5002
@@ -104,6 +104,7 @@ public OnPluginStart() {
 	SetTrieString(qualityNameTrie, "300", "Uncraftable Vintage"); // custom for backpack.tf
 	SetTrieString(qualityNameTrie, "600", "Uncraftable"); // custom for backpack.tf
 	SetTrieString(qualityNameTrie, "1100", "Uncraftable Strange"); // custom for backpack.tf
+	SetTrieString(qualityNameTrie, "1300", "Uncraftable Haunted"); // custom for backpack.tf
 	
 	unusualNameTrie = CreateTrie();
 	// Original effects
