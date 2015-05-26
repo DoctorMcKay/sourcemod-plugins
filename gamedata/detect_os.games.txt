@@ -26,4 +26,14 @@
 			"Convar_Mac"		"mac_fsbackground"
 		}
 	}
+	
+	"left4dead2"
+	{
+		"Keys"
+		{
+			"Convar_Windows"	"windows_speaker_config"
+			"Convar_Linux"		"joy_gamecontroller_config"
+			"Convar_Mac"		"cl_debugrumble"
+		}
+	}
 }
