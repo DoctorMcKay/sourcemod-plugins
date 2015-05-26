@@ -6,7 +6,7 @@
 #include <steamtools>
 #include <geoipcity>
 
-#define PLUGIN_VERSION		"1.3.0"
+#define PLUGIN_VERSION		"1.3.1"
 
 enum OS {
 	OS_Unknown = -1,
