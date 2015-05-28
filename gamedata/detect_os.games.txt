@@ -8,6 +8,7 @@
 			"game"		"tf"
 			"game"		"dod"
 			"game"		"hl2mp"
+			"engine"	"sdk2013"
 		}
 		
 		"Keys"
