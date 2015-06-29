@@ -10,7 +10,7 @@ enum MOTDFailureReason {
 	MOTDFailure_QueryFailed // cl_disablehtmlmotd convar query failed
 };
 
-functag public MOTDFailure(client, MOTDFailureReason:reason);
+typedef MOTDFailure = function void (int client, MOTDFailureReason reason);
 
 /**
  * Displays an MOTD panel to a client with advanced options
@@ -25,8 +25,8 @@ functag public MOTDFailure(client, MOTDFailureReason:reason);
  * @param callback		A callback to be called if we determine that the client can't receive HTML MOTDs
  * @noreturn
  */
-stock AdvMOTD_ShowMOTDPanel(client, const String:title[], const String:msg[], type=MOTDPANEL_TYPE_INDEX, bool:visible=true, bool:big=false, bool:verify=false, MOTDFailure:callback=INVALID_FUNCTION) {
-	decl String:connectmethod[32];
+stock void AdvMOTD_ShowMOTDPanel(int client, const char[] title, const char[] msg, int type=MOTDPANEL_TYPE_INDEX, bool visible=true, bool big=false, bool verify=false, MOTDFailure callback=INVALID_FUNCTION) {
+	char connectmethod[32];
 	if(verify && GetClientInfo(client, "cl_connectmethod", connectmethod, sizeof(connectmethod))) {
 		if(StrContains(connectmethod, "quickplay", false) != -1 || StrContains(connectmethod, "matchmaking", false) != -1) {
 			if(callback != INVALID_FUNCTION) {
@@ -36,47 +36,59 @@ stock AdvMOTD_ShowMOTDPanel(client, const String:title[], const String:msg[], ty
 		}
 	}
 	
-	new Handle:kv = CreateKeyValues("data");
-	KvSetString(kv, "title", title);
-	KvSetNum(kv, "type", type);
-	KvSetString(kv, "msg", msg);
+	KeyValues kv = new KeyValues("data");
+	kv.SetString("title", title);
+	kv.SetNum("type", type);
+	kv.SetString("msg", msg);
 	if(big) {
-		KvSetNum(kv, "customsvr", 1);
+		kv.SetNum("customsvr", 1);
 	}
 	
 	if(verify) {
-		new Handle:pack = CreateDataPack();
-		WritePackCell(pack, _:kv);
-		WritePackCell(pack, _:visible);
-		WritePackCell(pack, _:callback);
+		DataPack pack = new DataPack();
+		pack.WriteCell(kv);
+		pack.WriteCell(visible);
+		
+		if(callback != INVALID_FUNCTION) {
+			Handle fwd = CreateForward(ET_Ignore, Param_Cell, Param_Cell);
+			AddToForward(fwd, null, callback);
+			pack.WriteCell(fwd);
+		} else {
+			pack.WriteCell(0);
+		}
+		
 		QueryClientConVar(client, "cl_disablehtmlmotd", AdvMOTD_OnQueryFinished, pack);
 	} else {
-		ShowVGUIPanel(client, "info", kv);
+		ShowVGUIPanel(client, "info", kv, visible);
 		CloseHandle(kv);
 	}
 }
 
-public AdvMOTD_OnQueryFinished(QueryCookie:cookie, client, ConVarQueryResult:result, const String:cvarName[], const String:cvarValue[], any:pack) {
-	ResetPack(pack);
-	new Handle:kv = Handle:ReadPackCell(pack);
-	new bool:visible = bool:ReadPackCell(pack);
-	new MOTDFailure:callback = MOTDFailure:ReadPackCell(pack);
-	CloseHandle(pack);
+public void AdvMOTD_OnQueryFinished(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, DataPack pack) {
+	pack.Reset();
+	KeyValues kv = pack.ReadCell();
+	bool visible = pack.ReadCell();
+	Handle fwd = pack.ReadCell();
+	delete pack;
 	
-	if(result != ConVarQuery_Okay || bool:StringToInt(cvarValue)) {
-		CloseHandle(kv);
-		if(callback != INVALID_FUNCTION) {
-			AdvMOTD_CallFailure(callback, client, (result != ConVarQuery_Okay) ? MOTDFailure_QueryFailed : MOTDFailure_Disabled);
+	if(result != ConVarQuery_Okay || StringToInt(cvarValue)) {
+		delete kv;
+		
+		if(fwd) {
+			Call_StartForward(fwd);
+			Call_PushCell(client);
+			Call_PushCell((result != ConVarQuery_Okay) ? MOTDFailure_QueryFailed : MOTDFailure_Disabled);
+			delete fwd;
 		}
 		return;
 	}
 	
 	ShowVGUIPanel(client, "info", kv, visible);
-	CloseHandle(kv);
+	delete kv;
 }
 
-AdvMOTD_CallFailure(MOTDFailure:callback, client, MOTDFailureReason:reason) {
-	Call_StartFunction(INVALID_HANDLE, callback);
+static void AdvMOTD_CallFailure(MOTDFailure callback, int client, MOTDFailureReason reason) {
+	Call_StartFunction(null, callback);
 	Call_PushCell(client);
 	Call_PushCell(reason);
 	Call_Finish();
