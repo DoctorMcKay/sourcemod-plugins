@@ -30,7 +30,10 @@ stock void AdvMOTD_ShowMOTDPanel(int client, const char[] title, const char[] ms
 	if(verify && GetClientInfo(client, "cl_connectmethod", connectmethod, sizeof(connectmethod))) {
 		if(StrContains(connectmethod, "quickplay", false) != -1 || StrContains(connectmethod, "matchmaking", false) != -1) {
 			if(callback != INVALID_FUNCTION) {
-				AdvMOTD_CallFailure(callback, client, MOTDFailure_Matchmaking);
+				Call_StartFunction(null, callback);
+				Call_PushCell(client);
+				Call_PushCell(MOTDFailure_Matchmaking);
+				Call_Finish();
 			}
 			return;
 		}
@@ -85,11 +88,4 @@ public void AdvMOTD_OnQueryFinished(QueryCookie cookie, int client, ConVarQueryR
 	
 	ShowVGUIPanel(client, "info", kv, visible);
 	delete kv;
-}
-
-static void AdvMOTD_CallFailure(MOTDFailure callback, int client, MOTDFailureReason reason) {
-	Call_StartFunction(null, callback);
-	Call_PushCell(client);
-	Call_PushCell(reason);
-	Call_Finish();
 }
