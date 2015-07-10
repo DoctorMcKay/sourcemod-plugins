@@ -3,7 +3,7 @@
 #endif
 #define _bytebuffer_included
 
-#define BYTEBUFFER_VERSION		1
+#define BYTEBUFFER_VERSION		2
 
 #if !defined MAX_BUFFERS
  #define MAX_BUFFERS 32
@@ -156,21 +156,22 @@ methodmap ByteBuffer {
 		return maxlen;
 	}
 	
-	public void Dump(char[] output, int maxlen) {
+	public int Dump(char[] output, int maxlen) {
 		CheckBuffer(this);
 		// Dump from start to cursor
 		if(maxlen > this.Cursor) {
 			maxlen = this.Cursor;
 		}
 		
-		for(int i = 0; i < maxlen; i++) {
+		int i;
+		for(i = 0; i < maxlen; i++) {
 			output[i] = g_Buffer[this][i];
 		}
 		
 		return i;
 	}
 	
-	public void Append(ByteBuffer buffer) {
+	public int Append(ByteBuffer buffer) {
 		CheckBuffer(this);
 		int length = buffer.Cursor;
 		char[] dumped = new char[length];
@@ -238,7 +239,7 @@ ByteBuffer CreateByteBuffer(bool littleEndian = true, const char data[] = "", in
 	return view_as<ByteBuffer>(id);
 }
 
-static void CheckBuffer(int index) {
+static void CheckBuffer(ByteBuffer index) {
 	if(!g_InUse[index]) {
 		ThrowError("Cannot read/write from closed buffer %d", index);
 	}
