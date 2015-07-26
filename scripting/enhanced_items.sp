@@ -93,7 +93,7 @@ public Event_ItemFound(Handle:event, const String:name[], bool:dontBroadcast) {
 	new method = GetEventInt(event, "method");
 	new defindex = GetEventInt(event, "itemdef");
 	
-	if(quality == QUALITY_DECORATED_WEAPON) {
+	if(quality == QUALITY_DECORATED_WEAPON || method >= 4) {
 		return; // Too much garbage to deal with here, we'll just let the default message print
 	}
 	
