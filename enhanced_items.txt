@@ -10,6 +10,7 @@
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
 		"Notes" " - Fixed unicode issues in names with special characters"
 		"Notes" " - Painted weapons now print the default game messages"
+		"Notes" " - Plugin now only intercepts and rewrites methods which can contain multiple items of the same type"
 	}
 	
 	"Files"
