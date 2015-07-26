@@ -2,7 +2,9 @@
 
 #include <sourcemod>
 
-#define PLUGIN_VERSION		"1.0.0"
+#define PLUGIN_VERSION		"1.1.0"
+
+#define QUALITY_DECORATED_WEAPON	15
 
 public Plugin:myinfo = {
 	name		= "[TF2] Enhanced Item Notifications",
@@ -90,6 +92,10 @@ public Event_ItemFound(Handle:event, const String:name[], bool:dontBroadcast) {
 	new quality = GetEventInt(event, "quality");
 	new method = GetEventInt(event, "method");
 	new defindex = GetEventInt(event, "itemdef");
+	
+	if(quality == QUALITY_DECORATED_WEAPON) {
+		return; // Too much garbage to deal with here, we'll just let the default message print
+	}
 	
 	SetEventBroadcast(event, true);
 	
@@ -204,6 +210,7 @@ GetAcquisitionMethodToken(method, String:token[], maxlen) {
 		// 19 is "received from the community market", but there's no translation token for it
 		// If we wanted we could maybe use Item_Purchased but this also covers items that the player listed and has just removed the listing for
 		case 20: strcopy(token, maxlen, "Item_RecipeOutput");
+		case 22: strcopy(token, maxlen, "Item_QuestOutput");
 		default: strcopy(token, maxlen, "Item_Found"); // The game defaults to "found"
 	}
 }
@@ -321,7 +328,7 @@ Handle:ParseLanguage(const String:language[]) {
 		return INVALID_HANDLE;
 	}
 	
-	// The localization files are littered with null bytes for some reason, breaking all of our available parsing options
+	// The localization files are encoded in UCS-2, breaking all of our available parsing options
 	// We have to go byte-by-byte then line-by-line :(
 	
 	// This parser isn't perfect since some values span multiple lines, but since we're only interested in single-line values, this is sufficient
@@ -331,17 +338,29 @@ Handle:ParseLanguage(const String:language[]) {
 	
 	new data, i = 0;
 	decl String:line[2048];
-	while(ReadFileCell(file, data, 1) == 1) {
-		if(data == '\0') {
-			// Ignore the nulls
-			continue;
-		}
-		
-		line[i++] = data;
-		if(data == '\n') {
-			line[i] = '\0';
-			HandleLangLine(line, lang);
-			i = 0;
+	while(ReadFileCell(file, data, 2) == 1) {
+		if(data < 0x80) {
+			// It's a single-byte character
+			line[i++] = data;
+			
+			if(data == '\n') {
+				line[i] = '\0';
+				HandleLangLine(line, lang);
+				i = 0;
+			}
+		} else if(data < 0x800) {
+			// It's a two-byte character
+			line[i++] = (data >> 6) | 0xC0;
+			line[i++] = (data & 0x3F) | 0x80;
+		} else if(data < 0xFFFF && data >= 0xD800 && data <= 0xDFFF) {
+			line[i++] = (data >> 12) | 0xE0;
+			line[i++] = ((data >> 6) & 0x3F) | 0x80;
+			line[i++] = (data & 0x3F) | 0x80;
+		} else if(data >= 0x10000 && data < 0x10FFFF) {
+			line[i++] = (data >> 18) | 0xF0;
+			line[i++] = ((data >> 12) & 0x3F) | 0x80;
+			line[i++] = ((data >> 6) & 0x3F) | 0x80;
+			line[i++] = (data & 0x3F) | 0x80;
 		}
 	}
 	
