@@ -31,7 +31,7 @@ new Handle:fwdBotKick;
 
 #include "mckayupdater.sp"
 
-// BEGIN: Enums and stocks ported from tf2.inc and tf2_stocks.inc (for TF2Classic compacitibility)
+// BEGIN: Enums and stocks ported from tf2.inc and tf2_stocks.inc (for TF2Classic compatibility)
 enum TFClassType
 {
 	TFClass_Unknown = 0,
