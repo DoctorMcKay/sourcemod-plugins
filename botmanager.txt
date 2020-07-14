@@ -4,10 +4,10 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.2.1"
+			"Latest"	"1.3.0"
 		}
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed double connect messages"
+		"Notes" " - Added support for TF2 Classic"
 	}
 	
 	"Files"

@@ -2,10 +2,8 @@
 
 #include <sourcemod>
 #include <sdktools>
-#include <tf2>
-#include <tf2_stocks>
 
-#define PLUGIN_VERSION			"1.2.1"
+#define PLUGIN_VERSION			"1.3.0"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Bot Manager",
@@ -33,10 +31,39 @@ new Handle:fwdBotKick;
 
 #include "mckayupdater.sp"
 
+// BEGIN: Enums and stocks ported from tf2.inc and tf2_stocks.inc (for TF2Classic compacitibility)
+enum TFClassType
+{
+	TFClass_Unknown = 0,
+	TFClass_Scout,
+	TFClass_Sniper,
+	TFClass_Soldier,
+	TFClass_DemoMan,
+	TFClass_Medic,
+	TFClass_Heavy,
+	TFClass_Pyro,
+	TFClass_Spy,
+	TFClass_Engineer
+};
+
+enum TFTeam
+{
+	TFTeam_Unassigned = 0,
+	TFTeam_Spectator = 1,
+	TFTeam_Red = 2,
+	TFTeam_Blue = 3
+};
+
+stock TFClassType TF2_GetPlayerClass(int client)
+{
+	return view_as<TFClassType>(GetEntProp(client, Prop_Send, "m_iClass"));
+}
+// END
+
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max) {
 	decl String:game[64];
 	GetGameFolderName(game, sizeof(game));
-	if(!StrEqual(game, "tf")) {
+	if(!StrEqual(game, "tf") && !StrEqual(game, "tf2classic")) {
 		strcopy(error, err_max, "Bot Manager only works on Team Fortress 2");
 		return APLRes_Failure;
 	}
