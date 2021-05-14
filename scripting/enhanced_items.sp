@@ -336,10 +336,20 @@ Handle:ParseLanguage(const String:language[]) {
 	new Handle:lang = CreateTrie();
 	SetTrieString(lang, "__name__", language);
 	
-	new data, i = 0;
+	new data, i = 0, high_surrogate, low_surrogate;
 	decl String:line[2048];
 	while(ReadFileCell(file, data, 2) == 1) {
-		if(data < 0x80) {
+		if( high_surrogate ) {
+			// for characters in range 0x10000 <= X <= 0x10FFFF
+			low_surrogate = data;
+			data = ((high_surrogate - 0xD800) << 10) + (low_surrogate - 0xDC00) + 0x10000;
+			line[i++] = ((data >> 18) & 0x07) | 0xF0;
+			line[i++] = ((data >> 12) & 0x3F) | 0x80;
+			line[i++] = ((data >> 6) & 0x3F) | 0x80;
+			line[i++] = (data & 0x3F) | 0x80;
+			high_surrogate = 0;
+		}
+		else if(data < 0x80) {
 			// It's a single-byte character
 			line[i++] = data;
 			
@@ -348,22 +358,23 @@ Handle:ParseLanguage(const String:language[]) {
 				HandleLangLine(line, lang);
 				i = 0;
 			}
-		} else if(data < 0x800) {
+		}
+		else if(data < 0x800) {
 			// It's a two-byte character
-			line[i++] = (data >> 6) | 0xC0;
+			line[i++] = ((data >> 6) & 0x1F) | 0xC0;
 			line[i++] = (data & 0x3F) | 0x80;
-		} else if(data < 0xFFFF && data >= 0xD800 && data <= 0xDFFF) {
-			line[i++] = (data >> 12) | 0xE0;
-			line[i++] = ((data >> 6) & 0x3F) | 0x80;
-			line[i++] = (data & 0x3F) | 0x80;
-		} else if(data >= 0x10000 && data < 0x10FFFF) {
-			line[i++] = (data >> 18) | 0xF0;
-			line[i++] = ((data >> 12) & 0x3F) | 0x80;
+		} else if(data <= 0xFFFF) {
+			if(0xD800 <= data <= 0xDFFF) {
+				high_surrogate = data;
+				continue;
+			}
+			line[i++] = ((data >> 12) & 0x0F) | 0xE0;
 			line[i++] = ((data >> 6) & 0x3F) | 0x80;
 			line[i++] = (data & 0x3F) | 0x80;
 		}
 	}
 	
+	CloseHandle(file);
 	return lang;
 }
 
