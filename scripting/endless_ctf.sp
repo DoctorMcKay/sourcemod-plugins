@@ -52,43 +52,8 @@ public void OnPluginStart() {
 	HookEvent("teamplay_flag_event", Event_FlagEvent);
 	HookEvent("teamplay_round_start", Event_RoundStart);
 	HookEvent("player_death", Event_PlayerDeath);
-	HookEvent("teamplay_broadcast_audio", Event_Audio);
 	
 	AddNormalSoundHook(NormalSoundHook);
-}
-
-public Action NormalSoundHook(int clients[64], int& numClients, char sample[PLATFORM_MAX_PATH], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags) {
-	// We don't care about sounds at all if we're not using win sounds
-	if (!g_cvarWinSounds.BoolValue) {
-		return Plugin_Continue;
-	}
-	
-	int capturingTeam = -1;
-	if (StrContains(sample, "vo/intel_teamcaptured") == 0) {
-		capturingTeam = GetClientTeam(clients[0]);
-	} else if (StrContains(sample, "vo/intel_enemycaptured") == 0) {
-		capturingTeam = 5 - GetClientTeam(clients[0]);
-	}
-	
-	if (capturingTeam == -1) {
-		// This isn't a relevant sound
-		return Plugin_Continue;
-	}
-	
-	// Does the next capture for this team win it?
-	int captureCount = GetEntProp(g_TeamResourceEntities[capturingTeam], Prop_Send, PROP_FLAG_CAPS);
-	if (captureCount + 1 >= g_cvarFlagCapsPerRound.IntValue) {
-		// This is going to be the winning capture. Suppress the default announcer sounds since we're about to have win/lose sounds.
-		return Plugin_Stop;
-	}
-	
-	return Plugin_Continue;
-}
-
-public Action Event_Audio(Event event, const char[] name, bool dontBroadcast) {
-	char sound[64];
-	event.GetString("sound", sound, sizeof(sound));
-	PrintToServer("Broadcast: %s", sound);
 }
 
 public void Hook_FlagCapsChanged(ConVar cvar, const char[] oldValue, const char[] newValue) {
@@ -157,8 +122,6 @@ public void OnClientPutInServer(int client) {
 public Action Event_FlagEvent(Event event, const char[] name, bool dontBroadcast) {
 	int client = event.GetInt("player");
 	int eventType = event.GetInt("eventtype");
-	
-	PrintToServer("flag event");
 	
 	if (eventType != view_as<int>(TF_FLAGEVENT_CAPTURED)) {
 		return;
@@ -344,4 +307,32 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 	if (killstreak > g_RoundPlayerKillstreaks[client]) {
 		g_RoundPlayerKillstreaks[client] = killstreak;
 	}
+}
+
+public Action NormalSoundHook(int clients[64], int& numClients, char sample[PLATFORM_MAX_PATH], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags) {
+	// We don't care about sounds at all if we're not using win sounds
+	if (!g_cvarWinSounds.BoolValue) {
+		return Plugin_Continue;
+	}
+	
+	int capturingTeam = -1;
+	if (StrContains(sample, "vo/intel_teamcaptured") == 0) {
+		capturingTeam = GetClientTeam(clients[0]);
+	} else if (StrContains(sample, "vo/intel_enemycaptured") == 0) {
+		capturingTeam = 5 - GetClientTeam(clients[0]);
+	}
+	
+	if (capturingTeam == -1) {
+		// This isn't a relevant sound
+		return Plugin_Continue;
+	}
+	
+	// Does the next capture for this team win it?
+	int captureCount = GetEntProp(g_TeamResourceEntities[capturingTeam], Prop_Send, PROP_FLAG_CAPS);
+	if (captureCount + 1 >= g_cvarFlagCapsPerRound.IntValue) {
+		// This is going to be the winning capture. Suppress the default announcer sounds since we're about to have win/lose sounds.
+		return Plugin_Stop;
+	}
+	
+	return Plugin_Continue;
 }
