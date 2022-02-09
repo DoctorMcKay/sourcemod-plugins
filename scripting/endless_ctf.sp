@@ -3,7 +3,7 @@
 #include <tf2>
 #include <tf2_stocks>
 
-#define PLUGIN_VERSION   "1.0.0"
+#define PLUGIN_VERSION   "1.0.1"
 #define PROP_FLAG_CAPS   "m_nFlagCaptures"
 #define PROP_SCORE       "m_iTotalScore"
 
@@ -63,9 +63,15 @@ public void Hook_FlagCapsChanged(ConVar cvar, const char[] oldValue, const char[
 }
 
 public void OnMapStart() {
-	char mapName[5]; // 5 bytes is just enough to hold "ctf_\0"
+	char mapName[128];
 	GetCurrentMap(mapName, sizeof(mapName));
-	if (!StrEqual(mapName, "ctf_")) {
+	
+	if (StrContains(mapName, "workshop/", false) == 0) {
+		// It's a workshop map
+		GetMapDisplayName(mapName, mapName, sizeof(mapName));
+	}
+	
+	if (StrContains(mapName, "ctf_") != 0) {
 		char pluginName[128];
 		GetPluginFilename(INVALID_HANDLE, pluginName, sizeof(pluginName));
 		PrintToServer("[%s] Current map is not ctf_*. Unloading self.", pluginName);
