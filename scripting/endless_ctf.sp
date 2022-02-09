@@ -3,7 +3,7 @@
 #include <tf2>
 #include <tf2_stocks>
 
-#define PLUGIN_VERSION   "1.0.3"
+#define PLUGIN_VERSION   "1.1.0"
 #define PROP_FLAG_CAPS   "m_nFlagCaptures"
 #define PROP_SCORE       "m_iTotalScore"
 
@@ -26,6 +26,7 @@ ConVar g_cvarFlagCapsPerRound;
 ConVar g_cvarWinPanelTime;
 ConVar g_cvarWinCritsTime;
 ConVar g_cvarWinSounds;
+ConVar g_cvarLosingTeamKillstreaks;
 ConVar tf_flag_caps_per_round;
 
 int g_TeamResourceEntities[4] = {-1, ...};
@@ -40,6 +41,7 @@ public void OnPluginStart() {
 	g_cvarWinPanelTime = CreateConVar("endless_ctf_win_panel_time", "10", "How long (in seconds) to show the win panel when a team wins", 0, true, 3.0);
 	g_cvarWinCritsTime = CreateConVar("endless_ctf_win_crits_time", "10", "How long (in seconds) to give all players on the winning team crits (0 to disable)", 0, true, 0.0);
 	g_cvarWinSounds = CreateConVar("endless_ctf_win_sounds", "1", "Enable or disable \"victory\" or \"you failed\" sounds on round win", 0, true, 0.0, true, 1.0);
+	g_cvarLosingTeamKillstreaks = CreateConVar("endless_ctf_loser_killstreaks", "1", "Allow the \"highest killstreak\" player on the win panel to be on the losing team", 0, true, 0.0, true, 1.0);
 	tf_flag_caps_per_round = FindConVar("tf_flag_caps_per_round");
 	
 	tf_flag_caps_per_round.IntValue = 0;
@@ -231,7 +233,7 @@ void CheckWinCondition() {
 			// Highest killstreak
 			int highestKillstreakPlayer = 0;
 			for (int i = 1; i <= MaxClients; i++) {
-				if (!IsClientInGame(i)) {
+				if (!IsClientInGame(i) || (!g_cvarLosingTeamKillstreaks.BoolValue && GetClientTeam(i) != team)) {
 					continue;
 				}
 				

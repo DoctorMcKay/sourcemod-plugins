@@ -4,10 +4,11 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.0.3"
+			"Latest"	"1.1.0"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
+		"Notes" " - Added endless_ctf_loser_killstreaks cvar which controls whether the highest killstreak shown on the win panel can be on the losing team"
 		"Notes" " - Fixed plugin refusing to load on workshop maps"
 		"Notes" " - Fixed an error when sounds are broadcast"
 	}
