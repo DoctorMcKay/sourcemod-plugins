@@ -3,7 +3,7 @@
 #include <tf2>
 #include <tf2_stocks>
 
-#define PLUGIN_VERSION   "1.0.1"
+#define PLUGIN_VERSION   "1.0.2"
 #define PROP_FLAG_CAPS   "m_nFlagCaptures"
 #define PROP_SCORE       "m_iTotalScore"
 
@@ -317,7 +317,7 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 
 public Action NormalSoundHook(int clients[64], int& numClients, char sample[PLATFORM_MAX_PATH], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags) {
 	// We don't care about sounds at all if we're not using win sounds
-	if (!g_cvarWinSounds.BoolValue) {
+	if (!g_cvarWinSounds.BoolValue || clients[0] == 0) {
 		return Plugin_Continue;
 	}
 	
