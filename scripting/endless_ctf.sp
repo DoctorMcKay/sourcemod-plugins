@@ -3,7 +3,7 @@
 #include <tf2>
 #include <tf2_stocks>
 
-#define PLUGIN_VERSION   "1.1.0"
+#define PLUGIN_VERSION   "1.2.0"
 #define PROP_FLAG_CAPS   "m_nFlagCaptures"
 #define PROP_SCORE       "m_iTotalScore"
 
@@ -27,6 +27,7 @@ ConVar g_cvarWinPanelTime;
 ConVar g_cvarWinCritsTime;
 ConVar g_cvarWinSounds;
 ConVar g_cvarLosingTeamKillstreaks;
+ConVar g_cvarResetFlags;
 ConVar tf_flag_caps_per_round;
 
 int g_TeamResourceEntities[4] = {-1, ...};
@@ -35,6 +36,7 @@ int g_TeamResourceEntities[4] = {-1, ...};
 ArrayList g_RoundCappers;
 int g_RoundPlayerStartScores[MAXPLAYERS + 1];
 int g_RoundPlayerKillstreaks[MAXPLAYERS + 1];
+int g_RoundEndTime = 0;
 
 public void OnPluginStart() {
 	g_cvarFlagCapsPerRound = CreateConVar("sm_flag_caps_per_round", "3", "How many flag captures should be considered a round", 0, true, 0.0, true, 127.0);
@@ -42,6 +44,7 @@ public void OnPluginStart() {
 	g_cvarWinCritsTime = CreateConVar("endless_ctf_win_crits_time", "10", "How long (in seconds) to give all players on the winning team crits (0 to disable)", 0, true, 0.0);
 	g_cvarWinSounds = CreateConVar("endless_ctf_win_sounds", "1", "Enable or disable \"victory\" or \"you failed\" sounds on round win", 0, true, 0.0, true, 1.0);
 	g_cvarLosingTeamKillstreaks = CreateConVar("endless_ctf_loser_killstreaks", "1", "Allow the \"highest killstreak\" player on the win panel to be on the losing team", 0, true, 0.0, true, 1.0);
+	g_cvarResetFlags = CreateConVar("endless_ctf_reset_flags", "1", "Reset carried flags when a round is won", 0, true, 0.0, true, 1.0);
 	tf_flag_caps_per_round = FindConVar("tf_flag_caps_per_round");
 	
 	tf_flag_caps_per_round.IntValue = 0;
@@ -51,7 +54,7 @@ public void OnPluginStart() {
 	
 	g_RoundCappers = CreateArray();
 	
-	HookEvent("teamplay_flag_event", Event_FlagEvent);
+	HookEvent("teamplay_flag_event", Event_FlagEvent, EventHookMode_Pre);
 	HookEvent("teamplay_round_start", Event_RoundStart);
 	HookEvent("player_death", Event_PlayerDeath);
 	
@@ -85,7 +88,7 @@ public void OnMapStart() {
 	
 	// Find team resource entities
 	int ent = -1;
-	while ((ent = FindEntityByClassname(ent, "tf_team")) != -1) {
+	while ((ent = FindEntityByClassname(ent, "tf_team")) != INVALID_ENT_REFERENCE) {
 		g_TeamResourceEntities[GetEntProp(ent, Prop_Send, "m_iTeamNum")] = ent;
 	}
 	
@@ -131,8 +134,13 @@ public Action Event_FlagEvent(Event event, const char[] name, bool dontBroadcast
 	int client = event.GetInt("player");
 	int eventType = event.GetInt("eventtype");
 	
+	if (eventType == view_as<int>(TF_FLAGEVENT_RETURNED) && GetTime() - g_RoundEndTime < 2 && g_cvarResetFlags.BoolValue) {
+		event.BroadcastDisabled = true;
+		return Plugin_Changed;
+	}
+	
 	if (eventType != view_as<int>(TF_FLAGEVENT_CAPTURED)) {
-		return;
+		return Plugin_Continue;
 	}
 	
 	// When running in tf_flag_caps_per_round=0, the server does not actually increment the team resource entity's flag captures prop.
@@ -151,6 +159,7 @@ public Action Event_FlagEvent(Event event, const char[] name, bool dontBroadcast
 	}
 	
 	CheckWinCondition();
+	return Plugin_Continue;
 }
 
 void CheckWinCondition() {
@@ -248,9 +257,19 @@ void CheckWinCondition() {
 			}
 			
 			winEvent.SetInt("game_over", 0);
+			g_RoundEndTime = GetTime();
 			winEvent.Fire();
 			
 			CreateTimer(g_cvarWinPanelTime.FloatValue, Timer_StartRound);
+			
+			// Reset carried flags
+			if (g_cvarResetFlags.BoolValue) {
+				int ent = -1;
+				while ((ent = FindEntityByClassname(ent, "item_teamflag")) != INVALID_ENT_REFERENCE) {
+					// Reset the flag regardless of whether it's being carried because it might be dropped
+					AcceptEntityInput(ent, "ForceReset");
+				}
+			}
 			
 			float winCritsTime = g_cvarWinCritsTime.FloatValue;
 			if (winCritsTime > 0.0) {
@@ -318,7 +337,20 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 }
 
 public Action NormalSoundHook(int clients[64], int& numClients, char sample[PLATFORM_MAX_PATH], int &entity, int &channel, float &volume, int &level, int &pitch, int &flags) {
-	// We don't care about sounds at all if we're not using win sounds
+	// Suppress "our intelligence has returned to our base" at the end of a round
+	if (
+		GetTime() - g_RoundEndTime < 2 &&
+		(
+			StrContains(sample, "vo/intel_teamdropped") == 0 ||
+			StrContains(sample, "vo/intel_enemydropped") == 0 ||
+			StrContains(sample, "vo/intel_teamreturned") == 0 ||
+			StrContains(sample, "vo/intel_enemyreturned") == 0
+		)
+	) {
+		return Plugin_Stop;
+	}
+	
+	// We don't care about other sounds at all if we're not using win sounds
 	if (!g_cvarWinSounds.BoolValue || clients[0] < 1 || clients[0] > MaxClients || !IsClientInGame(clients[0])) {
 		return Plugin_Continue;
 	}
