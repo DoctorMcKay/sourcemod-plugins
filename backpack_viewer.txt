@@ -4,12 +4,12 @@
 	{
 		"Version"
 		{
-			"Latest"	"1.1.2"
-			"Previous"	"1.1.1"
+			"Latest"	"1.1.3"
+			"Previous"	"1.1.2"
 		}
 		
 		"Notes"	"Find a list of my plugins (and links to their threads) at www.doctormckay.com. Changes:"
-		"Notes" " - Fixed issue where URL could be too long"
+		"Notes" " - Changed default viewer to backpacktf"
 	}
 	
 	"Files"

@@ -5,7 +5,7 @@
 #include <clientprefs>
 #include <advanced_motd>
 
-#define PLUGIN_VERSION		"1.1.2"
+#define PLUGIN_VERSION		"1.1.3"
 
 public Plugin:myinfo = {
 	name		= "[TF2] Custom Backpack Viewer",
@@ -29,7 +29,7 @@ new String:g_ServerIP[32];
 
 public OnPluginStart() {
 	g_cookieBackpackPreference = RegClientCookie("backpack_viewer_preference", "Backpack viewer preference", CookieAccess_Protected);
-	g_cvarDefaultPreference = CreateConVar("backpack_viewer_default", "traderep", "Default backpack viewer to use");
+	g_cvarDefaultPreference = CreateConVar("backpack_viewer_default", "backpacktf", "Default backpack viewer to use");
 	g_cvarAllowTracking = CreateConVar("backpack_viewer_allow_tracking", "1", "Allow the server IP to be sent to the backpack viewer (if configured as such) for analytics purposes", _, true, 0.0, true, 1.0);
 	
 	HookConVarChange(g_cvarAllowTracking, OnTrackingChanged);
@@ -186,6 +186,12 @@ ShowBackpack(client, target) {
 	KvRewind(g_BackpackViewers);
 	if(strlen(viewer) == 0 || !KvJumpToKey(g_BackpackViewers, viewer)) {
 		GetConVarString(g_cvarDefaultPreference, viewer, sizeof(viewer));
+		if(StrEqual(viewer, "traderep")) {
+			// traderep is gone, so overwrite cvar to backpacktf if someone put the default value in their server.cfg
+			strcopy(viewer, sizeof(viewer), "backpacktf");
+			SetConVarString(g_cvarDefaultPreference, "backpacktf");
+		}
+		
 		if(!KvJumpToKey(g_BackpackViewers, viewer)) {
 			PrintToChat(client, "\x04[SM] \x01The server administrator has not configured the backpack viewer properly so it cannot display \x03%N\x01's backpack.", target);
 			return;
@@ -211,10 +217,10 @@ ShowBackpack(client, target) {
 
 public OnMOTDFailure(client, MOTDFailureReason:reason) {
 	switch(reason) {
-		case MOTDFailure_Disabled:		PrintToChat(client, "\x04[SM] \x01You must enable HTML MOTDs in Advanced Options to view backpacks.");
-		case MOTDFailure_Matchmaking:	PrintToChat(client, "\x04[SM] \x01You cannot view backpacks after joining the server via matchmaking.");
-		case MOTDFailure_QueryFailed:	PrintToChat(client, "\x04[SM] \x01Unable to verify that you can view backpacks. Please try again later.");
-		default:						PrintToChat(client, "\x04[SM] \x01An unknown error occurred when trying to display the backpack.");
+		case MOTDFailure_Disabled:     PrintToChat(client, "\x04[SM] \x01You must enable HTML MOTDs in Advanced Options to view backpacks.");
+		case MOTDFailure_Matchmaking:  PrintToChat(client, "\x04[SM] \x01You cannot view backpacks after joining the server via matchmaking.");
+		case MOTDFailure_QueryFailed:  PrintToChat(client, "\x04[SM] \x01Unable to verify that you can view backpacks. Please try again later.");
+		default:                     PrintToChat(client, "\x04[SM] \x01An unknown error occurred when trying to display the backpack.");
 	}
 }
 

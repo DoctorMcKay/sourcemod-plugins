@@ -34,11 +34,4 @@
 		"url"			"http://www.tf2items.com/profiles/{ID}"
 		"idtype"		"3"
 	}
-	
-	"traderep"
-	{
-		"name"			"TradeRep"
-		"url"			"http://www.traderep.org/load?title=backpack&url=%2Fbackpack%2F{ID}%3Fpk_campaign%3DBackpack-Viewer-Plugin%26pk_keyword%3D{SERVER_IP}"
-		"idtype"		"3"
-	}
 }
